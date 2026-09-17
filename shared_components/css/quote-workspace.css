@@ -568,7 +568,9 @@
 :where([data-ui="unified"][data-quote-workspace]) .additional-charges-panel.qb-m-0-0-14 { margin:0 0 14px; }
 :where([data-ui="unified"][data-quote-workspace]) .estimate-ship-row.qb-m-8-0-0 { margin:8px 0 0; }
 :where([data-ui="unified"][data-quote-workspace]) :is(.customer-panel-header,.customer-lookup-hero).qb-mb8 { margin-bottom:8px; }
-:where([data-ui="unified"][data-quote-workspace]) .qb-ai-center-gap-6 { align-items:center; gap:6px; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-ai-center-gap-6 { display:flex; align-items:center; gap:6px; }
+:where([data-ui="unified"][data-quote-workspace]) .art-charge-wrapper { opacity:.4; }
+:where([data-ui="unified"][data-quote-workspace]) i[hidden] { --fa-display:none; }
 :where([data-ui="unified"][data-quote-workspace]) .pricing-row:is(.qb-bb-none-p-2-0,.qb-fs-12-c-gray-500-bb-none-p-2-0) { padding:2px 0; border-bottom:0; }
 :where([data-ui="unified"][data-quote-workspace]) .pricing-row.qb-fs-12-c-gray-500-bb-none-p-2-0 { color:var(--ui-muted); font-size:12px; }
 :where([data-ui="unified"][data-quote-workspace]) hr.qb-b-none-bt-1-dashed-gray-200-m-12-0 { margin:12px 0; border:0; border-top:1px dashed var(--ui-line-strong); }

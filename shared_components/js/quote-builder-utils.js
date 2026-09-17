@@ -2799,13 +2799,30 @@ function qbInstallCallDelegator() {
         if (img.dataset.onerrorParentClass && img.parentElement) img.parentElement.classList.add(img.dataset.onerrorParentClass);
     }, true);
 }
+/**
+ * Builder markup that starts hidden carries `hidden data-qb-hidden` instead of style="display: none",
+ * which only renders while the CSP allows inline style attributes. The builders show and hide those
+ * elements through el.style.display (and read it back), so this hands the state to CSSOM before
+ * their code runs: display none on the style object, then the attribute and marker come off.
+ */
+function qbAdoptHiddenMarkup() {
+    document.querySelectorAll('[data-qb-hidden]').forEach((el) => {
+        el.style.display = 'none';
+        el.hidden = false;
+        el.removeAttribute('data-qb-hidden');
+    });
+}
 if (typeof window !== 'undefined') {
     window.qbFocusMain = qbFocusMain;
     window.qbOpenInputUrl = qbOpenInputUrl;
     window.qbReload = qbReload;
     window.qbInstallCallDelegator = qbInstallCallDelegator;
     if (typeof document !== 'undefined') {
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });
-        else qbInstallCallDelegator();
+        // Now for the markup parsed so far, and again at DOMContentLoaded for anything after this script.
+        qbAdoptHiddenMarkup();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', qbAdoptHiddenMarkup, { once: true });
+            document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });
+        } else qbInstallCallDelegator();
     }
 }

@@ -65,7 +65,7 @@
     </div>
 
     <!-- Error Banner (hidden by default) -->
-    <div id="error-banner" class="error-banner" style="display: none;"></div>
+    <div id="error-banner" class="error-banner" hidden data-qb-hidden></div>
 
     <!-- Toast Container for notifications -->
     <div id="toast-container" class="toast-container"></div>
@@ -200,7 +200,7 @@
                 </div>
 
                 <!-- Minimum Order Warning Banner -->
-                <div id="min-order-warning" class="workspace-min-order" style="display: none;">
+                <div id="min-order-warning" class="workspace-min-order" hidden data-qb-hidden>
                     <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <strong>Minimum Order: 10 pieces required.</strong>
                     Orders of 10-23 pieces include a $<span id="ltm-fee-banner-amount">50</span> small-batch fee — it disappears at 24+.
@@ -246,7 +246,7 @@
                         </tbody>
                         <!-- Fee Summary Section (auto-populated by JS) -->
                         <tbody id="fees-tbody" class="fee-summary-section">
-                            <tr id="ltm-fee-row" class="fee-row" style="display: none;">
+                            <tr id="ltm-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-info-circle" aria-hidden="true"></i> <span title="Also called the Less Than Minimum (LTM) fee">Small-batch fee</span> <small class="text-muted">(per piece)</small>
                                 </td>
@@ -255,7 +255,7 @@
                                 <td class="cell-total" id="ltm-row-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="art-charge-row" class="fee-row" style="display: none;">
+                            <tr id="art-charge-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-palette" aria-hidden="true"></i> Art Charge (Logo Mockup & Review)
                                 </td>
@@ -264,7 +264,7 @@
                                 <td class="cell-total" id="art-charge-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="graphic-design-row" class="fee-row" style="display: none;">
+                            <tr id="graphic-design-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-pencil-ruler" aria-hidden="true"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $<span id="design-rate-label">75</span>)
                                 </td>
@@ -273,7 +273,7 @@
                                 <td class="cell-total" id="graphic-design-total-row">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="rush-fee-row" class="fee-row" style="display: none;">
+                            <tr id="rush-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-bolt" aria-hidden="true"></i> Rush Fee
                                 </td>
@@ -287,7 +287,7 @@
                     </table>
 
                     <!-- Empty State -->
-                    <div class="empty-table-message" id="empty-table-message" style="display: none;">
+                    <div class="empty-table-message" id="empty-table-message" hidden data-qb-hidden>
                         <i class="fas fa-box-open" aria-hidden="true"></i>
                         <p>No products added yet</p>
                         <span>Type a style number or search above</span>
@@ -326,14 +326,14 @@
                     </div>
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
                 </div>
-                <div id="fees-charges-content" class="charges-content hidden" style="display:none">
-                    <div class="workspace-charge-fields" style="display: flex">
+                <div id="fees-charges-content" class="charges-content hidden" hidden data-qb-hidden>
+                    <div class="workspace-charge-fields">
                         <div class="charge-field qb-m0">
                             <label class="d-flex align-items-center gap-2 qb-cur-pointer">
                                 <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge,updateAdditionalCharges">
                                 <span>Logo Mockup &amp; Review</span>
                             </label>
-                            <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
+                            <div class="input-with-prefix art-charge-wrapper" id="art-charge-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="art-charge" aria-label="Art charge in dollars" class="quote-input"
                                        min="0" step="0.01" value="0" disabled
@@ -540,7 +540,7 @@
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel qb-p-12-16-bb-1-solid-gray-200-m-16-16-16-16">
                 <div class="customer-panel-header qb-mb8" data-toggle-hidden="dtf-customer-fields" tabindex="0" role="button" aria-label="Toggle customer details" data-keyclick="1">
-                    <h4 class="qb-ai-center-gap-6" style="display: flex"><i class="fas fa-user qb-c-brand-700" aria-hidden="true"></i> Customer</h4>
+                    <h4 class="qb-ai-center-gap-6"><i class="fas fa-user qb-c-brand-700" aria-hidden="true"></i> Customer</h4>
                     <i class="fas fa-chevron-down qb-fs-12-c-print-line" aria-hidden="true"></i>
                 </div>
                 <div id="dtf-customer-fields">
@@ -554,14 +554,14 @@
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
-                        <div class="workspace-customer-search-row" style="display: flex">
+                        <div class="workspace-customer-search-row">
                             <span id="customer-tax-chip" hidden></span>
                             <span id="customer-tier-badge" hidden></span>
                         </div>
                     </div>
                     <details class="customer-manual" id="dtf-customer-manual">
                     <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                    <div class="workspace-customer-grid" style="display: grid">
+                    <div class="workspace-customer-grid">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
                             <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" data-input="?renderOrderRecap,?updateDtfPushButtonState">
@@ -631,13 +631,13 @@
                     <span class="label">Pricing Tier:</span>
                     <span class="tier-badge" id="pricing-tier" title="Your price break — the more pieces on the order, the cheaper each piece gets">10-23</span>
                 </div>
-                <div class="quantity-nudge" id="quantity-nudge" style="display: none;"></div>
+                <div class="quantity-nudge" id="quantity-nudge" hidden data-qb-hidden></div>
 
                 <div class="pricing-row">
                     <span class="label">Products Subtotal:</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
-                <div class="pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0" id="per-unit-price-row" style="display: none">
+                <div class="pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0" id="per-unit-price-row" hidden data-qb-hidden>
                     <span class="label qb-fst-italic">Per Piece:</span>
                     <span class="value qb-fst-italic-fw-500" id="per-unit-price">-</span>
                 </div>
@@ -651,7 +651,7 @@
 
 
             <!-- LTM Control Panel (shown only when LTM applies) -->
-            <div class="qb-mb-12" id="dtf-ltm-wrapper" style="display: none">
+            <div class="qb-mb-12" id="dtf-ltm-wrapper" hidden data-qb-hidden>
                 <div id="dtf-ltm-panel"></div>
             </div>
 
@@ -780,7 +780,7 @@
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2"></script>
 
     <!-- Save Success Modal (referenced by builders/dtf/page-ui.js showSaveModal) -->
-    <div id="save-success-modal" class="save-modal-overlay" style="display: none;">
+    <div id="save-success-modal" class="save-modal-overlay" hidden data-qb-hidden>
         <div class="save-modal-content">
             <div class="save-modal-header">
                 <i class="fas fa-check-circle" aria-hidden="true"></i>

@@ -113,7 +113,7 @@
                 <!-- Left Column: Logo Cards -->
                 <div class="logo-cards-column">
                     <!-- Primary Logo Card (Garments) - Hidden until garments added -->
-                    <div class="logo-card" id="garment-logo-card" style="display: none;">
+                    <div class="logo-card" id="garment-logo-card" hidden data-qb-hidden>
                         <div class="logo-card-header" data-call="toggleLogoCard" data-args="[&quot;garment-logo-card&quot;]" tabindex="0" role="button" data-keyclick="1">
                             <div class="logo-card-icon garment">
                                 <i class="fas fa-tshirt" aria-hidden="true"></i>
@@ -135,12 +135,12 @@
                                     <button type="button" class="design-btn design-btn-search" data-call="openDesignSearchModal" data-args="[&quot;garment&quot;]" title="Search by company or design #" aria-label="Search designs">
                                         <i class="fas fa-database" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" data-call="clearDesignNumber" data-args="[&quot;garment&quot;]" title="Clear design" aria-label="Clear design" style="display:none;">
+                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" data-call="clearDesignNumber" data-args="[&quot;garment&quot;]" title="Clear design" aria-label="Clear design" hidden data-qb-hidden>
                                         <i class="fas fa-times" aria-hidden="true"></i>
                                     </button>
                                 </div>
-                                <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
-                                <div class="design-thumbnail-preview" id="garment-design-thumbnail" style="display:none;" data-call="openThumbnailFullSize" data-args="[&quot;$this&quot;]">
+                                <div class="design-info-badge" id="garment-design-info" hidden data-qb-hidden></div>
+                                <div class="design-thumbnail-preview" id="garment-design-thumbnail" hidden data-qb-hidden data-call="openThumbnailFullSize" data-args="[&quot;$this&quot;]">
                                     <img class="design-thumb-img" alt="Design preview" data-onerror="hide-parent">
                                 </div>
                             </div>
@@ -174,7 +174,7 @@
                                         <option value="25000">Full Back (25K+)</option>
                                     </select>
                                 </div>
-                                <div class="logo-form-field" id="fb-stitch-count-field" style="display: none;">
+                                <div class="logo-form-field" id="fb-stitch-count-field" hidden data-qb-hidden>
                                     <label>Stitch Count</label>
                                     <input type="number" id="fb-stitch-count" aria-label="Full-back stitch count" value="25000"
                                            min="25000" max="100000" step="1000"
@@ -195,12 +195,12 @@
                                 <!-- Vertical divider -->
                                 <div class="logo-form-divider"></div>
                                 <!-- AL Toggle (inline) — RETIRED 2026-06-03: Additional Logo now lives on the Services bar (Artwork ▾ → Additional Logo), live-priced from the API. Hidden so new quotes add AL there; the globalAL engine path stays intact for backward-compat loading of older saved quotes. -->
-                                <div class="al-inline-toggle" id="garment-al-inline" style="display:none;">
+                                <div class="al-inline-toggle" id="garment-al-inline" hidden data-qb-hidden>
                                     <div class="toggle-switch" id="garment-al-switch" data-call="toggleGlobalALNew" data-args="[&quot;garment&quot;]">
                                         <div class="toggle-switch-handle"></div>
                                     </div>
                                     <span class="al-inline-label" id="garment-al-label">AL</span>
-                                    <input type="checkbox" id="garment-al-toggle" aria-label="Additional logo toggle" style="display: none;">
+                                    <input type="checkbox" id="garment-al-toggle" aria-label="Additional logo toggle" hidden data-qb-hidden>
                                 </div>
                                 <!-- AL Config Fields (hidden until toggle is on) -->
                                 <div class="al-inline-fields" id="garment-al-config-new">
@@ -216,7 +216,7 @@
                     </div>
 
                     <!-- Cap Logo Card (hidden by default) -->
-                    <div class="logo-card" id="cap-logo-card" style="display: none;">
+                    <div class="logo-card" id="cap-logo-card" hidden data-qb-hidden>
                         <div class="logo-card-header" data-call="toggleLogoCard" data-args="[&quot;cap-logo-card&quot;]" tabindex="0" role="button" data-keyclick="1">
                             <div class="logo-card-icon cap">
                                 <i class="fas fa-hat-cowboy" aria-hidden="true"></i>
@@ -238,12 +238,12 @@
                                     <button type="button" class="design-btn design-btn-search" data-call="openDesignSearchModal" data-args="[&quot;cap&quot;]" title="Search by company or design #" aria-label="Search designs">
                                         <i class="fas fa-database" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" data-call="clearDesignNumber" data-args="[&quot;cap&quot;]" title="Clear design" aria-label="Clear design" style="display:none;">
+                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" data-call="clearDesignNumber" data-args="[&quot;cap&quot;]" title="Clear design" aria-label="Clear design" hidden data-qb-hidden>
                                         <i class="fas fa-times" aria-hidden="true"></i>
                                     </button>
                                 </div>
-                                <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
-                                <div class="design-thumbnail-preview" id="cap-design-thumbnail" style="display:none;" data-call="openThumbnailFullSize" data-args="[&quot;$this&quot;]">
+                                <div class="design-info-badge" id="cap-design-info" hidden data-qb-hidden></div>
+                                <div class="design-thumbnail-preview" id="cap-design-thumbnail" hidden data-qb-hidden data-call="openThumbnailFullSize" data-args="[&quot;$this&quot;]">
                                     <img class="design-thumb-img" alt="Design preview" data-onerror="hide-parent">
                                 </div>
                             </div>
@@ -286,12 +286,12 @@
                                     <!-- Vertical divider -->
                                     <div class="logo-form-divider"></div>
                                     <!-- Cap AL Toggle (inline) — RETIRED 2026-06-03: now on the Services bar (Artwork ▾ → Additional Logo → Cap), live-priced from the API. Hidden; globalAL engine path kept for backward-compat loading. -->
-                                    <div class="al-inline-toggle" id="cap-al-inline" style="display:none;">
+                                    <div class="al-inline-toggle" id="cap-al-inline" hidden data-qb-hidden>
                                         <div class="toggle-switch" id="cap-al-switch" data-call="toggleGlobalALNew" data-args="[&quot;cap&quot;]">
                                             <div class="toggle-switch-handle"></div>
                                         </div>
                                         <span class="al-inline-label" id="cap-al-label">AL</span>
-                                        <input type="checkbox" id="cap-al-toggle" aria-label="Cap additional logo toggle" style="display: none;">
+                                        <input type="checkbox" id="cap-al-toggle" aria-label="Cap additional logo toggle" hidden data-qb-hidden>
                                     </div>
                                     <!-- Cap AL Config Fields (hidden until toggle is on) -->
                                     <div class="al-inline-fields" id="cap-al-config-new">
@@ -305,11 +305,11 @@
                                 </div>
                             </div>
                             <!-- Patch Options (hidden by default, shown for laser-patch) -->
-                            <div id="cap-patch-options" style="display: none;">
+                            <div id="cap-patch-options" hidden data-qb-hidden>
                                 <div class="logo-form-row">
                                     <div class="logo-form-field">
                                         <label>Position</label>
-                                        <select class="qb-cur-not-allowed" disabled aria-label="Cap logo position" style="opacity: 0.6">
+                                        <select class="qb-cur-not-allowed" disabled aria-label="Cap logo position">
                                             <option value="CF" selected>Cap Front</option>
                                         </select>
                                     </div>
@@ -348,7 +348,7 @@
                 </div>
 
                 <!-- Minimum Order Warning Banner -->
-                <div id="min-order-warning" style="display: none;">
+                <div id="min-order-warning" hidden data-qb-hidden>
                     <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <strong>Small Order Notice</strong> —
                     <span class="min-order-warning-text">Orders of 7 or fewer pieces include a $50 small-batch fee, built into the per-piece price — it disappears at 8+.</span>
@@ -397,7 +397,7 @@
                         <!-- Fee Summary Section (auto-populated by JS) -->
                         <tbody id="fees-tbody" class="fee-summary-section">
                             <!-- Garment LTM Row -->
-                            <tr id="garment-ltm-table-row" class="fee-row" style="display: none;">
+                            <tr id="garment-ltm-table-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-tshirt" aria-hidden="true"></i> <span title="Also called the Less Than Minimum (LTM) fee — applies to garment orders of 1–7 pieces">Garment small-batch fee</span>
                                 </td>
@@ -407,7 +407,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Cap LTM Row -->
-                            <tr id="cap-ltm-table-row" class="fee-row" style="display: none;">
+                            <tr id="cap-ltm-table-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-hat-cowboy" aria-hidden="true"></i> <span title="Also called the Less Than Minimum (LTM) fee — applies to cap orders of 1–7 pieces">Cap small-batch fee</span>
                                 </td>
@@ -417,7 +417,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Setup/Digitizing Fee Row -->
-                            <tr id="setup-fee-table-row" class="fee-row" style="display: none;">
+                            <tr id="setup-fee-table-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-cog" aria-hidden="true"></i> Digitizing/Setup Fee
                                 </td>
@@ -427,7 +427,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Additional Stitches Fee Rows (AS-GARM / AS-CAP) -->
-                            <tr id="garment-stitch-fee-row" class="fee-row" style="display: none;">
+                            <tr id="garment-stitch-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-layer-group" aria-hidden="true"></i> AS-GARM : Extra Stitches (Garments)
                                 </td>
@@ -436,7 +436,7 @@
                                 <td class="cell-total" id="garment-stitch-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="cap-stitch-fee-row" class="fee-row" style="display: none;">
+                            <tr id="cap-stitch-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-layer-group" aria-hidden="true"></i> AS-CAP : Extra Stitches (Caps)
                                 </td>
@@ -446,7 +446,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Additional Logo Fee Rows (AL / AL-Cap per-piece charges) -->
-                            <tr id="garment-al-fee-row" class="fee-row" style="display: none;">
+                            <tr id="garment-al-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-layer-group" aria-hidden="true"></i> AL : Additional Logo (Garments)
                                 </td>
@@ -455,7 +455,7 @@
                                 <td class="cell-total" id="garment-al-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="cap-al-fee-row" class="fee-row" style="display: none;">
+                            <tr id="cap-al-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-layer-group" aria-hidden="true"></i> AL-Cap : Additional Logo (Caps)
                                 </td>
@@ -465,7 +465,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Cap Embellishment Upcharge Row (3D-EMB / Laser Patch) -->
-                            <tr id="cap-embellishment-fee-row" class="fee-row" style="display: none;">
+                            <tr id="cap-embellishment-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-cube" aria-hidden="true"></i> <span id="cap-embellishment-fee-label">3D Puff Upcharge</span>
                                 </td>
@@ -475,7 +475,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Additional Logo Digitizing Rows (setup fees) -->
-                            <tr id="garment-al-digitizing-row" class="fee-row" style="display: none;">
+                            <tr id="garment-al-digitizing-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-cog" aria-hidden="true"></i> AL Digitizing: <span id="garment-al-digitizing-position">--</span>
                                 </td>
@@ -485,7 +485,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Cap Additional Logo Digitizing Row - KEEP (setup fee) -->
-                            <tr id="cap-al-digitizing-row" class="fee-row" style="display: none;">
+                            <tr id="cap-al-digitizing-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-cog" aria-hidden="true"></i> Cap AL Digitizing: <span id="cap-al-digitizing-position">--</span>
                                 </td>
@@ -495,7 +495,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Art Charge Row -->
-                            <tr id="art-charge-row" class="fee-row" style="display: none;">
+                            <tr id="art-charge-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-palette" aria-hidden="true"></i> Logo Mockup & Review
                                 </td>
@@ -505,7 +505,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Graphic Design Row -->
-                            <tr id="graphic-design-row" class="fee-row" style="display: none;">
+                            <tr id="graphic-design-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-pencil-ruler" aria-hidden="true"></i> Graphic Design (<span id="design-hours-label">0</span> hrs)
                                 </td>
@@ -515,7 +515,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Rush Fee Row -->
-                            <tr id="rush-fee-row" class="fee-row" style="display: none;">
+                            <tr id="rush-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-bolt" aria-hidden="true"></i> Rush Fee
                                 </td>
@@ -525,7 +525,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Discount Row -->
-                            <tr id="discount-row" class="fee-row discount-row" style="display: none;">
+                            <tr id="discount-row" class="fee-row discount-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-tag" aria-hidden="true"></i> Discount <span id="discount-reason-label"></span>
                                 </td>
@@ -539,7 +539,7 @@
                 </div>
 
                 <!-- Add Row Buttons -->
-                <div class="qb-gap-8-ai-center-fwrap-wrap" style="display: flex">
+                <div class="qb-gap-8-ai-center-fwrap-wrap">
                     <button class="add-row-btn" data-call="addNewRow">
                         <i class="fas fa-plus" aria-hidden="true"></i> Add Product (or press Tab from last cell)
                     </button>
@@ -610,11 +610,11 @@
                         <div class="flow-step-head">
                             <span class="flow-step-num">2</span>
                             <i class="fas fa-file-invoice" aria-hidden="true"></i> Order Details
-                            <span class="qb-bg-qb-cyan-c-white-r-9-p-1-6-fs-10-ml-6" id="order-details-badge" style="display: none">!</span>
-                            <i id="order-details-chevron" class="fas fa-chevron-down" style="display:none;" aria-hidden="true"></i>
+                            <span class="qb-bg-qb-cyan-c-white-r-9-p-1-6-fs-10-ml-6" id="order-details-badge" hidden data-qb-hidden>!</span>
+                            <i id="order-details-chevron" class="fas fa-chevron-down" hidden data-qb-hidden aria-hidden="true"></i>
                         </div>
                         <div class="flow-step-body" id="order-details-content">
-                            <div class="workspace-field-grid workspace-field-grid-order" style="display: grid">
+                            <div class="workspace-field-grid workspace-field-grid-order">
                                 <div>
                                     <label for="po-number">PO #</label>
                                     <input type="text" id="po-number" placeholder="Purchase Order #" class="qb-field--p5">
@@ -673,19 +673,19 @@
                             <span class="it-amt" id="grand-total-with-tax">$0.00</span>
                         </div>
                         <!-- Hidden carrier of the full pre-tax subtotal (incl. shipping) for the save path -->
-                        <span id="pre-tax-subtotal" style="display:none;">$0.00</span>
+                        <span id="pre-tax-subtotal" hidden data-qb-hidden>$0.00</span>
                     </div>
                     <!-- Special Notes — relocated from the sidebar into a full-width row under the footer (Erik 2026-06-07) -->
                     <div class="footer-notes-row" id="footer-notes-row">
                         <div class="notes-section collapsed in-footer qb-mb-0" id="notes-section">
                             <div class="notes-header" data-call="toggleNotesSection" tabindex="0" role="button" data-keyclick="1">
-                                <label class="qb-fs-12-c-qb-gray-cur-pointer-ai-center-gap-6-m-0" style="display: flex">
+                                <label class="qb-fs-12-c-qb-gray-cur-pointer-ai-center-gap-6-m-0">
                                     <i class="fas fa-sticky-note qb-c-qb-orange" aria-hidden="true"></i> Special Notes
-                                    <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
+                                    <span id="notes-badge" class="notes-badge" hidden data-qb-hidden>0</span>
                                     <i class="fas fa-chevron-down notes-toggle-icon qb-ml-auto-fs-10-tr-transform-0-2s" aria-hidden="true"></i>
                                 </label>
                             </div>
-                            <div class="notes-body" style="display: none;">
+                            <div class="notes-body" hidden data-qb-hidden>
                                 <textarea class="qb-w-100-minh-80-p-8-10-b-1-solid-store-line-r-4-fs-12-ff-inheri-b45c" id="notes" aria-label="Quote notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)"></textarea>
                             </div>
                         </div>
@@ -723,14 +723,14 @@
                                  Hidden until then. Customer Warning (amber) + Tax Exempt
                                  chip (green) + Account Tier badge (indigo). -->
                             <div id="customer-warning-banner" hidden></div>
-                            <div class="qb-fwrap-wrap-gap-6-m-4-0" style="display: flex">
+                            <div class="qb-fwrap-wrap-gap-6-m-4-0">
                                 <span id="customer-tax-chip" hidden></span>
                                 <span id="customer-tier-badge" hidden></span>
                             </div>
                         </div>
                         <details class="customer-manual" id="emb-customer-manual">
                         <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                        <div class="workspace-field-grid workspace-field-grid-customer" style="display: grid">
+                        <div class="workspace-field-grid workspace-field-grid-customer">
                             <div class="customer-field workspace-span-all workspace-span-contact">
                                 <label for="customer-name" class="qb-label">Name *</label>
                                 <input type="text" id="customer-name" placeholder="Customer name" class="qb-field">
@@ -790,11 +790,11 @@
                     <span class="value" id="total-qty">0</span>
                 </div>
                 <!-- Quantity breakdown for mixed quotes -->
-                <div class="pricing-row sub-breakdown" id="garment-qty-row" style="display: none;">
+                <div class="pricing-row sub-breakdown" id="garment-qty-row" hidden data-qb-hidden>
                     <span class="label"><i class="fas fa-tshirt qb-fs11-mr4" aria-hidden="true"></i> Garments:</span>
                     <span class="value sub-value" id="garment-qty">0</span>
                 </div>
-                <div class="pricing-row sub-breakdown" id="cap-qty-row" style="display: none;">
+                <div class="pricing-row sub-breakdown" id="cap-qty-row" hidden data-qb-hidden>
                     <span class="label"><i class="fas fa-hat-cowboy qb-fs11-mr4" aria-hidden="true"></i> Caps:</span>
                     <span class="value sub-value" id="cap-qty">0</span>
                 </div>
@@ -804,31 +804,31 @@
                     <span class="tier-badge" id="pricing-tier" title="Your price break — the more pieces on the order, the cheaper each piece gets">1-7</span>
                 </div>
                 <!-- Tier breakdown for mixed quotes -->
-                <div class="pricing-row sub-breakdown" id="garment-tier-row" style="display: none;">
+                <div class="pricing-row sub-breakdown" id="garment-tier-row" hidden data-qb-hidden>
                     <span class="label"><i class="fas fa-tshirt qb-fs11-mr4" aria-hidden="true"></i> Garment Tier:</span>
                     <span class="tier-badge small" id="garment-tier">1-7</span>
                 </div>
-                <div class="pricing-row sub-breakdown" id="cap-tier-row" style="display: none;">
+                <div class="pricing-row sub-breakdown" id="cap-tier-row" hidden data-qb-hidden>
                     <span class="label"><i class="fas fa-hat-cowboy qb-fs11-mr4" aria-hidden="true"></i> Cap Tier:</span>
                     <span class="tier-badge small" id="cap-tier">1-7</span>
                 </div>
-                <div class="quantity-nudge" id="quantity-nudge" style="display: none;"></div>
+                <div class="quantity-nudge" id="quantity-nudge" hidden data-qb-hidden></div>
 
                 <div class="pricing-row">
                     <span class="label" id="products-label">Products (Base 8K):</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
-                <div class="pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0" id="per-unit-price-row" style="display: none">
+                <div class="pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0" id="per-unit-price-row" hidden data-qb-hidden>
                     <span class="label qb-fst-italic">Per Piece:</span>
                     <span class="value qb-fst-italic-fw-500" id="per-unit-price">-</span>
                 </div>
 
                 <!-- Mixed Quote Breakdown (caps + garments) -->
-                <div class="pricing-row sub-breakdown" id="garment-subtotal-row" style="display: none;">
+                <div class="pricing-row sub-breakdown" id="garment-subtotal-row" hidden data-qb-hidden>
                     <span class="label"><i class="fas fa-tshirt qb-fs11-mr4" aria-hidden="true"></i> Garments:</span>
                     <span class="value sub-value" id="garment-subtotal">$0.00</span>
                 </div>
-                <div class="pricing-row sub-breakdown" id="cap-subtotal-row" style="display: none;">
+                <div class="pricing-row sub-breakdown" id="cap-subtotal-row" hidden data-qb-hidden>
                     <span class="label"><i class="fas fa-hat-cowboy qb-fs11-mr4" aria-hidden="true"></i> Caps:</span>
                     <span class="value sub-value" id="cap-subtotal">$0.00</span>
                 </div>
@@ -852,7 +852,7 @@
                  line items from the bottom Services bar (Logo Mockup & Review,
                  Graphic Design). Kept in the DOM (inputs read $0) so existing
                  save/load/pricing code keeps working without changes. -->
-            <div class="flow-step" id="artwork-services-step" style="display:none;">
+            <div class="flow-step" id="artwork-services-step" hidden data-qb-hidden>
                 <div class="flow-step-head">
                     <span class="flow-step-num">4</span>
                     <i class="fas fa-palette" aria-hidden="true"></i> Artwork Services
@@ -861,11 +861,11 @@
                 <div class="flow-step-body" id="artwork-content">
                     <!-- Logo Mockup & Review -->
                     <div class="charge-field qb-mb-10">
-                        <label class="qb-ai-center-gap-8-cur-pointer-fs-13-c-qb-gray-dark-mb-0" style="display: flex">
+                        <label class="qb-ai-center-gap-8-cur-pointer-fs-13-c-qb-gray-dark-mb-0">
                             <input class="qb-w-16-h-16-cur-pointer" type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge">
                             <span>Logo Mockup &amp; Review</span>
                         </label>
-                        <div class="qb-pos-relative-mt-6" id="art-charge-wrapper" style="opacity: 0.4">
+                        <div class="qb-pos-relative-mt-6 art-charge-wrapper" id="art-charge-wrapper">
                             <label class="sr-only" for="art-charge">Logo mockup &amp; review charge in dollars</label>
                             <span class="qb-pos-absolute-left-10-top-50-tf-translatey-50-c-qb-gray">$</span>
                             <input class="qb-w-100-p-8-10-8-30-b-1-solid-store-line-r-4-fs-13-box-sizing-b-2229" type="number" id="art-charge" min="0" max="5000" step="0.01" value="0" disabled
@@ -875,8 +875,8 @@
                     </div>
                     <!-- Graphic Design -->
                     <div class="charge-field">
-                        <label class="qb-fs-12-c-qb-gray-mb-4" for="graphic-design-hours" style="display: block">Graphic Design ($75/hr)</label>
-                        <div class="qb-ai-center-gap-8" style="display: flex">
+                        <label class="qb-fs-12-c-qb-gray-mb-4" for="graphic-design-hours">Graphic Design ($75/hr)</label>
+                        <div class="qb-ai-center-gap-8">
                             <input class="qb-w-80-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-box" type="number" id="graphic-design-hours" min="0" max="100" step="0.5" placeholder="0"
                                    data-change="updateArtworkCharges" data-input="updateArtworkCharges"
                                   >
@@ -899,15 +899,15 @@
             <!-- Optional Charges panel HIDDEN 2026-06-03 — Rush Fee is now added as a
                  line item from the bottom Services bar (Charges ▸ Rush Fee). Kept in
                  the DOM (input reads $0) so existing save/load/pricing code is untouched. -->
-            <div class="flow-step" id="optional-charges-step" style="display:none;">
+            <div class="flow-step" id="optional-charges-step" hidden data-qb-hidden>
                 <div class="flow-step-head">
                     <i class="fas fa-plus-circle" aria-hidden="true"></i> Optional Charges
-                    <span class="qb-ml-auto-bg-qb-green-c-white-p-2-8-r-12-fs-11-fw-600" id="charges-badge" style="display: none">+$0.00</span>
-                    <i id="charges-chevron" class="fas fa-chevron-up" style="display:none;" aria-hidden="true"></i>
+                    <span class="qb-ml-auto-bg-qb-green-c-white-p-2-8-r-12-fs-11-fw-600" id="charges-badge" hidden data-qb-hidden>+$0.00</span>
+                    <i id="charges-chevron" class="fas fa-chevron-up" hidden data-qb-hidden aria-hidden="true"></i>
                 </div>
                 <div class="flow-step-body" id="charges-content">
                     <div class="charge-field">
-                        <label class="qb-fs-12-c-qb-gray-mb-4" for="rush-fee" style="display: block">Rush Fee</label>
+                        <label class="qb-fs-12-c-qb-gray-mb-4" for="rush-fee">Rush Fee</label>
                         <div class="qb-pos-relative">
                             <span class="qb-pos-absolute-left-10-top-50-tf-translatey-50-c-qb-gray">$</span>
                             <input class="qb-w-100-p-8-10-8-30-b-1-solid-store-line-r-4-fs-13-box-sizing-b-2229" type="number" id="rush-fee" min="0" max="10000" step="0.01" placeholder="0.00"
@@ -919,7 +919,7 @@
             </div>
 
             <!-- LTM Control Panel (shown only when garment qty <= 7 or cap qty <= 7) -->
-            <div class="qb-mb-12" id="emb-ltm-wrapper" style="display: none">
+            <div class="qb-mb-12" id="emb-ltm-wrapper" hidden data-qb-hidden>
                 <div id="emb-ltm-panel"></div>
             </div>
 
@@ -973,7 +973,7 @@
             </div>
 
             <!-- Sticky TOTAL - Hidden (totals now shown in pricing summary above) -->
-            <div class="pricing-total-sticky" style="display: none;">
+            <div class="pricing-total-sticky" hidden data-qb-hidden>
                 <div class="pricing-row total">
                     <span class="label">TOTAL:</span>
                     <span class="value" id="grand-total">$0.00</span>
@@ -1057,7 +1057,7 @@ Company:Absher Construction Company
                     <div class="preview-grid" id="preview-grid"></div>
                     <div class="preview-products" id="preview-products"></div>
                     <div class="preview-services" id="preview-services"></div>
-                    <div class="preview-warnings" id="preview-warnings" style="display: none;"></div>
+                    <div class="preview-warnings" id="preview-warnings" hidden data-qb-hidden></div>
                 </div>
             </div>
             <div class="shopworks-import-footer">
@@ -1065,7 +1065,7 @@ Company:Absher Construction Company
                 <button class="btn-parse-import" id="btn-parse-import" data-call="parseAndPreviewShopWorks">
                     <i class="fas fa-search" aria-hidden="true"></i> Preview Import
                 </button>
-                <button class="btn-parse-import" id="btn-confirm-import" data-call="confirmShopWorksImport" style="display: none;">
+                <button class="btn-parse-import" id="btn-confirm-import" data-call="confirmShopWorksImport" hidden data-qb-hidden>
                     <i class="fas fa-check" aria-hidden="true"></i> Import Items
                 </button>
             </div>
@@ -1090,7 +1090,7 @@ Company:Absher Construction Company
                 </p>
 
                 <!-- Products section (dynamically shown/hidden) -->
-                <div id="spr-products-section" style="display: none;">
+                <div id="spr-products-section" hidden data-qb-hidden>
                     <div class="spr-section-label">Products</div>
                     <div id="spr-products-container">
                         <!-- Populated by showServicePricingReview() -->
@@ -1098,16 +1098,16 @@ Company:Absher Construction Company
                 </div>
 
                 <!-- Embroidery Configuration section (dynamically shown/hidden) -->
-                <div id="spr-embconfig-section" style="display: none;">
+                <div id="spr-embconfig-section" hidden data-qb-hidden>
                     <div class="spr-section-label">Embroidery Configuration</div>
-                    <div class="qb-p-6-12-bg-color-floor-tint-b-1-solid-qb-cyan-tint-r-6-mb-10-f-ce2f" id="spr-design-info-banner" style="display: none">
+                    <div class="qb-p-6-12-bg-color-floor-tint-b-1-solid-qb-cyan-tint-r-6-mb-10-f-ce2f" id="spr-design-info-banner" hidden data-qb-hidden>
                         <i class="fas fa-palette qb-mr-6" aria-hidden="true"></i><span id="spr-design-info-text"></span>
                     </div>
                     <div class="qb-b-1-solid-slate-200-r-8-ov-hidden">
                         <!-- Garment config -->
-                        <div class="qb-p-12-bb-1-solid-slate-200" id="spr-garment-config" style="display: none">
+                        <div class="qb-p-12-bb-1-solid-slate-200" id="spr-garment-config" hidden data-qb-hidden>
                             <div class="qb-fs-13-fw-600-c-gray-700-mb-8">&#128085; Garment</div>
-                            <div class="qb-gap-12-fwrap-wrap" style="display: flex">
+                            <div class="qb-gap-12-fwrap-wrap">
                                 <div class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Position</label>
                                     <select id="spr-garment-position" aria-label="Garment logo position" data-change="onSprGarmentPositionChange" class="qb-field--gray">
@@ -1126,8 +1126,8 @@ Company:Absher Construction Company
                                         <option value="25000">Full Back (25K+)</option>
                                     </select>
                                 </div>
-                                <div class="qb-ai-flex-end-pb-2" style="display: flex">
-                                    <label class="qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer" style="display: flex">
+                                <div class="qb-ai-flex-end-pb-2">
+                                    <label class="qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer">
                                         <input class="qb-w-14-h-14-accent-color-color-floor-light" type="checkbox" id="spr-garment-digitizing">
                                         Digitizing ($100)
                                     </label>
@@ -1135,9 +1135,9 @@ Company:Absher Construction Company
                             </div>
                         </div>
                         <!-- Cap config -->
-                        <div class="qb-p-12-bb-1-solid-slate-200" id="spr-cap-config" style="display: none">
+                        <div class="qb-p-12-bb-1-solid-slate-200" id="spr-cap-config" hidden data-qb-hidden>
                             <div class="qb-fs-13-fw-600-c-gray-700-mb-8">&#129506; Cap</div>
-                            <div class="qb-gap-12-fwrap-wrap" style="display: flex">
+                            <div class="qb-gap-12-fwrap-wrap">
                                 <div class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Type</label>
                                     <select id="spr-cap-embellishment" aria-label="Cap embellishment" data-change="onSprCapEmbellishmentChange" class="qb-field--gray">
@@ -1154,8 +1154,8 @@ Company:Absher Construction Company
                                         <option value="18000">Large (&le;25K)</option>
                                     </select>
                                 </div>
-                                <div class="qb-ai-flex-end-pb-2" style="display: flex">
-                                    <label class="qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer" style="display: flex">
+                                <div class="qb-ai-flex-end-pb-2">
+                                    <label class="qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer">
                                         <input class="qb-w-14-h-14-accent-color-color-floor-light" type="checkbox" id="spr-cap-digitizing">
                                         Digitizing ($100)
                                     </label>
@@ -1163,8 +1163,8 @@ Company:Absher Construction Company
                             </div>
                         </div>
                         <!-- LTM override -->
-                        <div class="qb-p-10-12-bg-store-paper-bt-1-solid-qb-yellow" id="spr-ltm-row" style="display: none">
-                            <label class="qb-ai-center-gap-8-cur-pointer-fs-13-c-amber-800" style="display: flex">
+                        <div class="qb-p-10-12-bg-store-paper-bt-1-solid-qb-yellow" id="spr-ltm-row" hidden data-qb-hidden>
+                            <label class="qb-ai-center-gap-8-cur-pointer-fs-13-c-amber-800">
                                 <input class="qb-w-15-h-15-accent-color-amber-500" type="checkbox" id="spr-ltm-enabled" checked>
                                 <i class="fas fa-exclamation-triangle qb-c-amber-500" aria-hidden="true"></i>
                                 <span title="Also called the Less Than Minimum (LTM) fee">Apply small-batch fee ($50)</span>
@@ -1175,7 +1175,7 @@ Company:Absher Construction Company
                 </div>
 
                 <!-- Services section (dynamically shown/hidden) -->
-                <div id="spr-services-section" style="display: none;">
+                <div id="spr-services-section" hidden data-qb-hidden>
                     <div class="spr-section-label">Services</div>
                     <div class="spr-table-wrapper">
                         <table class="spr-table">
@@ -1218,7 +1218,7 @@ Company:Absher Construction Company
                 </button>
             </div>
             <!-- Gallery header (visible only in gallery mode) -->
-            <div class="design-gallery-header" id="design-gallery-header" style="display:none;">
+            <div class="design-gallery-header" id="design-gallery-header" hidden data-qb-hidden>
                 <div class="gallery-header-info">
                     <i class="fas fa-user-check" aria-hidden="true"></i>
                     <span>Designs for <strong class="gallery-customer-name"></strong></span>
@@ -1240,7 +1240,7 @@ Company:Absher Construction Company
                     Type a company name (e.g. "Aaberg") or design number to find existing designs
                 </div>
                 <!-- Tier filter chips -->
-                <div class="design-search-filters" id="design-search-filters" style="display:none;">
+                <div class="design-search-filters" id="design-search-filters" hidden data-qb-hidden>
                     <button class="design-search-chip active" data-tier="all" data-call="filterDesignSearchByTier" data-args="[&quot;all&quot;]">All</button>
                     <button class="design-search-chip" data-tier="Standard" data-call="filterDesignSearchByTier" data-args="[&quot;Standard&quot;]">Standard</button>
                     <button class="design-search-chip" data-tier="Mid" data-call="filterDesignSearchByTier" data-args="[&quot;Mid&quot;]">Mid</button>
@@ -1248,17 +1248,17 @@ Company:Absher Construction Company
                     <button class="design-search-chip" data-tier="Full Back" data-call="filterDesignSearchByTier" data-args="[&quot;Full Back&quot;]">Full Back</button>
                 </div>
                 <!-- Dynamic company filter chips -->
-                <div class="design-search-company-chips" id="design-search-company-chips" style="display:none;"></div>
+                <div class="design-search-company-chips" id="design-search-company-chips" hidden data-qb-hidden></div>
                 <!-- Results count header -->
-                <div class="design-search-results-header" id="design-search-results-header" style="display:none;"></div>
+                <div class="design-search-results-header" id="design-search-results-header" hidden data-qb-hidden></div>
                 <div id="design-search-results" class="design-search-results">
                     <!-- Results populated by JS -->
                 </div>
-                <div id="design-search-empty" class="design-search-empty" style="display:none;">
+                <div id="design-search-empty" class="design-search-empty" hidden data-qb-hidden>
                     <i class="fas fa-search" aria-hidden="true"></i>
                     <p>No designs found. Try a different search term.</p>
                 </div>
-                <div id="design-search-loading" class="design-search-loading" style="display:none;">
+                <div id="design-search-loading" class="design-search-loading" hidden data-qb-hidden>
                     <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching...
                 </div>
             </div>
@@ -1298,7 +1298,7 @@ Company:Absher Construction Company
                 </div>
 
                 <!-- Carrier + address + shipping charge (shown when Ship it selected) -->
-                <div id="ship-carrier-wrap" style="display: none;">
+                <div id="ship-carrier-wrap" hidden data-qb-hidden>
                     <label for="ship-method">Carrier / Method</label>
                     <select class="qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-9704" id="ship-method" data-change="onShipMethodChange">
                         <option value="Customer Pickup" selected>Customer Pickup</option>
@@ -1308,13 +1308,13 @@ Company:Absher Construction Company
                         <option value="Sales Rep Deliver">Sales Rep Deliver</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input class="qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-3e84" type="text" id="ship-method-other" aria-label="Other shipping method" placeholder="Enter shipping method" style="display: none">
+                    <input class="qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-3e84" type="text" id="ship-method-other" aria-label="Other shipping method" placeholder="Enter shipping method" hidden data-qb-hidden>
 
                     <label for="ship-address">Ship To Address</label>
                     <div id="ship-address-fields">
                         <input class="qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-299f" type="text" id="ship-address" placeholder="Street address"
                               >
-                        <div class="workspace-fields-inline" style="display: flex">
+                        <div class="workspace-fields-inline">
                             <input class="qb-flex-2-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-box" type="text" id="ship-city" aria-label="Shipping city" placeholder="City"
                                   >
                             <select class="qb-w-64-p-8-4-b-1-solid-store-line-r-4-fs-13-bg-white" id="ship-state" aria-label="Shipping state" data-change="onShipStateChange"
@@ -1358,7 +1358,7 @@ Company:Absher Construction Company
                                   >
                         </div>
                         <!-- [B12] residential delivery surcharge — check before Estimate to add the UPS residential fee -->
-                        <label class="qb-mt-6-fs-12-c-slate-600" style="display: block">
+                        <label class="qb-mt-6-fs-12-c-slate-600">
                             <input type="checkbox" id="ship-residential"> Residential delivery (+$6.50)
                         </label>
                         <!-- UPS Ground prepay estimate (real SanMar weights + case packs) -->

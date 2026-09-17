@@ -443,6 +443,47 @@ test('CSS quote builders: embroidery shipping estimate notes carry no style attr
  expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.mutations).toEqual([]);
 });
 
+// The builder pages carry no static style attributes (2026-09-17). Markup that starts hidden uses
+// `hidden data-qb-hidden`, which quote-builder-utils.js hands to style.display before the builders run,
+// so each page is served with style attributes blocked, as the target CSP will block them.
+for(const method of ['embroidery','screenprint','dtf'])test('CSS quote builders: '+method+' page renders with style attributes blocked',async({page})=>{
+ test.skip(original,'Static style attributes moved to classes after the reviewed migration.');
+ const fs=require('fs'),path=require('path'),file='quote-builders/'+method+'-quote-builder.html';
+ await page.route('**/'+file,route=>route.fulfill({contentType:'text/html',headers:{'Content-Security-Policy':"style-src-attr 'none'"},body:fs.readFileSync(path.join(__dirname,'../..',file))}));
+ const blocked=[];page.on('console',m=>{if(/Content Security Policy/.test(m.text()))blocked.push(m.text());});
+ const e=await open(page,{url:'/'+file});await page.waitForLoadState('networkidle');
+ expect(blocked).toEqual([]);
+ await expect(page.locator('[data-qb-hidden]')).toHaveCount(0);
+ const warning=page.locator('#min-order-warning');
+ await expect(warning).toBeHidden();expect(await warning.evaluate(el=>[el.hidden,el.style.display])).toEqual([false,'none']);
+ const css=(selector,prop,value)=>expect(page.locator(selector).first()).toHaveCSS(prop,value);
+ await page.locator('.guided-toggle').click();
+ const art=page.locator('#art-charge-wrapper');
+ if(method==='embroidery'){
+  await css('.workspace-field-grid-customer','display','grid');await css('.workspace-fields-inline','display','flex');
+  await css('label:has(> #ship-residential)','display','block');await css('label[for="graphic-design-hours"]','display','block');
+  await css('select.qb-cur-not-allowed','opacity','0.6');
+  // The notes toggle reads and writes style.display on markup that started hidden.
+  const notes=page.locator('#notes-section .notes-body');await expect(notes).toBeHidden();
+  await page.locator('#notes-section .notes-header').click();await expect(notes).toBeVisible();
+  await page.locator('#notes-section .notes-header').click();await expect(notes).toBeHidden();
+ }else{
+  await css('.workspace-customer-grid','display','grid');await css('h4.qb-ai-center-gap-6','display','flex');
+  const fees=page.locator('#fees-charges-content');await expect(fees).toBeHidden();
+  await page.locator('.charges-header[data-call="toggleFeesCharges"]').click();await expect(fees).toBeVisible();
+ }
+ // The art charge starts dimmed by its class; the toggle still writes the opacity through CSSOM.
+ // (The embroidery artwork step stays hidden since art moved to the services bar, so it calls the handler.)
+ const setArt=checked=>method==='embroidery'
+  ?page.evaluate(checked=>{document.getElementById('art-charge-toggle').checked=checked;toggleArtCharge();},checked)
+  :page.locator('#art-charge-toggle').setChecked(checked);
+ await expect(art).toHaveCSS('opacity','0.4');
+ await setArt(true);await expect(art).toHaveCSS('opacity','1');
+ await setArt(false);await expect(art).toHaveCSS('opacity','0.4');
+ expect(blocked).toEqual([]);
+ expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.mutations).toEqual([]);
+});
+
 // Every runtime overlay, notice and warning state the retired sheets styled has a real style again.
 for(const method of ['embroidery','screenprint','dtf','dtg'])test('CSS quote builders: '+method+' runtime overlays and warning states are styled',async({page})=>{
  test.skip(original,'The original page loaded the retired sheets.');

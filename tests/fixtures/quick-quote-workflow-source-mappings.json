@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets. release-2026.09.17.1: Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles dtg-dialogs-and-swatches-2026-09-17: Requested 2026-09-17 (DTG accessibility follow-up): the push and assistant-overwrite confirms are native modal dialogs named by their titles (Tab stays inside, Escape closes only the confirm, focus returns to the opener); top-seller colour chips are coloured through CSSOM instead of a style attribute; a failed placeholder-src swatch shows a blank pixel instead of the broken-image icon and alt text. builder-native-dialogs-2026-09-17: Requested 2026-09-17 (embroidery dialog accessibility follow-up): the embroidery goods, names and manual-item dialogs and the DTG confirms share builders/shared/modal-dialog.js. They are native modal dialogs named by their titles; Tab stays inside, Escape and the dimmed layer close only the dialog, and focus returns to the opener (or, when that is hidden or gone, to the row's quantity, the services-bar menu button or the first size). The manual-item cost error also shows inside the dialog. builder-runtime-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the shared builder scripts and the DTG row/colour menu carries no style attributes. Static styles are token classes in quote-workspace.css / quote-dtg.css: edit-mode label, push checklist link, tier nudge, recent ShopWorks orders, customer warning banner, UPS estimate notes and DTG colour menu rows. Data-driven values go through CSSOM: the DTG row swatch image and the hidden logo assumption panel. Same look; three slate text/border shades map to the nearest grey tokens.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets. release-2026.09.17.1: Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles dtg-dialogs-and-swatches-2026-09-17: Requested 2026-09-17 (DTG accessibility follow-up): the push and assistant-overwrite confirms are native modal dialogs named by their titles (Tab stays inside, Escape closes only the confirm, focus returns to the opener); top-seller colour chips are coloured through CSSOM instead of a style attribute; a failed placeholder-src swatch shows a blank pixel instead of the broken-image icon and alt text. builder-native-dialogs-2026-09-17: Requested 2026-09-17 (embroidery dialog accessibility follow-up): the embroidery goods, names and manual-item dialogs and the DTG confirms share builders/shared/modal-dialog.js. They are native modal dialogs named by their titles; Tab stays inside, Escape and the dimmed layer close only the dialog, and focus returns to the opener (or, when that is hidden or gone, to the row's quantity, the services-bar menu button or the first size). The manual-item cost error also shows inside the dialog. builder-runtime-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the shared builder scripts and the DTG row/colour menu carries no style attributes. Static styles are token classes in quote-workspace.css / quote-dtg.css: edit-mode label, push checklist link, tier nudge, recent ShopWorks orders, customer warning banner, UPS estimate notes and DTG colour menu rows. Data-driven values go through CSSOM: the DTG row swatch image and the hidden logo assumption panel. Same look; three slate text/border shades map to the nearest grey tokens. builder-static-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -3298,6 +3298,854 @@
       "count": 1,
       "stage": "builder-runtime-style-attributes-2026-09-17",
       "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the shared builder scripts and the DTG row/colour menu carries no style attributes. Static styles are token classes in quote-workspace.css / quote-dtg.css: edit-mode label, push checklist link, tier nudge, recent ShopWorks orders, customer warning banner, UPS estimate notes and DTG colour menu rows. Data-driven values go through CSSOM: the DTG row swatch image and the hidden logo assumption panel. Same look; three slate text/border shades map to the nearest grey tokens."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                    <div class=\"logo-card\" id=\"garment-logo-card\" style=\"display: none;\">",
+      "after": "                    <div class=\"logo-card\" id=\"garment-logo-card\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                    <button type=\"button\" class=\"design-btn design-btn-clear\" id=\"garment-design-clear\" data-call=\"clearDesignNumber\" data-args=\"[&quot;garment&quot;]\" title=\"Clear design\" aria-label=\"Clear design\" style=\"display:none;\">\n                                        <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                                    </button>\n                                </div>\n                                <div class=\"design-info-badge\" id=\"garment-design-info\" style=\"display:none;\"></div>\n                                <div class=\"design-thumbnail-preview\" id=\"garment-design-thumbnail\" style=\"display:none;\" data-call=\"openThumbnailFullSize\" data-args=\"[&quot;$this&quot;]\">",
+      "after": "                                    <button type=\"button\" class=\"design-btn design-btn-clear\" id=\"garment-design-clear\" data-call=\"clearDesignNumber\" data-args=\"[&quot;garment&quot;]\" title=\"Clear design\" aria-label=\"Clear design\" hidden data-qb-hidden>\n                                        <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                                    </button>\n                                </div>\n                                <div class=\"design-info-badge\" id=\"garment-design-info\" hidden data-qb-hidden></div>\n                                <div class=\"design-thumbnail-preview\" id=\"garment-design-thumbnail\" hidden data-qb-hidden data-call=\"openThumbnailFullSize\" data-args=\"[&quot;$this&quot;]\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                <div class=\"logo-form-field\" id=\"fb-stitch-count-field\" style=\"display: none;\">",
+      "after": "                                <div class=\"logo-form-field\" id=\"fb-stitch-count-field\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                <div class=\"al-inline-toggle\" id=\"garment-al-inline\" style=\"display:none;\">",
+      "after": "                                <div class=\"al-inline-toggle\" id=\"garment-al-inline\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                    <input type=\"checkbox\" id=\"garment-al-toggle\" aria-label=\"Additional logo toggle\" style=\"display: none;\">",
+      "after": "                                    <input type=\"checkbox\" id=\"garment-al-toggle\" aria-label=\"Additional logo toggle\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                    <div class=\"logo-card\" id=\"cap-logo-card\" style=\"display: none;\">",
+      "after": "                    <div class=\"logo-card\" id=\"cap-logo-card\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                    <button type=\"button\" class=\"design-btn design-btn-clear\" id=\"cap-design-clear\" data-call=\"clearDesignNumber\" data-args=\"[&quot;cap&quot;]\" title=\"Clear design\" aria-label=\"Clear design\" style=\"display:none;\">\n                                        <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                                    </button>\n                                </div>\n                                <div class=\"design-info-badge\" id=\"cap-design-info\" style=\"display:none;\"></div>\n                                <div class=\"design-thumbnail-preview\" id=\"cap-design-thumbnail\" style=\"display:none;\" data-call=\"openThumbnailFullSize\" data-args=\"[&quot;$this&quot;]\">",
+      "after": "                                    <button type=\"button\" class=\"design-btn design-btn-clear\" id=\"cap-design-clear\" data-call=\"clearDesignNumber\" data-args=\"[&quot;cap&quot;]\" title=\"Clear design\" aria-label=\"Clear design\" hidden data-qb-hidden>\n                                        <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                                    </button>\n                                </div>\n                                <div class=\"design-info-badge\" id=\"cap-design-info\" hidden data-qb-hidden></div>\n                                <div class=\"design-thumbnail-preview\" id=\"cap-design-thumbnail\" hidden data-qb-hidden data-call=\"openThumbnailFullSize\" data-args=\"[&quot;$this&quot;]\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                    <div class=\"al-inline-toggle\" id=\"cap-al-inline\" style=\"display:none;\">",
+      "after": "                                    <div class=\"al-inline-toggle\" id=\"cap-al-inline\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                        <input type=\"checkbox\" id=\"cap-al-toggle\" aria-label=\"Cap additional logo toggle\" style=\"display: none;\">",
+      "after": "                                        <input type=\"checkbox\" id=\"cap-al-toggle\" aria-label=\"Cap additional logo toggle\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <div id=\"cap-patch-options\" style=\"display: none;\">\n                                <div class=\"logo-form-row\">\n                                    <div class=\"logo-form-field\">\n                                        <label>Position</label>\n                                        <select class=\"qb-cur-not-allowed\" disabled aria-label=\"Cap logo position\" style=\"opacity: 0.6\">",
+      "after": "                            <div id=\"cap-patch-options\" hidden data-qb-hidden>\n                                <div class=\"logo-form-row\">\n                                    <div class=\"logo-form-field\">\n                                        <label>Position</label>\n                                        <select class=\"qb-cur-not-allowed\" disabled aria-label=\"Cap logo position\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div id=\"min-order-warning\" style=\"display: none;\">",
+      "after": "                <div id=\"min-order-warning\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"garment-ltm-table-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"garment-ltm-table-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"cap-ltm-table-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"cap-ltm-table-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"setup-fee-table-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"setup-fee-table-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"garment-stitch-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"garment-stitch-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"cap-stitch-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"cap-stitch-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"garment-al-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"garment-al-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"cap-al-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"cap-al-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"cap-embellishment-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"cap-embellishment-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"garment-al-digitizing-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"garment-al-digitizing-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"cap-al-digitizing-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"cap-al-digitizing-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"art-charge-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"art-charge-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"graphic-design-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"graphic-design-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"rush-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"rush-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <tr id=\"discount-row\" class=\"fee-row discount-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"discount-row\" class=\"fee-row discount-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div class=\"qb-gap-8-ai-center-fwrap-wrap\" style=\"display: flex\">",
+      "after": "                <div class=\"qb-gap-8-ai-center-fwrap-wrap\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <span class=\"qb-bg-qb-cyan-c-white-r-9-p-1-6-fs-10-ml-6\" id=\"order-details-badge\" style=\"display: none\">!</span>\n                            <i id=\"order-details-chevron\" class=\"fas fa-chevron-down\" style=\"display:none;\" aria-hidden=\"true\"></i>\n                        </div>\n                        <div class=\"flow-step-body\" id=\"order-details-content\">\n                            <div class=\"workspace-field-grid workspace-field-grid-order\" style=\"display: grid\">",
+      "after": "                            <span class=\"qb-bg-qb-cyan-c-white-r-9-p-1-6-fs-10-ml-6\" id=\"order-details-badge\" hidden data-qb-hidden>!</span>\n                            <i id=\"order-details-chevron\" class=\"fas fa-chevron-down\" hidden data-qb-hidden aria-hidden=\"true\"></i>\n                        </div>\n                        <div class=\"flow-step-body\" id=\"order-details-content\">\n                            <div class=\"workspace-field-grid workspace-field-grid-order\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <span id=\"pre-tax-subtotal\" style=\"display:none;\">$0.00</span>",
+      "after": "                        <span id=\"pre-tax-subtotal\" hidden data-qb-hidden>$0.00</span>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                <label class=\"qb-fs-12-c-qb-gray-cur-pointer-ai-center-gap-6-m-0\" style=\"display: flex\">\n                                    <i class=\"fas fa-sticky-note qb-c-qb-orange\" aria-hidden=\"true\"></i> Special Notes\n                                    <span id=\"notes-badge\" class=\"notes-badge\" style=\"display: none;\">0</span>\n                                    <i class=\"fas fa-chevron-down notes-toggle-icon qb-ml-auto-fs-10-tr-transform-0-2s\" aria-hidden=\"true\"></i>\n                                </label>\n                            </div>\n                            <div class=\"notes-body\" style=\"display: none;\">",
+      "after": "                                <label class=\"qb-fs-12-c-qb-gray-cur-pointer-ai-center-gap-6-m-0\">\n                                    <i class=\"fas fa-sticky-note qb-c-qb-orange\" aria-hidden=\"true\"></i> Special Notes\n                                    <span id=\"notes-badge\" class=\"notes-badge\" hidden data-qb-hidden>0</span>\n                                    <i class=\"fas fa-chevron-down notes-toggle-icon qb-ml-auto-fs-10-tr-transform-0-2s\" aria-hidden=\"true\"></i>\n                                </label>\n                            </div>\n                            <div class=\"notes-body\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                            <div class=\"qb-fwrap-wrap-gap-6-m-4-0\" style=\"display: flex\">",
+      "after": "                            <div class=\"qb-fwrap-wrap-gap-6-m-4-0\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <div class=\"workspace-field-grid workspace-field-grid-customer\" style=\"display: grid\">",
+      "after": "                        <div class=\"workspace-field-grid workspace-field-grid-customer\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div class=\"pricing-row sub-breakdown\" id=\"garment-qty-row\" style=\"display: none;\">\n                    <span class=\"label\"><i class=\"fas fa-tshirt qb-fs11-mr4\" aria-hidden=\"true\"></i> Garments:</span>\n                    <span class=\"value sub-value\" id=\"garment-qty\">0</span>\n                </div>\n                <div class=\"pricing-row sub-breakdown\" id=\"cap-qty-row\" style=\"display: none;\">",
+      "after": "                <div class=\"pricing-row sub-breakdown\" id=\"garment-qty-row\" hidden data-qb-hidden>\n                    <span class=\"label\"><i class=\"fas fa-tshirt qb-fs11-mr4\" aria-hidden=\"true\"></i> Garments:</span>\n                    <span class=\"value sub-value\" id=\"garment-qty\">0</span>\n                </div>\n                <div class=\"pricing-row sub-breakdown\" id=\"cap-qty-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div class=\"pricing-row sub-breakdown\" id=\"garment-tier-row\" style=\"display: none;\">\n                    <span class=\"label\"><i class=\"fas fa-tshirt qb-fs11-mr4\" aria-hidden=\"true\"></i> Garment Tier:</span>\n                    <span class=\"tier-badge small\" id=\"garment-tier\">1-7</span>\n                </div>\n                <div class=\"pricing-row sub-breakdown\" id=\"cap-tier-row\" style=\"display: none;\">\n                    <span class=\"label\"><i class=\"fas fa-hat-cowboy qb-fs11-mr4\" aria-hidden=\"true\"></i> Cap Tier:</span>\n                    <span class=\"tier-badge small\" id=\"cap-tier\">1-7</span>\n                </div>\n                <div class=\"quantity-nudge\" id=\"quantity-nudge\" style=\"display: none;\"></div>",
+      "after": "                <div class=\"pricing-row sub-breakdown\" id=\"garment-tier-row\" hidden data-qb-hidden>\n                    <span class=\"label\"><i class=\"fas fa-tshirt qb-fs11-mr4\" aria-hidden=\"true\"></i> Garment Tier:</span>\n                    <span class=\"tier-badge small\" id=\"garment-tier\">1-7</span>\n                </div>\n                <div class=\"pricing-row sub-breakdown\" id=\"cap-tier-row\" hidden data-qb-hidden>\n                    <span class=\"label\"><i class=\"fas fa-hat-cowboy qb-fs11-mr4\" aria-hidden=\"true\"></i> Cap Tier:</span>\n                    <span class=\"tier-badge small\" id=\"cap-tier\">1-7</span>\n                </div>\n                <div class=\"quantity-nudge\" id=\"quantity-nudge\" hidden data-qb-hidden></div>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div class=\"pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0\" id=\"per-unit-price-row\" style=\"display: none\">",
+      "after": "                <div class=\"pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0\" id=\"per-unit-price-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div class=\"pricing-row sub-breakdown\" id=\"garment-subtotal-row\" style=\"display: none;\">\n                    <span class=\"label\"><i class=\"fas fa-tshirt qb-fs11-mr4\" aria-hidden=\"true\"></i> Garments:</span>\n                    <span class=\"value sub-value\" id=\"garment-subtotal\">$0.00</span>\n                </div>\n                <div class=\"pricing-row sub-breakdown\" id=\"cap-subtotal-row\" style=\"display: none;\">",
+      "after": "                <div class=\"pricing-row sub-breakdown\" id=\"garment-subtotal-row\" hidden data-qb-hidden>\n                    <span class=\"label\"><i class=\"fas fa-tshirt qb-fs11-mr4\" aria-hidden=\"true\"></i> Garments:</span>\n                    <span class=\"value sub-value\" id=\"garment-subtotal\">$0.00</span>\n                </div>\n                <div class=\"pricing-row sub-breakdown\" id=\"cap-subtotal-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "            <div class=\"flow-step\" id=\"artwork-services-step\" style=\"display:none;\">",
+      "after": "            <div class=\"flow-step\" id=\"artwork-services-step\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <label class=\"qb-ai-center-gap-8-cur-pointer-fs-13-c-qb-gray-dark-mb-0\" style=\"display: flex\">\n                            <input class=\"qb-w-16-h-16-cur-pointer\" type=\"checkbox\" id=\"art-charge-toggle\" data-change=\"toggleArtCharge\">\n                            <span>Logo Mockup &amp; Review</span>\n                        </label>\n                        <div class=\"qb-pos-relative-mt-6\" id=\"art-charge-wrapper\" style=\"opacity: 0.4\">",
+      "after": "                        <label class=\"qb-ai-center-gap-8-cur-pointer-fs-13-c-qb-gray-dark-mb-0\">\n                            <input class=\"qb-w-16-h-16-cur-pointer\" type=\"checkbox\" id=\"art-charge-toggle\" data-change=\"toggleArtCharge\">\n                            <span>Logo Mockup &amp; Review</span>\n                        </label>\n                        <div class=\"qb-pos-relative-mt-6 art-charge-wrapper\" id=\"art-charge-wrapper\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <label class=\"qb-fs-12-c-qb-gray-mb-4\" for=\"graphic-design-hours\" style=\"display: block\">Graphic Design ($75/hr)</label>\n                        <div class=\"qb-ai-center-gap-8\" style=\"display: flex\">",
+      "after": "                        <label class=\"qb-fs-12-c-qb-gray-mb-4\" for=\"graphic-design-hours\">Graphic Design ($75/hr)</label>\n                        <div class=\"qb-ai-center-gap-8\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "            <div class=\"flow-step\" id=\"optional-charges-step\" style=\"display:none;\">\n                <div class=\"flow-step-head\">\n                    <i class=\"fas fa-plus-circle\" aria-hidden=\"true\"></i> Optional Charges\n                    <span class=\"qb-ml-auto-bg-qb-green-c-white-p-2-8-r-12-fs-11-fw-600\" id=\"charges-badge\" style=\"display: none\">+$0.00</span>\n                    <i id=\"charges-chevron\" class=\"fas fa-chevron-up\" style=\"display:none;\" aria-hidden=\"true\"></i>\n                </div>\n                <div class=\"flow-step-body\" id=\"charges-content\">\n                    <div class=\"charge-field\">\n                        <label class=\"qb-fs-12-c-qb-gray-mb-4\" for=\"rush-fee\" style=\"display: block\">Rush Fee</label>",
+      "after": "            <div class=\"flow-step\" id=\"optional-charges-step\" hidden data-qb-hidden>\n                <div class=\"flow-step-head\">\n                    <i class=\"fas fa-plus-circle\" aria-hidden=\"true\"></i> Optional Charges\n                    <span class=\"qb-ml-auto-bg-qb-green-c-white-p-2-8-r-12-fs-11-fw-600\" id=\"charges-badge\" hidden data-qb-hidden>+$0.00</span>\n                    <i id=\"charges-chevron\" class=\"fas fa-chevron-up\" hidden data-qb-hidden aria-hidden=\"true\"></i>\n                </div>\n                <div class=\"flow-step-body\" id=\"charges-content\">\n                    <div class=\"charge-field\">\n                        <label class=\"qb-fs-12-c-qb-gray-mb-4\" for=\"rush-fee\">Rush Fee</label>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "            <div class=\"qb-mb-12\" id=\"emb-ltm-wrapper\" style=\"display: none\">",
+      "after": "            <div class=\"qb-mb-12\" id=\"emb-ltm-wrapper\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "            <div class=\"pricing-total-sticky\" style=\"display: none;\">",
+      "after": "            <div class=\"pricing-total-sticky\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                    <div class=\"preview-warnings\" id=\"preview-warnings\" style=\"display: none;\"></div>",
+      "after": "                    <div class=\"preview-warnings\" id=\"preview-warnings\" hidden data-qb-hidden></div>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <button class=\"btn-parse-import\" id=\"btn-confirm-import\" data-call=\"confirmShopWorksImport\" style=\"display: none;\">",
+      "after": "                <button class=\"btn-parse-import\" id=\"btn-confirm-import\" data-call=\"confirmShopWorksImport\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div id=\"spr-products-section\" style=\"display: none;\">",
+      "after": "                <div id=\"spr-products-section\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div id=\"spr-embconfig-section\" style=\"display: none;\">\n                    <div class=\"spr-section-label\">Embroidery Configuration</div>\n                    <div class=\"qb-p-6-12-bg-color-floor-tint-b-1-solid-qb-cyan-tint-r-6-mb-10-f-ce2f\" id=\"spr-design-info-banner\" style=\"display: none\">",
+      "after": "                <div id=\"spr-embconfig-section\" hidden data-qb-hidden>\n                    <div class=\"spr-section-label\">Embroidery Configuration</div>\n                    <div class=\"qb-p-6-12-bg-color-floor-tint-b-1-solid-qb-cyan-tint-r-6-mb-10-f-ce2f\" id=\"spr-design-info-banner\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <div class=\"qb-p-12-bb-1-solid-slate-200\" id=\"spr-garment-config\" style=\"display: none\">\n                            <div class=\"qb-fs-13-fw-600-c-gray-700-mb-8\">&#128085; Garment</div>\n                            <div class=\"qb-gap-12-fwrap-wrap\" style=\"display: flex\">",
+      "after": "                        <div class=\"qb-p-12-bb-1-solid-slate-200\" id=\"spr-garment-config\" hidden data-qb-hidden>\n                            <div class=\"qb-fs-13-fw-600-c-gray-700-mb-8\">&#128085; Garment</div>\n                            <div class=\"qb-gap-12-fwrap-wrap\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                <div class=\"qb-ai-flex-end-pb-2\" style=\"display: flex\">\n                                    <label class=\"qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer\" style=\"display: flex\">",
+      "after": "                                <div class=\"qb-ai-flex-end-pb-2\">\n                                    <label class=\"qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <div class=\"qb-p-12-bb-1-solid-slate-200\" id=\"spr-cap-config\" style=\"display: none\">\n                            <div class=\"qb-fs-13-fw-600-c-gray-700-mb-8\">&#129506; Cap</div>\n                            <div class=\"qb-gap-12-fwrap-wrap\" style=\"display: flex\">",
+      "after": "                        <div class=\"qb-p-12-bb-1-solid-slate-200\" id=\"spr-cap-config\" hidden data-qb-hidden>\n                            <div class=\"qb-fs-13-fw-600-c-gray-700-mb-8\">&#129506; Cap</div>\n                            <div class=\"qb-gap-12-fwrap-wrap\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                                </div>\n                                <div class=\"qb-ai-flex-end-pb-2\" style=\"display: flex\">\n                                    <label class=\"qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer\" style=\"display: flex\">\n                                        <input class=\"qb-w-14-h-14-accent-color-color-floor-light\" type=\"checkbox\" id=\"spr-cap-digitizing\">",
+      "after": "                                </div>\n                                <div class=\"qb-ai-flex-end-pb-2\">\n                                    <label class=\"qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer\">\n                                        <input class=\"qb-w-14-h-14-accent-color-color-floor-light\" type=\"checkbox\" id=\"spr-cap-digitizing\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <div class=\"qb-p-10-12-bg-store-paper-bt-1-solid-qb-yellow\" id=\"spr-ltm-row\" style=\"display: none\">\n                            <label class=\"qb-ai-center-gap-8-cur-pointer-fs-13-c-amber-800\" style=\"display: flex\">",
+      "after": "                        <div class=\"qb-p-10-12-bg-store-paper-bt-1-solid-qb-yellow\" id=\"spr-ltm-row\" hidden data-qb-hidden>\n                            <label class=\"qb-ai-center-gap-8-cur-pointer-fs-13-c-amber-800\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div id=\"spr-services-section\" style=\"display: none;\">",
+      "after": "                <div id=\"spr-services-section\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "            <div class=\"design-gallery-header\" id=\"design-gallery-header\" style=\"display:none;\">",
+      "after": "            <div class=\"design-gallery-header\" id=\"design-gallery-header\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div class=\"design-search-filters\" id=\"design-search-filters\" style=\"display:none;\">",
+      "after": "                <div class=\"design-search-filters\" id=\"design-search-filters\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div class=\"design-search-company-chips\" id=\"design-search-company-chips\" style=\"display:none;\"></div>\n                <!-- Results count header -->\n                <div class=\"design-search-results-header\" id=\"design-search-results-header\" style=\"display:none;\"></div>\n                <div id=\"design-search-results\" class=\"design-search-results\">\n                    <!-- Results populated by JS -->\n                </div>\n                <div id=\"design-search-empty\" class=\"design-search-empty\" style=\"display:none;\">\n                    <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                    <p>No designs found. Try a different search term.</p>\n                </div>\n                <div id=\"design-search-loading\" class=\"design-search-loading\" style=\"display:none;\">",
+      "after": "                <div class=\"design-search-company-chips\" id=\"design-search-company-chips\" hidden data-qb-hidden></div>\n                <!-- Results count header -->\n                <div class=\"design-search-results-header\" id=\"design-search-results-header\" hidden data-qb-hidden></div>\n                <div id=\"design-search-results\" class=\"design-search-results\">\n                    <!-- Results populated by JS -->\n                </div>\n                <div id=\"design-search-empty\" class=\"design-search-empty\" hidden data-qb-hidden>\n                    <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                    <p>No designs found. Try a different search term.</p>\n                </div>\n                <div id=\"design-search-loading\" class=\"design-search-loading\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                <div id=\"ship-carrier-wrap\" style=\"display: none;\">",
+      "after": "                <div id=\"ship-carrier-wrap\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                    <input class=\"qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-3e84\" type=\"text\" id=\"ship-method-other\" aria-label=\"Other shipping method\" placeholder=\"Enter shipping method\" style=\"display: none\">",
+      "after": "                    <input class=\"qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-3e84\" type=\"text\" id=\"ship-method-other\" aria-label=\"Other shipping method\" placeholder=\"Enter shipping method\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <div class=\"workspace-fields-inline\" style=\"display: flex\">",
+      "after": "                        <div class=\"workspace-fields-inline\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "                        <label class=\"qb-mt-6-fs-12-c-slate-600\" style=\"display: block\">",
+      "after": "                        <label class=\"qb-mt-6-fs-12-c-slate-600\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <div class=\"workspace-location-stack\" style=\"display: flex\">",
+      "after": "                            <div class=\"workspace-location-stack\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <div class=\"workspace-ink-section\" id=\"back-colors-section\" style=\"display: none\">\n                                <div class=\"qb-fs-11-c-qb-gray-mb-6\">INK COLORS</div>\n                                <div class=\"ink-color-selector qb-gap-4\" style=\"display: flex\">",
+      "after": "                            <div class=\"workspace-ink-section\" id=\"back-colors-section\" hidden data-qb-hidden>\n                                <div class=\"qb-fs-11-c-qb-gray-mb-6\">INK COLORS</div>\n                                <div class=\"ink-color-selector qb-gap-4\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <div class=\"workspace-sleeve-inks\" id=\"left-sleeve-colors-section\" style=\"display: none\">\n                                <div class=\"qb-fs-11-c-qb-gray-mb-6\">LEFT SLEEVE INK COLORS</div>\n                                <div class=\"ink-color-selector qb-gap-4\" style=\"display: flex\">",
+      "after": "                            <div class=\"workspace-sleeve-inks\" id=\"left-sleeve-colors-section\" hidden data-qb-hidden>\n                                <div class=\"qb-fs-11-c-qb-gray-mb-6\">LEFT SLEEVE INK COLORS</div>\n                                <div class=\"ink-color-selector qb-gap-4\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <div class=\"workspace-ink-section\" id=\"right-sleeve-colors-section\" style=\"display: none\">\n                                <div class=\"qb-fs-11-c-qb-gray-mb-6\">RIGHT SLEEVE INK COLORS</div>\n                                <div class=\"ink-color-selector qb-gap-4\" style=\"display: flex\">",
+      "after": "                            <div class=\"workspace-ink-section\" id=\"right-sleeve-colors-section\" hidden data-qb-hidden>\n                                <div class=\"qb-fs-11-c-qb-gray-mb-6\">RIGHT SLEEVE INK COLORS</div>\n                                <div class=\"ink-color-selector qb-gap-4\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <div class=\"qb-fs-10-c-qb-gray-mt-4\" id=\"dark-garment-note\" style=\"display: none\">Includes white underbase</div>",
+      "after": "                            <div class=\"qb-fs-10-c-qb-gray-mt-4\" id=\"dark-garment-note\" hidden data-qb-hidden>Includes white underbase</div>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div id=\"min-order-warning\" class=\"workspace-min-order\" style=\"display: none;\">",
+      "after": "                <div id=\"min-order-warning\" class=\"workspace-min-order\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <tr id=\"ltm-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"ltm-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <tr id=\"art-charge-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"art-charge-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <tr id=\"graphic-design-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"graphic-design-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <tr id=\"rush-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"rush-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <tr id=\"vellum-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"vellum-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <tr id=\"color-change-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"color-change-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div id=\"fees-charges-content\" class=\"charges-content hidden\" style=\"display:none\">\n                    <div class=\"workspace-charge-fields\" style=\"display: flex\">",
+      "after": "                <div id=\"fees-charges-content\" class=\"charges-content hidden\" hidden data-qb-hidden>\n                    <div class=\"workspace-charge-fields\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                            <div class=\"input-with-prefix\" id=\"art-charge-wrapper\" style=\"opacity: 0.4;\">",
+      "after": "                            <div class=\"input-with-prefix art-charge-wrapper\" id=\"art-charge-wrapper\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                    <h4 class=\"qb-ai-center-gap-6\" style=\"display: flex\"><i class=\"fas fa-user qb-c-brand-700\" aria-hidden=\"true\"></i> Customer</h4>",
+      "after": "                    <h4 class=\"qb-ai-center-gap-6\"><i class=\"fas fa-user qb-c-brand-700\" aria-hidden=\"true\"></i> Customer</h4>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                        <div class=\"workspace-customer-search-row\" style=\"display: flex\">",
+      "after": "                        <div class=\"workspace-customer-search-row\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                    <div class=\"workspace-customer-grid\" style=\"display: grid\">",
+      "after": "                    <div class=\"workspace-customer-grid\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div class=\"pricing-row\" id=\"sidebar-back-row\" style=\"display: none;\">",
+      "after": "                <div class=\"pricing-row\" id=\"sidebar-back-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div class=\"pricing-row\" id=\"sidebar-sleeves-row\" style=\"display: none;\">",
+      "after": "                <div class=\"pricing-row\" id=\"sidebar-sleeves-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div class=\"pricing-row\" id=\"sidebar-dark-row\" style=\"display: none;\">",
+      "after": "                <div class=\"pricing-row\" id=\"sidebar-dark-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div class=\"pricing-row\" id=\"sidebar-stripes-row\" style=\"display: none;\">",
+      "after": "                <div class=\"pricing-row\" id=\"sidebar-stripes-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div class=\"quantity-nudge\" id=\"quantity-nudge\" style=\"display: none;\"></div>",
+      "after": "                <div class=\"quantity-nudge\" id=\"quantity-nudge\" hidden data-qb-hidden></div>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div class=\"pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0\" id=\"per-unit-price-row\" style=\"display: none\">",
+      "after": "                <div class=\"pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0\" id=\"per-unit-price-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "            <div class=\"qb-mb-12\" id=\"spc-ltm-wrapper\" style=\"display: none\">",
+      "after": "            <div class=\"qb-mb-12\" id=\"spc-ltm-wrapper\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <div id=\"error-banner\" class=\"error-banner\" style=\"display: none;\"></div>",
+      "after": "    <div id=\"error-banner\" class=\"error-banner\" hidden data-qb-hidden></div>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                <div id=\"min-order-warning\" class=\"workspace-min-order\" style=\"display: none;\">",
+      "after": "                <div id=\"min-order-warning\" class=\"workspace-min-order\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                            <tr id=\"ltm-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"ltm-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                            <tr id=\"art-charge-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"art-charge-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                            <tr id=\"graphic-design-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"graphic-design-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                            <tr id=\"rush-fee-row\" class=\"fee-row\" style=\"display: none;\">",
+      "after": "                            <tr id=\"rush-fee-row\" class=\"fee-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                    <div class=\"empty-table-message\" id=\"empty-table-message\" style=\"display: none;\">",
+      "after": "                    <div class=\"empty-table-message\" id=\"empty-table-message\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                <div id=\"fees-charges-content\" class=\"charges-content hidden\" style=\"display:none\">\n                    <div class=\"workspace-charge-fields\" style=\"display: flex\">",
+      "after": "                <div id=\"fees-charges-content\" class=\"charges-content hidden\" hidden data-qb-hidden>\n                    <div class=\"workspace-charge-fields\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                            <div class=\"input-with-prefix\" id=\"art-charge-wrapper\" style=\"opacity: 0.4;\">",
+      "after": "                            <div class=\"input-with-prefix art-charge-wrapper\" id=\"art-charge-wrapper\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                    <h4 class=\"qb-ai-center-gap-6\" style=\"display: flex\"><i class=\"fas fa-user qb-c-brand-700\" aria-hidden=\"true\"></i> Customer</h4>",
+      "after": "                    <h4 class=\"qb-ai-center-gap-6\"><i class=\"fas fa-user qb-c-brand-700\" aria-hidden=\"true\"></i> Customer</h4>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                        <div class=\"workspace-customer-search-row\" style=\"display: flex\">",
+      "after": "                        <div class=\"workspace-customer-search-row\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                    <div class=\"workspace-customer-grid\" style=\"display: grid\">",
+      "after": "                    <div class=\"workspace-customer-grid\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                <div class=\"quantity-nudge\" id=\"quantity-nudge\" style=\"display: none;\"></div>",
+      "after": "                <div class=\"quantity-nudge\" id=\"quantity-nudge\" hidden data-qb-hidden></div>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "                <div class=\"pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0\" id=\"per-unit-price-row\" style=\"display: none\">",
+      "after": "                <div class=\"pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0\" id=\"per-unit-price-row\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "            <div class=\"qb-mb-12\" id=\"dtf-ltm-wrapper\" style=\"display: none\">",
+      "after": "            <div class=\"qb-mb-12\" id=\"dtf-ltm-wrapper\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <div id=\"save-success-modal\" class=\"save-modal-overlay\" style=\"display: none;\">",
+      "after": "    <div id=\"save-success-modal\" class=\"save-modal-overlay\" hidden data-qb-hidden>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "}\nif (typeof window !== 'undefined') {",
+      "after": "}\n/**\n * Builder markup that starts hidden carries `hidden data-qb-hidden` instead of style=\"display: none\",\n * which only renders while the CSP allows inline style attributes. The builders show and hide those\n * elements through el.style.display (and read it back), so this hands the state to CSSOM before\n * their code runs: display none on the style object, then the attribute and marker come off.\n */\nfunction qbAdoptHiddenMarkup() {\n    document.querySelectorAll('[data-qb-hidden]').forEach((el) => {\n        el.style.display = 'none';\n        el.hidden = false;\n        el.removeAttribute('data-qb-hidden');\n    });\n}\nif (typeof window !== 'undefined') {",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });\n        else qbInstallCallDelegator();",
+      "after": "        // Now for the markup parsed so far, and again at DOMContentLoaded for anything after this script.\n        qbAdoptHiddenMarkup();\n        if (document.readyState === 'loading') {\n            document.addEventListener('DOMContentLoaded', qbAdoptHiddenMarkup, { once: true });\n            document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });\n        } else qbInstallCallDelegator();",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-session.js",
+      "before": "        dropdown.className = 'recent-quotes-dropdown';\n        dropdown.innerHTML = `",
+      "after": "        dropdown.className = 'recent-quotes-dropdown';\n        // The menu starts hidden through CSSOM below (the toggle reads style.display; no style=\"\" for the CSP).\n        dropdown.innerHTML = `",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-session.js",
+      "before": "            <div class=\"recent-quotes-menu\" style=\"display: none;\">",
+      "after": "            <div class=\"recent-quotes-menu\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-session.js",
+      "before": "        container.appendChild(dropdown);\n        \n        // Toggle menu\n        const toggle = dropdown.querySelector('.recent-quotes-toggle');\n        const menu = dropdown.querySelector('.recent-quotes-menu');\n        ",
+      "after": "        const menu = dropdown.querySelector('.recent-quotes-menu');\n        menu.style.display = 'none';\n        container.appendChild(dropdown);\n\n        // Toggle menu\n        const toggle = dropdown.querySelector('.recent-quotes-toggle');\n",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-share-modal.js",
+      "before": "        document.body.insertAdjacentHTML('beforeend', this.getModalHTML());\n        this.bindEvents();",
+      "after": "        document.body.insertAdjacentHTML('beforeend', this.getModalHTML());\n        // Start hidden through CSSOM: the show/hide code sets and reads style.display, and a\n        // style=\"\" attribute only renders while the CSP allows inline styles.\n        document.getElementById('quote-share-modal').style.display = 'none';\n        document.getElementById('quote-share-note').style.display = 'none';\n        this.bindEvents();",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-share-modal.js",
+      "before": "        <div id=\"quote-share-modal\" class=\"quote-share-modal-overlay\" style=\"display: none;\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"quote-share-title\">",
+      "after": "        <div id=\"quote-share-modal\" class=\"quote-share-modal-overlay\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"quote-share-title\">",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/quote-share-modal.js",
+      "before": "                    <p>Quote ID: <strong id=\"quote-share-modal-id\">---</strong> <span id=\"quote-share-note\" class=\"quote-share-note\" style=\"display:none;\"></span></p>",
+      "after": "                    <p>Quote ID: <strong id=\"quote-share-modal-id\">---</strong> <span id=\"quote-share-note\" class=\"quote-share-note\"></span></p>",
+      "count": 1,
+      "stage": "builder-static-style-attributes-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
     }
   ]
 }
