@@ -1,13 +1,13 @@
 const {test,expect}=require('@playwright/test');
 const fs=require('fs'),path=require('path'),{open,snapshot,check}=require('./helpers/quote-builders-browser');
-const {evidence}=require('./helpers/quote-builder-workflow-review');
+const {evidence,stableOriginal}=require('./helpers/quote-builder-workflow-review');
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),original=process.env.CAPTURE_QUOTE_BUILDERS_ORIGINAL==='1',phase=original?'original':'current';
 test.setTimeout(120000);
 for(const method of ['embroidery','screenprint','dtf','dtg','screenprint-fast'])test('CSS quote builders: '+method+' initial',async({page})=>{
  const url='/quote-builders/'+(method==='screenprint-fast'?'screenprint-fast-quote':method+'-quote-builder')+'.html';
  const e=await open(page,{original,url});
  await page.waitForLoadState('networkidle');
- if(!original&&method==='screenprint'){
+ if(method==='screenprint'){
   await expect(page.locator('#toast-container')).toContainText('Vellum rate is an estimate');
   await expect(page.locator('#toast-container')).toContainText('Color Chg rate is an estimate');
  }
@@ -24,6 +24,6 @@ for(const method of ['embroidery','screenprint','dtf','dtg','screenprint-fast'])
  await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'quote-builders-'+method+'-initial-'+phase+'.pdf'),format:'Letter',printBackground:true});
  check(expect,e);
  const file='tests/fixtures/quote-builders-'+method+'-initial-original-browser.json',record={method,states};
- if(original){if(fs.existsSync(path.join(root,file)))expect(record).toEqual(JSON.parse(fs.readFileSync(path.join(root,file),'utf8')));else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable original synthetic quote-builder initial browser evidence.\n');}}
+ if(original){if(fs.existsSync(path.join(root,file))){const [actual,expected]=stableOriginal(record,JSON.parse(fs.readFileSync(path.join(root,file),'utf8')),method+'-initial',await page.evaluate(()=>location.origin));expect(actual).toEqual(expected);}else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable original synthetic quote-builder initial browser evidence.\n');}}
  else{const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));for(let i=0;i<states.length;i++)for(const key of ['title','url','ids','fields','links','tables'])expect(states[i][key],method+' '+key).toEqual(before.states[i][key]);}
 });

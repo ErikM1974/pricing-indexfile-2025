@@ -28,7 +28,7 @@ for(const method of ['embroidery','screenprint','dtf'])for(const scene of ['prod
  // Use a fully intercepted synthetic production origin for their original draft output.
  const origin=scene==='invoice'&&method!=='embroidery'?'https://quote-builder.example.invalid':'';
  const e=await open(page,{original,realPreview:scene==='invoice'&&!original,save:scene==='save',url:origin+'/quote-builders/'+method+'-quote-builder.html'});
- if(!original&&method==='screenprint'){
+ if(method==='screenprint'){
   await expect(page.locator('#toast-container')).toContainText('Vellum rate is an estimate');
   await expect(page.locator('#toast-container')).toContainText('Color Chg rate is an estimate');
  }

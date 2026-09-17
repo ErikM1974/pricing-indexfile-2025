@@ -13,6 +13,64 @@ function stableArtwork(value,key){
  if(key==='fields')return copy.map(field=>({...field,id:identity(field.id)}));
  return copy;
 }
+// Informational notices expire on real timers during four-width capture, so whether one still
+// shows is a timing sample. Transient warnings below are asserted at their trigger. Persistent
+// errors, success messages and calculated cap pricing still compare exactly.
+function stableToasts(ids,name){
+ if(typeof ids['toast-container']!=='string')return ids;
+ const notices=['Ready to build quotes!','Ready to build Screen Print quotes!'];
+ // These two exact fee warnings are asserted immediately after startup in the
+ // missing-fee scenes; their existing timeout can expire during full-panel capture.
+ if(name.startsWith('screenprint-'))notices.push("Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving.","Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.");
+ if(name.startsWith('embroidery-caps'))notices.push('Cap detected - using cap embroidery pricing');
+ if(name==='embroidery-full-back')notices.push('Full Back requires minimum 25,000 stitches');
+ if(name==='embroidery-save-failure')notices.push('Error saving quote: Session save failed: {"error":"Synthetic save failure"}');
+ let text=ids['toast-container'];
+ for(const notice of notices)text=text.replace(notice,'');
+ return {...ids,'toast-container':text.replace(/\s+/g,' ').trim()};
+}
+// Preview ports differ between local capture, CI and the saved evidence (port 3414). The share
+// link must still use this page's origin; its exact quote ID, path and query stay checked.
+function stableShareLink(fields,saved,previewOrigin,name){
+ return fields.map(field=>{
+  if(field.id!=='quote-share-url'||!field.value)return field;
+  const expected=saved?.find(item=>item.id===field.id);
+  if(!expected?.value)return field;
+  const url=new URL(field.value);
+  expect(url.origin,name+' share link uses the current app origin').toBe(previewOrigin);
+  return {...field,value:new URL(expected.value).origin+url.pathname+url.search+url.hash};
+ });
+}
+// Capture mode replays hash-locked original sources, so these contrast readings differ only by
+// when axe sampled a moving page. Both sides drop them; every other reading compares exactly.
+// - A guided-step title under the resting pointer takes the :hover wash, which Chromium
+//   re-applies asynchronously after each resize and full-page screenshot.
+// - While the snapshot still shows the company lookup "Searching...", its debounced search
+//   replaces that node during the axe run: axe reports the loading node, the no-results node,
+//   or ':root' (its selector for a node no longer in the document).
+// - The original fast-quote steps fade in with no reduced-motion rule; evidence() asserts the
+//   settled page has no contrast failures instead.
+function stableContrast(state,name){
+ if(!state.violations)return state;
+ const searching=state.ids?.['company-name-dropdown']==='Searching...';
+ const sampled=target=>name.startsWith('screenprint-fast-')||/\.gs-title$/.test(target)||(searching&&/^(?::root|\.customer-lookup-(?:loading|no-results))$/.test(target));
+ return {...state,violations:state.violations.map(v=>v.id==='color-contrast'?{...v,nodes:v.nodes.filter(n=>!sampled(n.join(' ')))}:v).filter(v=>v.nodes.length)};
+}
+// Normalize a capture-mode record and its saved original evidence identically.
+function stableOriginal(record,saved,name,previewOrigin){
+ const stable=(state,savedState)=>{
+  let {ids,fields}=state;
+  if(ids){ids=stableArtwork(ids,'ids');if(/^(embroidery|screenprint|dtf)-/.test(name)&&!name.startsWith('screenprint-fast-'))ids=stableToasts(ids,name);}
+  if(fields)fields=stableArtwork(savedState?stableShareLink(fields,savedState.fields,previewOrigin,name):fields,'fields');
+  return stableContrast({...state,ids,fields},name);
+ };
+ return [{...record,states:record.states.map((state,i)=>stable(state,saved.states[i]))},{...saved,states:saved.states.map(state=>stable(state))}];
+}
+// Measure the page, not one frame of it: let entrance animations and resize transitions finish.
+// Looping spinners never finish and keep running.
+async function settle(page){
+ await page.evaluate(()=>Promise.all(document.getAnimations().filter(a=>a.playState==='running'&&Number.isFinite(a.effect?.getComputedTiming().endTime)).map(a=>a.finished.then(()=>{},()=>{}))));
+}
 async function evidence(page,name,e){
  fs.mkdirSync(out,{recursive:true});const states=[];
  const previewOrigin=await page.evaluate(()=>location.origin);
@@ -24,7 +82,7 @@ async function evidence(page,name,e){
  }
  fs.writeFileSync(path.join(out,'quote-builder-'+name+'-network.json'),JSON.stringify(e,null,2)+'\n');
  for(const width of [1440,768,390,320]){
-  await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);
+  await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);await settle(page);
   const state=await snapshot(page),axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   states.push({width,...state,violations:axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))});
   if(!original){expect.soft(state.overflow,name+' '+width+' overflow').toBe(false);expect.soft(states.at(-1).violations,name+' '+width+' accessibility').toEqual([]);}
@@ -36,7 +94,11 @@ async function evidence(page,name,e){
  }
  check(expect,e);
  const file='tests/fixtures/quote-builders-'+name+'-original-browser.json',record={name,states,mutations:e.mutations||[]};
- if(original){if(fs.existsSync(path.join(root,file)))expect(record).toEqual(JSON.parse(fs.readFileSync(path.join(root,file),'utf8')));else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable original synthetic populated builder workflow evidence.\n');}}
+ if(original){if(fs.existsSync(path.join(root,file))){
+  if(name.startsWith('screenprint-fast-'))for(const state of states)expect.soft(state.violations.filter(v=>v.id==='color-contrast'),name+' '+state.width+' settled contrast').toEqual([]);
+  const [actual,expected]=stableOriginal(record,JSON.parse(fs.readFileSync(path.join(root,file),'utf8')),name,previewOrigin);
+  expect(actual).toEqual(expected);
+ }else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable original synthetic populated builder workflow evidence.\n');}}
  else{
   const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
   const failedFastSave=name==='screenprint-fast-save-failure';
@@ -44,16 +106,7 @@ async function evidence(page,name,e){
   for(let i=0;i<states.length;i++)for(const key of ['title','url','ids','fields','links','tables']){
    let actual=key==='ids'?{...states[i][key]}:states[i][key];
    let expectedValue=key==='ids'?{...expected.states[i][key]}:expected.states[i][key];
-   if(key==='fields')actual=actual.map(field=>{
-    if(field.id!=='quote-share-url'||!field.value)return field;
-    const saved=expectedValue.find(item=>item.id===field.id);
-    if(!saved?.value)return field;
-    const currentURL=new URL(field.value),originalURL=new URL(saved.value);
-    // Preview ports differ between local capture and CI. The share link must
-    // still use this page's origin; its exact quote ID, path and query stay checked.
-    expect(currentURL.origin,name+' share link uses the current app origin').toBe(previewOrigin);
-    return {...field,value:originalURL.origin+currentURL.pathname+currentURL.search+currentURL.hash};
-   });
+   if(key==='fields')actual=stableShareLink(actual,expectedValue,previewOrigin,name);
    if(name.startsWith('dtg-')&&!name.endsWith('-invoice')){
     // Legacy inline display declarations exposed hidden, empty CRM banners and
     // a thumbnail with no design. The canonical hidden contract now wins.
@@ -91,19 +144,7 @@ async function evidence(page,name,e){
     // value must equal the original desktop state before comparing old visibility.
     if(name.startsWith('dtf-'))for(const id of ['color-dropdown-1-opt-0','color-dropdown-1-opt-1','art-charge-total','art-charge-unit','graphic-design-total-row','graphic-design-unit','rush-fee-total','rush-fee-unit'])if(expectedValue[id]===undefined&&actual[id]!==undefined){expect(actual[id]).toBe(expected.states[0].ids[id]);delete actual[id];}
     if(name==='screenprint-healthy-fees')for(const id of ['vellum-qty-cell','color-change-qty-cell'])if(expectedValue[id]===undefined){expect(actual[id]).toBe(expected.states[0].ids[id]);delete actual[id];}
-    // These informational notices expire on real timers during four-width capture.
-    // Transient warnings below are asserted at their trigger. Persistent errors,
-    // success messages and calculated cap pricing still compare exactly.
-    for(const state of [actual,expectedValue])if(typeof state['toast-container']==='string'){
-     state['toast-container']=state['toast-container'].replace('Ready to build quotes!','').trim();
-     state['toast-container']=state['toast-container'].replace('Ready to build Screen Print quotes!','').trim();
-     // These two exact fee warnings are asserted immediately after startup in the
-     // missing-fee scenes; their existing timeout can expire during full-panel capture.
-     if(name.startsWith('screenprint-'))for(const notice of ["Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving.","Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving."])state['toast-container']=state['toast-container'].replace(notice,'').trim();
-     if(name.startsWith('embroidery-caps'))state['toast-container']=state['toast-container'].replace('Cap detected - using cap embroidery pricing','').trim();
-     if(name==='embroidery-full-back')state['toast-container']=state['toast-container'].replace('Full Back requires minimum 25,000 stitches','').trim();
-     if(name==='embroidery-save-failure')state['toast-container']=state['toast-container'].replace('Error saving quote: Session save failed: {"error":"Synthetic save failure"}','').trim();
-    }
+    actual=stableToasts(actual,name);expectedValue=stableToasts(expectedValue,name);
    }
    if(name.startsWith('dtf-')&&key==='tables'){
     // Every table column now remains available at all widths; compare the
@@ -174,4 +215,4 @@ async function evidence(page,name,e){
  await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'quote-builders-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});
 }
 
-module.exports={evidence};
+module.exports={evidence,stableOriginal};

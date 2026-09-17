@@ -5,6 +5,12 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 ---
 
 ## Archived 2026-09-17
+## Calculator references need complete field and paper ownership (2026-09-11)
+
+- Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.
+- Solution: canonical fields on every quantity selector/input, focusable named scroll regions and selected-type state; scoped print table sizing and visible error banners. Preserve each amount, tier, fee and original financial transformation.
+- Prevention: compare actual original/current values at four widths, keyboard-scroll all sizes, exercise failure and print-view restoration, and inspect every rendered page including long service lists and the contact footer. Keep headings with rows without making entire long categories unbreakable.
+
 ## Record workspaces need current-response checks before secondary writes (2026-09-10)
 
 - Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.

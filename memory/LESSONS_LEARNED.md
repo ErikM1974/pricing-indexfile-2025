@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Saved browser evidence must not record timing samples (2026-09-17)
+
+- Problem/root cause: `CAPTURE_QUOTE_BUILDERS_ORIGINAL=1` failed 30 of 79 replayed builder states on every run, even on the commit before the September 16 changes, although the replayed sources are hash-locked. The saved records held values that change between runs: `Math.random` artwork-widget ids, share links on port 3414, toasts that expire on real timers, guided-step titles that fail contrast only under the resting pointer (Chromium re-applies `:hover` asynchronously after a resize or full-page screenshot), the fast-quote step fade-in (0.3 s, no reduced-motion rule), and the company lookup replacing its "Searching..." node while axe ran. axe names a node that left the document `:root`.
+- Solution: `evidence()` lets finite animations finish before each width. Capture mode compares `stableOriginal()` forms of the new record and the saved one, which normalize only those identities and samples on both sides. Customer values, amounts, quote ids, visible text and saved requests stay exact, and settled fast-quote pages must show no contrast failure. No fixture was regenerated.
+- Prevention: settle animations before recording axe or snapshots, keep random ids and ports out of saved evidence, and treat an axe `:root` target as a node replaced mid-run.
+
 ## Moving an overlay to a native `<dialog>` has three traps (2026-09-17)
 
 - Problem/root cause: the DTG push and assistant-overwrite confirms were unnamed `div[role=dialog]` overlays; Tab walked out to the page and Escape or a backdrop click left focus on `<body>`. Switching to `showModal()` brings its own traps: an overlay class with `display:flex` overrides the browser's `dialog:not([open]) { display:none }`; a panel class with `position:relative` computes to `absolute` in the top layer, so it opens above a scrolled page; and Chrome's native modal still lets Tab leave for the browser toolbar.
@@ -162,12 +168,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 - Problem/root cause: DTG/DTF color handlers read an undeclared currentStyleNumber; inline presentation duplicated CSS; fixed print headers covered prices, and the Embroidery product wrapper also contained pricing/inventory. Screen Print errors disappeared after10 seconds without recovery. Native arrow scroll began after an inventory refresh had replaced its region; search ARIA targeted an empty placeholder.
 - Solution: use the displayed product style with CATALOG_COLOR, canonical scoped CSS and keyboard controls, complete table scroll regions, an independent product wrapper, static print headers and persistent dismissible pricing errors. Save keyboard horizontal movement synchronously before refresh; bind search to actual results and preserve Escape focus. Keep every financial function body and pricing service unchanged.
 - Prevention: immutable original source/value contracts, exact financial function checks, every quantity/color/input path, keyboard focus after generated controls are replaced, failed inventory/pricing, and visual review of every paper page. Do not make whole long sections unbreakable.
-
-## Calculator references need complete field and paper ownership (2026-09-11)
-
-- Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.
-- Solution: canonical fields on every quantity selector/input, focusable named scroll regions and selected-type state; scoped print table sizing and visible error banners. Preserve each amount, tier, fee and original financial transformation.
-- Prevention: compare actual original/current values at four widths, keyboard-scroll all sizes, exercise failure and print-view restoration, and inspect every rendered page including long service lists and the contact footer. Keep headings with rows without making entire long categories unbreakable.
 
 ## CRM UI recovery and print (2026-09-09, archived)
 Full entry in LESSONS_LEARNED_ARCHIVE.md; preserve asynchronous view ownership and native dialog/table semantics.
