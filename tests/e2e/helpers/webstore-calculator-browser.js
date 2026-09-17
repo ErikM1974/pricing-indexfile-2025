@@ -42,7 +42,9 @@ async function open(page,state={}){
  await page.goto('/calculators/webstores.html');await page.evaluate(()=>document.fonts.ready);return events;
 }
 async function snapshot(page){return page.evaluate(()=>{
- const norm=s=>s.replace(/\s+/g,' ').trim(),visible=n=>!!n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden',ids={};
+ // Closed <details> content can give a stale empty first layout answer after Playwright's failed-expect ARIA snapshot walked it; read until two answers agree.
+ const boxes=n=>{let count=n.getClientRects().length;for(let read=0;read<3;read++){const next=n.getClientRects().length;if(next===count)break;count=next;}return count;};
+ const norm=s=>s.replace(/\s+/g,' ').trim(),visible=n=>boxes(n)>0&&getComputedStyle(n).visibility!=='hidden',ids={};
  for(const n of document.querySelectorAll('[id]'))if(visible(n)&&!n.querySelector('[id]')&&!['SCRIPT','STYLE'].includes(n.tagName))ids[n.id]=norm(n.innerText||n.textContent);
  return{title:document.title,url:location.pathname,ids,headings:[...document.querySelectorAll('h1,h2,h3')].filter(visible).map(n=>norm(n.textContent)),fields:[...document.querySelectorAll('input,select,textarea')].filter(visible).map(n=>({id:n.id,value:n.value,disabled:n.disabled})),links:[...document.querySelectorAll('a[href]')].filter(visible).map(n=>({href:n.getAttribute('href'),text:norm(n.textContent)})),cards:[...document.querySelectorAll('.webstore-quote-card,.fundraiser-quote-card,.email-draft-card')].map(n=>norm(n.textContent)),overflow:document.documentElement.scrollWidth>innerWidth+1};
  });}
