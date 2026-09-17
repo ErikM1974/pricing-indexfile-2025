@@ -1,3 +1,9 @@
+## v2026.09.16.5 (2026.09.16)
+
+- Memory: headwear alignment live (v2026.09.16.4)
+- Quick Quote print methods never limited; builder runtime styles and vendor import fixes
+- Deploy v2026.09.16.5: 10 files (dtf-prints-prototype.html, index.html, customer-product.html...)
+
 ## v2026.09.16.4 (2026.09.16)
 
 - Memory: Quick Quote version line live (v2026.09.16.3)
