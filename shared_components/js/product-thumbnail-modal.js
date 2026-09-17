@@ -90,9 +90,9 @@ class ProductThumbnailModal {
                         <p>Style: <span id="modal-product-style"></span></p>
                         <p>Color: <span id="modal-product-color"></span></p>
                     </div>
-                    <div id="modal-product-meta" style="display:none;"></div>
+                    <div id="modal-product-meta"></div>
                 </div>
-                <div id="modal-product-actions" class="product-image-modal-actions" style="display:none;">
+                <div id="modal-product-actions" class="product-image-modal-actions">
                     <a id="modal-product-download"
                        class="product-image-modal-download"
                        target="_blank"
@@ -102,11 +102,8 @@ class ProductThumbnailModal {
         `;
         document.body.appendChild(modal);
         this.modalElement = modal;
-        if (this._usesUnifiedUI()) {
-            modal.querySelectorAll('[style]').forEach(node => {
-                if (node.style.display === 'none') this._setDisplay(node, 'none');
-            });
-        }
+        // Meta lines and the download action start hidden (no style="" attribute: it needs 'unsafe-inline').
+        modal.querySelectorAll('#modal-product-meta, #modal-product-actions').forEach(node => this._setDisplay(node, 'none'));
         const preview = modal.querySelector('#modal-product-img');
         const unavailable = modal.querySelector('.product-image-unavailable');
         preview.addEventListener('error', () => { this._setDisplay(preview, 'none'); unavailable.hidden = false; });
@@ -333,9 +330,8 @@ window.createProductThumbnailCell = function(options) {
         </td>`;
     } else {
         return `<td class="thumbnail-col">
-            <div class="product-thumbnail no-image"
-                 title="No image available"
-                 style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+            <div class="product-thumbnail no-image qb-thumb-box"
+                 title="No image available">
             </div>
         </td>`;
     }

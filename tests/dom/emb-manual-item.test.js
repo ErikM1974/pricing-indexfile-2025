@@ -21,7 +21,7 @@ const path = require('path');
 // globals). Stub them all as no-ops BEFORE requiring the bundle — an undefined one throws
 // asynchronously inside the recalc and takes the worker down rather than failing a test.
 [
-    'renderOrderRecap', 'productThumbnailModal', 'cleanProductTitle', 'getSwatchStyle', 'formatPrice',
+    'renderOrderRecap', 'productThumbnailModal', 'cleanProductTitle', 'getSwatchAttrs', 'qbPaintSwatches', 'formatPrice',
     'parseRatePercent', 'getLtmControlState', 'setLtmControlState',
     'updateQuantityNudge', 'renderLtmControlPanel', 'initLtmControlListeners',
     'renderShipToCard', 'updatePerUnitPrice', 'updateNotesBadge',

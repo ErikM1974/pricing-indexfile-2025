@@ -484,6 +484,184 @@ for(const method of ['embroidery','screenprint','dtf'])test('CSS quote builders:
  expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.mutations).toEqual([]);
 });
 
+// Runtime markup from the builder scripts carries no style attributes either (2026-09-17): static styles are classes,
+// swatch colours and other data go through CSSOM. Each page is served with style attributes blocked while the
+// templates render; every request is synthetic (the push below is a routed fake, never a real order).
+async function blockStyleAttributes(page,method,state={}){
+ const fs=require('fs'),path=require('path'),file='quote-builders/'+method+'-quote-builder.html';
+ await page.route('**/'+file,route=>route.fulfill({contentType:'text/html',headers:{'Content-Security-Policy':"style-src-attr 'none'"},body:fs.readFileSync(path.join(__dirname,'../..',file))}));
+ const blocked=[];page.on('console',m=>{if(/Content Security Policy/.test(m.text()))blocked.push(m.text());});
+ const e=await open(page,{url:'/'+file,...state});await page.waitForLoadState('networkidle');
+ return {e,blocked};
+}
+const FIXTURE_IMAGE='/__core-fixture/garment.svg';
+
+test('CSS quote builders: embroidery runtime markup keeps its look with style attributes blocked',async({page})=>{
+ test.skip(original,'Runtime markup moved to classes after the reviewed migration.');
+ page.setDefaultTimeout(20000);
+ const {e,blocked}=await blockStyleAttributes(page,'embroidery',{save:true});
+ const empty=u=>/^ZZZ/.test(new URL(u).searchParams.get('term')||new URL(u).searchParams.get('q')||'');
+ await page.route('**/api/stylesearch**',r=>empty(r.request().url())?r.fulfill({json:[]}):r.fallback());
+ await page.route('**/api/products/search**',r=>empty(r.request().url())?r.fulfill({json:{success:true,data:{products:[]}}}):r.fallback());
+ await page.route('**/api/digitized-designs/lookup**',r=>r.fulfill({json:{success:true,designs:{4321:{company:'Example Co',designName:'Front Logo',maxStitchCount:9000,maxStitchTier:'Standard',extraColors:2,extraColorSurcharge:1.5,dstFilenames:['a.dst'],variants:[{stitchCount:9000}]}}}}));
+ await page.route('**/api/digitized-designs/by-customer**',r=>r.fulfill({json:{success:true,designs:[]}}));
+ await page.route('**/api/thumbnails/**',r=>r.fulfill({json:/by-designs/.test(r.request().url())?{thumbnails:{}}:{found:false}}));
+ await page.route('**/api/embroidery-push/preview/**',r=>r.fulfill({json:{extOrderId:'NWCA-EMB-2026-777',designCount:1,orderJson:{id_Customer:10001,ExtCustomerID:'X-1',LinesOE:[{PartNumber:'PC54',Description:'Tee',Qty:48,Price:20}],Designs:[{DesignName:'Front Logo',Locations:[{ImageURL:FIXTURE_IMAGE}]}],Notes:[]}}}));
+ await page.route('**/api/embroidery-push/push-quote',r=>r.fulfill({json:{success:true,extOrderId:'NWCA-EMB-2026-777',lineItemCount:1,designCount:1}}));
+ await page.route('**/api/manageorders/getorderno/**',r=>r.fulfill({json:{result:[{id_Order:145001}]}}));
+ const search=page.locator('#product-search');await search.click();await search.pressSequentially('ZZZ9',{delay:60});
+ await expect(page.locator('.suggestion-add-nonsanmar')).toHaveCSS('color','rgb(22, 163, 74)');
+ await search.fill('');await page.keyboard.press('Escape');
+ // Product row: the cap badge starts hidden and the colour swatches are painted.
+ await addProduct(page,'embroidery');
+ const row=page.locator('tr[data-style]').first();
+ await expect(row.locator('.cap-badge')).toBeHidden();
+ await expect(row.locator('.color-picker-option .color-swatch').first()).toHaveCSS('background-color','rgb(38, 59, 70)');
+ // Push preview, the "Sent to ManageOrders" status and the confirmed check.
+ await page.evaluate(()=>{document.getElementById('customer-number').value='10001';document.getElementById('customer-name').value='Example Customer';document.getElementById('customer-email').value='customer@example.invalid';});
+ await page.evaluate(()=>pushToShopWorks());
+ await expect(page.locator('#emb-sw-push-preview .push-design-thumb')).toHaveCSS('width','40px');
+ await expect(page.locator('#emb-sw-push-preview .push-ext-id')).toHaveCSS('color','rgb(156, 163, 175)');
+ await page.evaluate(()=>confirmPushToShopWorks());
+ await expect(page.locator('#emb-sw-import-result .push-confirmed')).toHaveCSS('color','rgb(21, 128, 61)');
+ const verify=page.locator('#emb-sw-verify-btn');
+ await expect(verify).toHaveCSS('color','rgb(255, 255, 255)');await expect(verify).toHaveCSS('border-top-style','none');await expect(verify).toHaveCSS('padding-left','12px');
+ await expect(page.locator('#emb-sw-push-status .push-sent')).toHaveCSS('background-color','rgb(239, 246, 255)');
+ await page.evaluate(()=>closePushPreview());
+ // Service rows: garment and cap badges, icons, the no-size note and the quantity box.
+ await page.evaluate(async()=>{addManualServiceRow('Monogram');await addDECGLineItem('cap',5000);document.querySelectorAll('dialog[open]').forEach(d=>d.close());});
+ const capBadge=page.locator('.service-product-row .service-style-badge.is-cap');
+ await expect(capBadge).toHaveCSS('display','inline-flex');await expect(capBadge).toHaveCSS('color','rgb(30, 64, 175)');
+ await expect(page.locator('.service-product-row .service-style-badge:not(.is-cap)').first()).toHaveCSS('background-color','rgb(254, 243, 199)');
+ await expect(page.locator('.service-product-row .service-icon.is-cap i')).toHaveCSS('color','rgb(59, 130, 246)');
+ await expect(page.locator('.service-product-row .service-icon').first()).toHaveCSS('width','50px');
+ await expect(page.locator('.service-product-row .cap-badge')).toHaveCSS('display','flex'); // inline-flex inside the flex row
+ await expect(page.locator('.service-product-row .service-size-note').first()).toHaveCSS('font-style','italic');
+ await expect(page.locator('.service-product-row .service-qty').first()).toHaveCSS('width','60px');
+ // Design badge and the empty customer gallery.
+ await page.evaluate(async()=>{document.getElementById('garment-design-number').value='4321';await lookupDesignNumber('garment');});
+ await expect(page.locator('#garment-design-info .design-extra-colors')).toHaveCSS('color','rgb(217, 119, 6)');
+ await expect(page.locator('#garment-design-info .design-dst-icon')).toHaveCSS('margin-right','2px');
+ await page.evaluate(()=>openDesignSearchModal('garment'));
+ await expect(page.locator('#design-search-results .is-gallery-empty')).toHaveCSS('display','flex');
+ await page.evaluate(()=>closeDesignSearchModal());
+ // Import preview: every section the parser can report.
+ await page.locator('button[data-call="openShopWorksImportModal"]').first().click();
+ await page.evaluate(()=>{
+  const parse=ShopWorksImportParser.prototype.parse;
+  ShopWorksImportParser.prototype.parse=function(text){
+   const r=parse.call(this,text);
+   Object.assign(r,{pricingSource:'fallback',decgApiFailed:true,notes:['Example note'],customProducts:[{partNumber:'VND100',description:'Vendor tee',sizes:{M:6}}],reviewItems:[{partNumber:'ODD1',description:'Odd item',quantity:2,unitPrice:4}],
+    decgItems:[{serviceType:'decg',description:'Customer jackets',quantity:12,stitchCount:9000,calculatedUnitPrice:18,ltmFee:0},{serviceType:'decc',description:'Customer caps',quantity:6,stitchCount:5000,calculatedUnitPrice:15,ltmFee:50}]});
+   return r;
+  };
+ });
+ await page.locator('#shopworks-paste-area').fill(VENDOR_ORDER);
+ await page.locator('#btn-parse-import').click();
+ const preview=page.locator('#shopworks-import-modal');
+ await expect(preview.locator('.preview-product-style.is-decc')).toHaveCSS('color','rgb(30, 64, 175)');
+ await expect(preview.locator('.preview-product-style.is-decg')).toHaveCSS('background-color','rgb(254, 243, 199)');
+ await expect(preview.locator('.preview-product-item.is-custom')).toHaveCSS('border-left-color','rgb(194, 65, 12)');
+ await expect(preview.locator('.preview-pricing-source.is-fallback')).toHaveCSS('color','rgb(251, 191, 36)');
+ await expect(preview.locator('input.product-include-check').first()).toHaveCSS('width','16px');
+ await expect(preview.locator('.preview-decg-error')).toHaveCSS('border-top-color','rgb(239, 68, 68)');
+ await expect(preview.locator('.preview-review-list')).toHaveCSS('max-height','150px');
+ await expect(preview.locator('label.preview-review-item')).toHaveCSS('font-size','13px');
+ await page.evaluate(()=>closeShopWorksImportModal());
+ // Service pricing review with a found, a fallback and an unknown design.
+ await page.evaluate(()=>{showServicePricingReview([{type:'monogram',quantity:6,shopWorksPrice:0,apiPrice:null},{type:'DECG',quantity:12,stitchCount:9000,shopWorksPrice:20,apiPrice:18,_sourceItems:[{unitPrice:19,quantity:6},{unitPrice:21,quantity:6}]}],[],
+  {hasGarments:true,hasCaps:true,totalQty:24,designNumbersRaw:['111','222','333'],designNumbers:['Design #111 — Back','Design #222 — Cap','Design #333 — Missing'],
+   designLookup:{designs:{111:{company:'ACME',designName:'Back',maxStitchCount:30000,maxStitchTier:'Full Back',maxAsSurcharge:0,thumbnailUrl:'/__core-fixture/garment.svg',variants:[{stitchCount:30000}]}},fallbackDesigns:{222:{companyName:'ACME',designName:'Cap',colorCount:2}}}});});
+ const review=page.locator('#service-pricing-review-modal');
+ await expect(review.locator('.spr-design-row').first()).toHaveCSS('display','flex');
+ await expect(review.locator('.spr-design-row-thumb')).toHaveCSS('width','40px');
+ await expect(review.locator('.spr-thumb-slot').first()).toBeHidden();
+ await expect(review.locator('.spr-design-flag:not(.is-missing)')).toHaveCSS('background-color','rgb(217, 119, 6)');
+ await expect(review.locator('.spr-design-flag.is-missing')).toHaveCSS('background-color','rgb(156, 163, 175)');
+ await expect(review.locator('select.spr-design-assign').first()).toHaveCSS('font-size','11px');
+ await expect(review.locator('.spr-banner-title')).toHaveCSS('color','rgb(30, 64, 175)');
+ await expect(review.locator('td.spr-na-cell')).toHaveCSS('text-align','center');
+ await expect(review.locator('summary.spr-detail-summary')).toHaveCSS('font-size','11px');
+ await page.evaluate(()=>cancelServicePricingReview());
+ // Pricing API warning: its parts are styled through CSSOM, like the banner itself.
+ await page.evaluate(()=>window.__embState.pricingCalculator.showAPIWarning('Synthetic pricing failure','general'));
+ await expect(page.locator('#pricing-api-warning .api-warning-title')).toHaveCSS('font-size','24px');
+ await expect(page.locator('#pricing-api-warning button').first()).toHaveCSS('color','rgb(239, 68, 68)');
+ expect(blocked).toEqual([]);
+ expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);
+});
+
+for(const method of ['screenprint','dtf'])test('CSS quote builders: '+method+' runtime markup keeps its look with style attributes blocked',async({page})=>{
+ test.skip(original,'Runtime markup moved to classes after the reviewed migration.');
+ page.setDefaultTimeout(20000);
+ const {e,blocked}=await blockStyleAttributes(page,method,{safetyRecs:true});
+ await page.route('**/api/designs/by-customer/**',r=>r.fulfill({json:{designs:[{idDesign:5001,designName:'Front Logo',thumbnailUrl:FIXTURE_IMAGE,designComplete:true,dateCreated:'2026-08-01T10:00:00'},{idDesign:5002,designName:'Back',thumbnailUrl:'',locationCount:2,designComplete:true}]}}));
+ await addProduct(page,method);
+ const row=page.locator('tr[data-style]:not(.child-row)').first();
+ await expect(row.locator('.color-picker-option .color-swatch').first()).toHaveCSS('background-color','rgb(38, 59, 70)');
+ // Safety-stripe recommendation dots take their colour through CSSOM.
+ if(method==='screenprint'){
+  await page.locator('#scp-safety-recs .ssr-head').click();
+  await expect(page.locator('#scp-safety-recs .ssr-swatch').first()).toHaveCSS('background-color','rgb(244, 229, 0)');
+  // Shared extended-size popup: the empty note spans the grid; collapsed waist groups start hidden.
+  const rowId=await row.getAttribute('data-row-id');
+  await page.evaluate(async rowId=>{const get=window.getAvailableExtendedSizes;window.getAvailableExtendedSizes=async()=>[];await openExtendedSizePopup(rowId);window.getAvailableExtendedSizes=get;},rowId);
+  await expect(page.locator('#size-popup-grid .size-popup-empty')).toHaveCSS('grid-column-end','-1');
+  await page.evaluate(async rowId=>{closeExtendedSizePopup();const r=document.getElementById('row-'+rowId);r.dataset.sizeCategory='pants';r.dataset.pantsSizes=JSON.stringify(['3030','4030']);await openExtendedSizePopup(rowId);r.dataset.sizeCategory='';delete r.dataset.pantsSizes;},rowId);
+  await expect(page.locator('.pants-waist-group.expanded .waist-sizes')).toBeVisible();await expect(page.locator('.pants-waist-group.collapsed .waist-sizes')).toBeHidden();
+  await page.locator('.pants-waist-group.collapsed .waist-header').click();await expect(page.locator('.waist-sizes').nth(1)).toBeVisible();
+  await page.evaluate(()=>closeExtendedSizePopup());
+ }
+ // Extended-size child row: painted swatch and the greyed column that is not its size.
+ await row.locator('.xxxl-picker-btn').click();
+ await page.locator('.size-popup-input, .ext-size-input').first().fill('3');
+ await page.locator('#extended-size-popup .size-popup-apply, #extended-size-popup [data-call="applyExtendedSizes"]').first().click();
+ const child=page.locator('tr.child-row').first();
+ // SCP keeps only http(s) swatch images (the fixture is local, so its colour shows); DTF shows the parent's image.
+ if(method==='screenprint')await expect(child.locator('.color-picker-selected .color-swatch')).toHaveCSS('background-color','rgb(38, 59, 70)');
+ else await expect(child.locator('.color-picker-selected .color-swatch')).toHaveCSS('background-image',/garment\.svg/);
+ if(method==='screenprint')await expect(child.locator('input.size-input-off')).toHaveCSS('background-color','rgb(243, 244, 246)');
+ else await expect(child.locator('img.qb-thumb-box-img')).toHaveCSS('object-fit','contain');
+ // Customer design combobox rows.
+ await page.locator('.guided-toggle').click();
+ await page.evaluate(()=>{const c=document.getElementById('customer-number');c.value='10001';c.dispatchEvent(new Event('change'));});
+ const design=page.locator('#design-number');
+ if(!await design.isVisible())await page.locator('.customer-manual summary').first().click();
+ await design.click();
+ const first=page.locator('.cdcb-row').first();
+ await expect(first).toHaveCSS('display','flex');
+ await expect(page.locator('.cdcb-thumb-empty')).toHaveCSS('font-size','10px');
+ await expect(page.locator('.cdcb-row-sub').first()).toHaveCSS('font-size','11px');
+ await design.press('ArrowDown');await expect(page.locator('.cdcb-row-active')).toHaveCSS('background-color','rgb(227, 241, 228)');
+ await design.fill('zzz');await expect(page.locator('.cdcb-empty')).toHaveCSS('padding-top','12px');
+ await design.press('Escape');
+ // Thumbnail modal: meta lines and download start hidden and show for a generic preview.
+ await page.evaluate(img=>productThumbnailModal.open(img,'Example','PC54','Jet Black'),FIXTURE_IMAGE);
+ await expect(page.locator('#modal-product-meta')).toBeHidden();await expect(page.locator('#modal-product-actions')).toBeHidden();
+ await page.evaluate(img=>{productThumbnailModal.close();productThumbnailModal.openGeneric({imageUrl:img,title:'Example',metaLines:[{label:'Style',value:'PC54'}],downloadUrl:img});},FIXTURE_IMAGE);
+ await expect(page.locator('#modal-product-meta')).toBeVisible();await expect(page.locator('#modal-product-actions')).toBeVisible();
+ await page.evaluate(()=>productThumbnailModal.close());
+ if(method==='dtf'){
+  await page.evaluate(()=>window.dtfQuoteBuilder.updateEditModeUI('DTF-2026-777',2));
+  await expect(page.locator('.power-header-subtitle .qb-edit-mode-label')).toHaveCSS('color','rgb(251, 191, 36)');
+  await page.evaluate(()=>window.dtfQuoteBuilder.resetQuote());
+  await expect(page.locator('#empty-state-row .dtf-reset-steps')).toHaveCSS('color','rgb(156, 163, 175)');
+ }
+ expect(blocked).toEqual([]);
+ expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);
+});
+
+test('CSS quote builders: dtf configuration error keeps its look with style attributes blocked',async({page})=>{
+ test.skip(original,'Runtime markup moved to classes after the reviewed migration.');
+ await page.route('**/shared_components/js/extended-sizes-config.js**',r=>r.fulfill({contentType:'application/javascript',body:''}));
+ const {blocked}=await blockStyleAttributes(page,'dtf');
+ const screen=page.locator('.dtf-config-error');
+ await expect(screen).toContainText('Configuration Error');
+ await expect(screen).toHaveCSS('padding-top','40px');await expect(screen).toHaveCSS('color','rgb(204, 0, 0)');
+ await expect(page.locator('.dtf-config-error-note')).toHaveCSS('font-size','12px');
+ expect(blocked).toEqual([]);
+});
+
 // Every runtime overlay, notice and warning state the retired sheets styled has a real style again.
 for(const method of ['embroidery','screenprint','dtf','dtg'])test('CSS quote builders: '+method+' runtime overlays and warning states are styled',async({page})=>{
  test.skip(original,'The original page loaded the retired sheets.');

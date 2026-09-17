@@ -137,7 +137,7 @@
 
             if (!customerId) {
                 m.innerHTML =
-                    '<div class="cdcb-empty" style="padding:12px;color:#6b7280;font-style:italic;">' +
+                    '<div class="cdcb-empty is-hint">' +
                     'Pick a customer first to see their designs</div>';
                 return;
             }
@@ -150,7 +150,7 @@
 
             if (filtered.length === 0) {
                 m.innerHTML =
-                    '<div class="cdcb-empty" style="padding:12px;color:#6b7280;">' +
+                    '<div class="cdcb-empty">' +
                     'No ' + method.toUpperCase() + ' designs found for this customer' +
                     (q ? ' matching "' + escapeHtml(q) + '"' : '') +
                     '</div>';
@@ -160,8 +160,8 @@
             const rows = filtered.slice(0, 50).map((d, idx) => {
                 const isActive = idx === activeIndex;
                 const thumb = d.thumbnailUrl
-                    ? '<img src="' + escapeHtml(resolveBoxUrl(d.thumbnailUrl)) + '" alt="" class="cdcb-thumb" style="width:40px;height:40px;object-fit:cover;border-radius:4px;background:#f3f4f6;flex-shrink:0;">'
-                    : '<div class="cdcb-thumb cdcb-thumb-empty" style="width:40px;height:40px;border-radius:4px;background:#f3f4f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:10px;">No img</div>';
+                    ? '<img src="' + escapeHtml(resolveBoxUrl(d.thumbnailUrl)) + '" alt="" class="cdcb-thumb">'
+                    : '<div class="cdcb-thumb cdcb-thumb-empty">No img</div>';
                 const status = [];
                 if (d.locationCount > 1) status.push(d.locationCount + ' locations');
                 if (d.isVariation) status.push('variation');
@@ -170,24 +170,21 @@
                 if (dateLabel && status.length === 0) status.push(dateLabel);
                 const subline = status.join(' · ');
                 return (
-                    '<div class="cdcb-row' + (isActive ? ' cdcb-row-active' : '') + '" data-idx="' + idx + '"' +
-                    ' style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--pnw-rule, rgba(31, 73, 34, 0.10));' +
-                    (isActive ? 'background:var(--pnw-mist, #e8eee7);' : '') +
-                    '">' +
+                    '<div class="cdcb-row' + (isActive ? ' cdcb-row-active' : '') + '" data-idx="' + idx + '">' +
                         thumb +
-                        '<div style="flex:1;min-width:0;">' +
-                            '<div style="font-weight:600;color:var(--pnw-pine, #1a3517);">' +
+                        '<div class="cdcb-row-body">' +
+                            '<div class="cdcb-row-title">' +
                                 '#' + escapeHtml(d.idDesign) +
                                 (d.designName ? ' — ' + escapeHtml(d.designName) : '') +
                             '</div>' +
-                            (subline ? '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + escapeHtml(subline) + '</div>' : '') +
+                            (subline ? '<div class="cdcb-row-sub">' + escapeHtml(subline) + '</div>' : '') +
                         '</div>' +
                     '</div>'
                 );
             }).join('');
 
             const more = filtered.length > 50
-                ? '<div style="padding:8px;text-align:center;font-size:11px;color:#9ca3af;">Showing first 50 of ' + filtered.length + ' — narrow your search</div>'
+                ? '<div class="cdcb-more">Showing first 50 of ' + filtered.length + ' — narrow your search</div>'
                 : '';
 
             m.innerHTML = rows + more;

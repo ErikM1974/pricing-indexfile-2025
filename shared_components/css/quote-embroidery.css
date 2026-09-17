@@ -351,6 +351,59 @@
 :where([data-ui="unified"][data-quote-workspace="embroidery"]) .chat-message.assistant .chat-bubble th { background:var(--ui-surface); font-weight:600; }
 :where([data-ui="unified"][data-quote-workspace="embroidery"]) .chat-message.assistant .chat-bubble br + br { display:none; }
 
+/* Runtime markup that used to carry style="" (2026-09-17): product rows and service rows. */
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .suggestion-item.suggestion-add-nonsanmar { color:var(--green-600); font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-product-row .cap-badge { display:inline-flex; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-style-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:4px; background:var(--amber-100); color:var(--amber-800); font-size:12px; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-style-badge.is-cap { background:color-mix(in srgb, var(--color-floor-light) 11%, var(--color-floor-tint)); color:var(--blue-800); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-icon { display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:6px; background:color-mix(in srgb, var(--amber-100) 35%, var(--color-surface)); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-icon.is-cap { background:var(--color-floor-tint); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-icon i { color:var(--amber-500); font-size:20px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-icon.is-cap i { color:var(--color-floor-light); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-description { color:var(--gray-700); font-size:13px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-na { color:var(--slate-500); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-size-note { color:var(--gray-400); font-size:11px; font-style:italic; text-align:center; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .product-table .service-product-row .service-qty { width:60px; text-align:center; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-table td.spr-na-cell { color:var(--gray-400); text-align:center; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-table td.spr-delta-cell { text-align:center; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) summary.spr-detail-summary { color:var(--slate-500); font-size:11px; cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-detail-table { width:100%; margin-top:4px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-design-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:5px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-design-row-thumb { flex-shrink:0; width:40px; height:40px; border:1px solid color-mix(in srgb, var(--gray-300) 50%, var(--gray-200)); border-radius:4px; object-fit:cover; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-thumb-slot { display:none; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-design-name { color:var(--slate-500); font-size:11px; font-style:italic; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-design-name.is-fallback { font-style:normal; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-design-flag { margin-left:4px; padding:1px 6px; border-radius:3px; background:var(--amber-600); color:var(--color-surface); font-size:11px; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-design-flag.is-missing { background:var(--gray-400); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) select.spr-design-assign { margin-left:auto; padding:2px 6px; border:1px solid var(--gray-300); border-radius:4px; background:var(--color-surface); font-size:11px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-banner-title { margin-bottom:6px; color:var(--blue-800); font-size:11px; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-banner-title.is-lookup { margin-bottom:4px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-pricing-source.is-live { color:color-mix(in srgb, var(--green-600) 67%, var(--brand-500)); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-pricing-source.is-fallback { color:var(--amber-400); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-product-item input.product-include-check { flex-shrink:0; width:16px; height:16px; cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-product-style.is-decg { background:var(--amber-100); color:var(--amber-800); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-product-style.is-decc { background:color-mix(in srgb, var(--color-floor-light) 11%, var(--color-floor-tint)); color:var(--blue-800); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-stitch-note { margin-top:8px; color:var(--slate-500); font-size:11px; font-style:italic; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-products h5.preview-custom-title { margin-top:12px; color:var(--store-rush-deep); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-product-item.is-custom { border-left:3px solid var(--store-rush-deep); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-product-style.is-custom { background:var(--orange-200); color:var(--store-rush-deep); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-product-qty.is-custom { color:var(--store-rush-deep); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-decg-error { margin-bottom:10px; padding:10px 12px; border:1px solid var(--red-500); border-radius:6px; background:var(--red-50); color:var(--red-700); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-warnings h5.preview-review-title { margin-top:12px; color:var(--amber-700); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-review-list { max-height:150px; padding:4px 0; overflow-y:auto; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-review-list label.preview-review-item { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:13px; cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .push-ext-id { color:var(--gray-400); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .push-design-thumb { width:40px; height:40px; margin-right:8px; border:1px solid var(--slate-200); border-radius:4px; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .shopworks-import-preview.push-sent { border-color:var(--blue-200); background:var(--color-floor-tint); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .push-sent-note { margin-top:10px; color:var(--slate-600); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .push-import-result { margin-top:8px; font-size:.92em; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .push-sent button.push-verify-btn { margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:color-mix(in srgb, var(--sky-900) 60%, var(--color-bradley-dark)); color:var(--color-surface); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .push-confirmed { color:var(--green-700); font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-dst-icon { margin-right:2px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-extra-colors { color:var(--amber-600); font-size:11px; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-empty.is-gallery-empty { display:flex; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-name.is-company { color:var(--gray-700); font-style:normal; font-weight:500; }
+
 @keyframes emb-pulse { 50% { box-shadow:0 0 0 4px color-mix(in srgb, var(--violet-600) 30%, transparent); } }
 
 }

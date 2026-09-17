@@ -364,7 +364,7 @@ export const lifecycleMethods = {
         // Update header subtitle
         const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
         if (headerSubtitle) {
-            headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
+            headerSubtitle.innerHTML = `<span class="qb-edit-mode-label">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
         }
 
         // Update save button text
@@ -1385,7 +1385,7 @@ export const lifecycleMethods = {
                 <td colspan="14" class="qb-empty-state">
                     <div class="qb-empty-state-emoji">&#128085;</div>
                     <div class="qb-empty-state-title">Getting Started</div>
-                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.8;">
+                    <div class="dtf-reset-steps">
                         <span class="step-badge step-1">1</span> Select transfer locations above
                         &nbsp;&bull;&nbsp;
                         <span class="step-badge step-2">2</span> Type a style # (e.g., PC54, G500)

@@ -69,7 +69,10 @@ describe('quote cart + PDP modules', () => {
     });
     test('safety-stripe swatches via --swatch; drawer close named', () => {
         expect(read('shared_components/js/safety-stripe-recs.js')).not.toMatch(/style="background/);
-        expect(read('shared_components/js/safety-stripe-recs.js')).toMatch(/style="--swatch:/);
+        // The dot colour is a data attribute applied as --swatch through CSSOM (no style="" attribute: CSP).
+        expect(read('shared_components/js/safety-stripe-recs.js')).not.toMatch(/\sstyle="[^"]/);
+        expect(read('shared_components/js/safety-stripe-recs.js')).toMatch(/data-swatch-hex="/);
+        expect(read('shared_components/js/safety-stripe-recs.js')).toMatch(/style\.setProperty\('--swatch', dot\.dataset\.swatchHex\)/);
         // Check the swatch property without assuming it is the rule's only declaration.
         const swatchBackgrounds = [];
         require('postcss').parse(read('shared_components/css/safety-stripe-recs.css')).walkRules(rule => {

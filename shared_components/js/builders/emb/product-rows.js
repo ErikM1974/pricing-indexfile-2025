@@ -16,7 +16,7 @@
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global
    escapeHtml, showToast, renderOrderRecap, QuoteOrderSummary, markAsUnsaved,
-   Event, cleanProductTitle, getSwatchStyle, productThumbnailModal, formatPrice,
+   Event, cleanProductTitle, getSwatchAttrs, qbPaintSwatches, productThumbnailModal, formatPrice,
    HeadwearClassifier, SKUValidationService, SIZE_TO_SUFFIX,
    EXTENDED_SIZE_ORDER */
 import { getServicePrice } from './pricing.js';
@@ -302,7 +302,7 @@ function showSearchSuggestions(products) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): only escapeHtml(q) interpolations (nested-ternary shape the rule cannot parse)
         suggestions.innerHTML = `
             <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${escapeHtml(q)}"` : ''}</span></div>
-            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" data-call="addNonSanmarFromSearch" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle" aria-hidden="true"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
+            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" data-call="addNonSanmarFromSearch"><span><i class="fas fa-plus-circle" aria-hidden="true"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
         suggestions.classList.add('show');
         return;
     }
@@ -406,7 +406,7 @@ export function addNewRow() {
                        placeholder="(auto)"
                        data-field="description"
                        readonly>
-                <span class="cap-badge" id="cap-badge-${rowId}" style="display: none;">
+                <span class="cap-badge" id="cap-badge-${rowId}">
                     <i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap
                 </span>
             </div>
@@ -442,6 +442,8 @@ export function addNewRow() {
             </button>
         </td>
     `;
+    // The cap badge starts hidden; its toggles write style.display.
+    /** @type {HTMLElement} */ (row.querySelector('.cap-badge')).style.display = 'none';
 
     tbody.appendChild(row);
 
@@ -573,33 +575,32 @@ export function createServiceProductRow(serviceType, data) {
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal service-type enums + numeric qty/rowId only
     row.innerHTML = `
         <td>
-            <span class="service-style-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: ${isCap ? '#dbeafe' : '#fef3c7'}; color: ${isCap ? '#1e40af' : '#92400e'}; border-radius: 4px; font-weight: 600; font-size: 12px;">
+            <span class="service-style-badge${isCap ? ' is-cap' : ''}">
                 <i class="fas ${meta.icon}" aria-hidden="true"></i>
                 ${serviceType}
             </span>
         </td>
         <td class="thumbnail-col">
-            <div class="service-icon" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: ${isCap ? '#eff6ff' : '#fffbeb'}; border-radius: 6px;">
-                <i class="fas ${meta.icon}" aria-hidden="true" style="font-size: 20px; color: ${isCap ? '#3b82f6' : '#f59e0b'};"></i>
+            <div class="service-icon${isCap ? ' is-cap' : ''}">
+                <i class="fas ${meta.icon}" aria-hidden="true"></i>
             </div>
         </td>
         <td class="desc-cell">
             <div class="desc-row">
-                <span class="service-description" style="font-size: 13px; color: #334155;">${escapeHtml(displayDescription)}</span>
-                ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap</span>' : ''}
+                <span class="service-description">${escapeHtml(displayDescription)}</span>
+                ${isCap ? '<span class="cap-badge"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap</span>' : ''}
                 ${['DECG', 'DECC'].includes(serviceType) ? `<button type="button" class="btn-describe-cs" data-call="openCustomerSuppliedDialog" data-args="[${rowId}]" title="Describe the customer's goods"><i class="fas fa-pencil-alt" aria-hidden="true"></i> Describe</button>` : ''}
             </div>
         </td>
         <td>
-            <span style="color: #64748b; font-size: 12px;">N/A</span>
+            <span class="service-na">N/A</span>
         </td>
-        <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 11px; font-style: italic;">
+        <td colspan="6" class="service-size-note">
             Service item - no size breakdown
         </td>
         <td class="cell-qty">
             <input type="number" class="cell-input service-qty" min="0" max="9999" value="${quantity}"
-                   data-change="onServiceQtyChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'
-                   style="width: 60px; text-align: center;">
+                   data-change="onServiceQtyChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'>
         </td>
         <td class="cell-price" id="row-price-${rowId}"
             ${['DECG', 'DECC'].includes(serviceType) ? `ondblclick="enablePriceOverride(${rowId})" title="Double-click to override price"` : ''}>$${unitPrice.toFixed(2)}</td>
@@ -1233,7 +1234,7 @@ export async function onStyleChange(input, rowId) {
 
             if (colors && colors.length > 0) {
                 // Populate custom color picker dropdown with swatches
-                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
+                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchAttrs (C32)
                 pickerDropdown.innerHTML = colors.map(c => `
                     <div class="color-picker-option"
                          data-color-name="${escapeHtml(c.COLOR_NAME)}"
@@ -1242,10 +1243,11 @@ export async function onStyleChange(input, rowId) {
                          data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
                          data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
                          data-call="selectColor" data-args='[${rowId}, "$this"]'>
-                        <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+                        <span class="color-swatch" ${getSwatchAttrs(c)}></span>
                         <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
                     </div>
                 `).join('');
+                qbPaintSwatches(pickerDropdown);
 
                 // Enable the picker
                 pickerSelected.classList.remove('disabled');
@@ -1524,7 +1526,7 @@ export function populateNonSanmarRow(row, rowId, product) {
     // Populate color dropdown from DefaultColors (comma-separated text)
     const defaultColors = (product.DefaultColors || '').split(',').map(c => c.trim()).filter(Boolean);
     if (defaultColors.length > 0 && pickerDropdown) {
-        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; fixed placeholder swatch
         pickerDropdown.innerHTML = defaultColors.map(color => `
             <div class="color-picker-option"
                  data-color-name="${escapeHtml(color)}"
@@ -1533,10 +1535,11 @@ export function populateNonSanmarRow(row, rowId, product) {
                  data-hex="#ccc"
                  data-image-url=""
                  data-call="selectNonSanmarColor" data-args='[${rowId}, "$this"]'>
-                <span class="color-swatch" style="background-color: #ccc;"></span>
+                <span class="color-swatch" data-swatch-color="#ccc"></span>
                 <span class="color-name">${escapeHtml(color)}</span>
             </div>
         `).join('');
+        qbPaintSwatches(pickerDropdown);
 
         pickerSelected.classList.remove('disabled');
         row.dataset.colors = JSON.stringify(defaultColors.map(c => ({ COLOR_NAME: c, CATALOG_COLOR: c })));
@@ -2654,7 +2657,7 @@ function extractAllSizes(skus) {
     });
 }
 
-// getSwatchStyle() — now provided by quote-builder-utils.js
+// getSwatchAttrs() / qbPaintSwatches() — now provided by quote-builder-utils.js
 
 // ============================================================
 // COLOR PICKER FUNCTIONS
@@ -3206,18 +3209,13 @@ export function createChildRow(parentRowId, size, qty) {
              data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
              data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
              data-call="selectChildColor" data-args='[${childRowId}, ${parentRowId}, "$this"]'>
-            <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+            <span class="color-swatch" ${getSwatchAttrs(c)}></span>
             <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
         </div>`
     ).join('');
 
-    // Build current color display — sanitize before interpolating into (CSS/attribute
-    // breakout); mirrors the hardened getSwatchStyle(). (review C32)
-    const _swUrl = String(parentSwatchUrl || '').replace(/["'()\\\s]/g, '');
-    const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';
-    const currentSwatchStyle = /^https?:\/\//i.test(_swUrl)
-        ? `background-image: url('${_swUrl}'); background-size: cover; background-position: center;`
-        : `background-color: ${_swHex};`;
+    // Current color display — the same hardened swatch attributes as the options (review C32).
+    const currentSwatchAttrs = getSwatchAttrs({ COLOR_SQUARE_IMAGE: parentSwatchUrl, HEX_CODE: parentHex });
 
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
@@ -3267,7 +3265,7 @@ export function createChildRow(parentRowId, size, qty) {
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
                 <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" data-keydown="handleColorPickerKeydown" data-keydown-args='["$event", ${childRowId}]'>
-                    <span class="color-swatch" style="${currentSwatchStyle}"></span>
+                    <span class="color-swatch" ${currentSwatchAttrs}></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
                     <i class="fas fa-chevron-down picker-arrow" aria-hidden="true"></i>
                 </div>
@@ -3280,8 +3278,8 @@ export function createChildRow(parentRowId, size, qty) {
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="M" aria-label="Quantity M" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="L" aria-label="Quantity L" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="XL" aria-label="Quantity XL" disabled value=""></td>
-        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
-        <td><input type="number" class="cell-input size-input" data-size="${size}" aria-label="Quantity ${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
+        <td><input type="number" class="cell-input size-input${isSize05 ? '' : ' size-input-off'}" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
+        <td><input type="number" class="cell-input size-input${isSize06 ? '' : ' size-input-off'}" data-size="${size}" aria-label="Quantity ${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
         <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
         <td class="cell-price unit-price-display" id="row-price-${childRowId}"
             ondblclick="enablePriceOverride(${childRowId})"
@@ -3293,6 +3291,7 @@ export function createChildRow(parentRowId, size, qty) {
             </button>
         </td>
     `;
+    qbPaintSwatches(childRow);
 
     // Insert in correct size order: XS, 2XL, 3XL, 4XL, 5XL, 6XL
     const existingChildren = Array.from(document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`));

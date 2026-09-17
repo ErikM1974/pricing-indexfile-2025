@@ -2127,35 +2127,25 @@ class EmbroideryPricingCalculator {
                      severity === 'warning' ? 'WARNING' : 'ERROR';
         
         warningBanner.innerHTML = `
-            <div style="font-size: 24px; margin-bottom: 10px;">
+            <div class="api-warning-title">
                 ${icon} ${title} ${icon}
             </div>
-            <div style="font-size: 16px; line-height: 1.5;">
+            <div class="api-warning-message">
                 ${message}
             </div>
-            <div style="margin-top: 15px;">
-                <button onclick="location.reload()" style="
-                    background: white;
-                    color: ${bgColor};
-                    border: none;
-                    padding: 10px 20px;
-                    margin: 0 5px;
-                    border-radius: 4px;
-                    font-weight: bold;
-                    cursor: pointer;
-                ">Try Again</button>
-                <button onclick="alert('Please contact IT support at erik@nwcustomapparel.com or call 253-922-5793.')" style="
-                    background: white;
-                    color: ${bgColor};
-                    border: none;
-                    padding: 10px 20px;
-                    margin: 0 5px;
-                    border-radius: 4px;
-                    font-weight: bold;
-                    cursor: pointer;
-                ">Report Issue</button>
+            <div class="api-warning-actions">
+                <button onclick="location.reload()">Try Again</button>
+                <button onclick="alert('Please contact IT support at erik@nwcustomapparel.com or call 253-922-5793.')">Report Issue</button>
             </div>
         `;
+        // Styled through CSSOM like the banner itself: this script also runs on pages without
+        // embroidery-quote-pricing.css, and a style="" attribute needs 'unsafe-inline'.
+        warningBanner.querySelector('.api-warning-title').style.cssText = 'font-size: 24px; margin-bottom: 10px;';
+        warningBanner.querySelector('.api-warning-message').style.cssText = 'font-size: 16px; line-height: 1.5;';
+        warningBanner.querySelector('.api-warning-actions').style.cssText = 'margin-top: 15px;';
+        warningBanner.querySelectorAll('.api-warning-actions button').forEach((button) => {
+            button.style.cssText = `background: white; color: ${bgColor}; border: none; padding: 10px 20px; margin: 0 5px; border-radius: 4px; font-weight: bold; cursor: pointer;`;
+        });
         
         // Add CSS animation if not already present
         if (!document.getElementById('api-warning-styles')) {

@@ -703,20 +703,35 @@ function cleanProductTitle(title, styleNumber) {
 }
 
 /**
- * Generate inline CSS style string for a color swatch
- * Uses COLOR_SQUARE_IMAGE if available, falls back to HEX_CODE
+ * Swatch data attributes for a color: its COLOR_SQUARE_IMAGE, or HEX_CODE as the fallback.
+ * Runtime markup carries no style="" attribute (blocked without 'unsafe-inline'); call
+ * qbPaintSwatches() on the inserted markup to apply them through CSSOM.
  */
-function getSwatchStyle(color) {
+function getSwatchAttrs(color) {
     if (color.COLOR_SQUARE_IMAGE) {
         // Strip quotes/parens/backslashes/whitespace + require an http(s) URL so a crafted swatch value
-        // can't break out of the style="" attribute or the url() (CSS/attribute injection). (review C32)
+        // can't break out of the attribute or the url() (CSS/attribute injection). (review C32)
         const safe = String(color.COLOR_SQUARE_IMAGE).replace(/["'()\\\s]/g, '');
         if (/^https?:\/\//i.test(safe)) {
-            return `background-image: url('${safe}'); background-size: cover; background-position: center;`;
+            return `data-swatch-image="${escapeHtml(safe)}"`;
         }
     }
     const hex = (color.HEX_CODE && /^#[0-9a-fA-F]{3,8}$/.test(color.HEX_CODE)) ? color.HEX_CODE : '#ccc';
-    return `background-color: ${hex};`;
+    return `data-swatch-color="${hex}"`;
+}
+
+/** Paints the data-swatch-image / data-swatch-color elements inside root through CSSOM. */
+function qbPaintSwatches(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-swatch-image], [data-swatch-color]').forEach((el) => {
+        if (el.dataset.swatchImage) {
+            el.style.backgroundImage = `url(${JSON.stringify(el.dataset.swatchImage)})`;
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+        } else {
+            el.style.backgroundColor = el.dataset.swatchColor;
+        }
+    });
 }
 
 // ============================================
@@ -2662,7 +2677,7 @@ if (typeof window !== 'undefined') {
 
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { parseQuickQuoteDecoration, getQuickQuotePrefill, escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };
+    module.exports = { parseQuickQuoteDecoration, getQuickQuotePrefill, escapeHtml, formatPrice, cleanProductTitle, getSwatchAttrs, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };
 }
 
 // QuoteBuilderUtils v3.1.0 loaded

@@ -77,6 +77,10 @@
 :where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast-warning { background:var(--color-warning-ink); }
 :where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast-info { background:var(--color-info-ink); }
 
+/* Runtime markup that used to carry style="" (2026-09-17). */
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .product-thumbnail img.qb-thumb-box-img { max-width:100%; max-height:100%; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .qb-empty-state > div.dtf-reset-steps { color:var(--gray-400); font-size:13px; line-height:1.8; }
+
 @media (prefers-reduced-motion: reduce) {
  :where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast { transition:none; }
 }

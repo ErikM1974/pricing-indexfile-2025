@@ -6911,11 +6911,12 @@
         "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
         "native-goods-names-and-manual-item-dialogs-tab-escape-backdrop-cost-error-and-returned-focus-2026-09-17",
         "shared-runtime-pieces-as-classes-and-ups-estimate-notes-without-style-attributes-2026-09-17",
-        "page-served-with-style-attributes-blocked-hidden-markup-adopted-through-cssom-notes-and-art-charge-toggles-2026-09-17"
+        "page-served-with-style-attributes-blocked-hidden-markup-adopted-through-cssom-notes-and-art-charge-toggles-2026-09-17",
+        "runtime-rows-import-preview-pricing-review-push-status-design-lookup-and-api-warning-with-style-attributes-blocked-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 319605,
-      "maxCssBytes": 321653,
+      "measuredRawCssBytes": 329377,
+      "maxCssBytes": 331425,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 623614,
@@ -6949,11 +6950,12 @@
         "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
         "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
         "shared-runtime-pieces-as-classes-covered-on-dtg-page-with-style-attributes-blocked-2026-09-17",
-        "page-served-with-style-attributes-blocked-hidden-markup-adopted-through-cssom-fees-and-art-charge-toggles-2026-09-17"
+        "page-served-with-style-attributes-blocked-hidden-markup-adopted-through-cssom-fees-and-art-charge-toggles-2026-09-17",
+        "runtime-swatches-child-rows-size-popup-design-combobox-safety-dots-and-thumbnail-modal-with-style-attributes-blocked-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 265713,
-      "maxCssBytes": 267761,
+      "measuredRawCssBytes": 267421,
+      "maxCssBytes": 269469,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 494161,
@@ -6992,11 +6994,12 @@
         "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
         "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
         "shared-runtime-pieces-as-classes-covered-on-dtg-page-with-style-attributes-blocked-2026-09-17",
-        "page-served-with-style-attributes-blocked-hidden-markup-adopted-through-cssom-fees-and-art-charge-toggles-2026-09-17"
+        "page-served-with-style-attributes-blocked-hidden-markup-adopted-through-cssom-fees-and-art-charge-toggles-2026-09-17",
+        "runtime-swatches-child-rows-design-combobox-thumbnail-modal-edit-label-reset-and-config-error-with-style-attributes-blocked-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 264627,
-      "maxCssBytes": 266675,
+      "measuredRawCssBytes": 266706,
+      "maxCssBytes": 268754,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 540541,
@@ -7035,8 +7038,8 @@
         "row-swatch-colour-menu-and-shared-pieces-with-style-attributes-blocked-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
-      "measuredRawCssBytes": 322792,
-      "maxCssBytes": 324840,
+      "measuredRawCssBytes": 324500,
+      "maxCssBytes": 326548,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 326706,

@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets. release-2026.09.17.1: Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles dtg-dialogs-and-swatches-2026-09-17: Requested 2026-09-17 (DTG accessibility follow-up): the push and assistant-overwrite confirms are native modal dialogs named by their titles (Tab stays inside, Escape closes only the confirm, focus returns to the opener); top-seller colour chips are coloured through CSSOM instead of a style attribute; a failed placeholder-src swatch shows a blank pixel instead of the broken-image icon and alt text. builder-native-dialogs-2026-09-17: Requested 2026-09-17 (embroidery dialog accessibility follow-up): the embroidery goods, names and manual-item dialogs and the DTG confirms share builders/shared/modal-dialog.js. They are native modal dialogs named by their titles; Tab stays inside, Escape and the dimmed layer close only the dialog, and focus returns to the opener (or, when that is hidden or gone, to the row's quantity, the services-bar menu button or the first size). The manual-item cost error also shows inside the dialog. builder-runtime-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the shared builder scripts and the DTG row/colour menu carries no style attributes. Static styles are token classes in quote-workspace.css / quote-dtg.css: edit-mode label, push checklist link, tier nudge, recent ShopWorks orders, customer warning banner, UPS estimate notes and DTG colour menu rows. Data-driven values go through CSSOM: the DTG row swatch image and the hidden logo assumption panel. Same look; three slate text/border shades map to the nearest grey tokens. builder-static-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets. release-2026.09.17.1: Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles dtg-dialogs-and-swatches-2026-09-17: Requested 2026-09-17 (DTG accessibility follow-up): the push and assistant-overwrite confirms are native modal dialogs named by their titles (Tab stays inside, Escape closes only the confirm, focus returns to the opener); top-seller colour chips are coloured through CSSOM instead of a style attribute; a failed placeholder-src swatch shows a blank pixel instead of the broken-image icon and alt text. builder-native-dialogs-2026-09-17: Requested 2026-09-17 (embroidery dialog accessibility follow-up): the embroidery goods, names and manual-item dialogs and the DTG confirms share builders/shared/modal-dialog.js. They are native modal dialogs named by their titles; Tab stays inside, Escape and the dimmed layer close only the dialog, and focus returns to the opener (or, when that is hidden or gone, to the row's quantity, the services-bar menu button or the first size). The manual-item cost error also shows inside the dialog. builder-runtime-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the shared builder scripts and the DTG row/colour menu carries no style attributes. Static styles are token classes in quote-workspace.css / quote-dtg.css: edit-mode label, push checklist link, tier nudge, recent ShopWorks orders, customer warning banner, UPS estimate notes and DTG colour menu rows. Data-driven values go through CSSOM: the DTG row swatch image and the hidden logo assumption panel. Same look; three slate text/border shades map to the nearest grey tokens. builder-static-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look. builder-runtime-style-attributes-emb-scp-dtf-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -4146,6 +4146,726 @@
       "count": 1,
       "stage": "builder-static-style-attributes-2026-09-17",
       "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-lifecycle.js",
+      "before": "            headerSubtitle.innerHTML = `<span style=\"color: #fbbf24;\">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;",
+      "after": "            headerSubtitle.innerHTML = `<span class=\"qb-edit-mode-label\">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-lifecycle.js",
+      "before": "                    <div style=\"font-size: 13px; color: #94a3b8; line-height: 1.8;\">",
+      "after": "                    <div class=\"dtf-reset-steps\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "/* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchStyle, productThumbnailModal,",
+      "after": "/* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchAttrs, qbPaintSwatches, productThumbnailModal,",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "        <div style=\"padding: 40px; text-align: center; color: #c00;\">\n            <h2>Configuration Error</h2>\n            <p>Extended sizes module failed to load. Please refresh the page.</p>\n            <p style=\"font-size: 12px; color: #666;\">If this persists, contact support.</p>\n        </div>\n    `;",
+      "after": "        <div class=\"dtf-config-error\">\n            <h2>Configuration Error</h2>\n            <p>Extended sizes module failed to load. Please refresh the page.</p>\n            <p class=\"dtf-config-error-note\">If this persists, contact support.</p>\n        </div>\n    `;\n    // Styled through CSSOM: this last-resort screen must not depend on the page's sheets,\n    // and a style=\"\" attribute needs 'unsafe-inline'.\n    /** @type {HTMLElement} */ (document.querySelector('.dtf-config-error')).style.cssText = 'padding: 40px; text-align: center; color: #c00;';\n    /** @type {HTMLElement} */ (document.querySelector('.dtf-config-error-note')).style.cssText = 'font-size: 12px; color: #666;';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "                // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3): every color field escapeHtml-wrapped; swatch via hardened getSwatchStyle",
+      "after": "                // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3): every color field escapeHtml-wrapped; swatch via hardened getSwatchAttrs",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "                        <span class=\"color-swatch\" style=\"${getSwatchStyle(c)}\"></span>\n                        <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>\n                    </div>\n                `).join('');",
+      "after": "                        <span class=\"color-swatch\" ${getSwatchAttrs(c)}></span>\n                        <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>\n                    </div>\n                `).join('');\n                qbPaintSwatches(pickerDropdown);",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "             data-call=\"selectChildColor\" data-args='[${childRowId}, ${parentRowId}, \"$this\"]'>\n            <span class=\"color-swatch\" style=\"${getSwatchStyle(c)}\"></span>\n            <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>",
+      "after": "             data-call=\"selectChildColor\" data-args='[${childRowId}, ${parentRowId}, \"$this\"]'>\n            <span class=\"color-swatch\" ${getSwatchAttrs(c)}></span>\n            <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "    // Build current color display style\n    const currentSwatchStyle = parentSwatchUrl\n        ? `background-image: url('${parentSwatchUrl}'); background-size: cover; background-position: center;`\n        : `background-color: ${parentHex};`;",
+      "after": "    // Current color display: the parent's swatch image or colour, painted through CSSOM\n    const currentSwatchAttrs = parentSwatchUrl\n        ? `data-swatch-image=\"${escapeHtml(parentSwatchUrl)}\"`\n        : `data-swatch-color=\"${escapeHtml(parentHex)}\"`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3, mirrors emb/product-rows C32): childRowId numeric (getNextRowId), partNumber/size internal codes, colors escapeHtml-wrapped, swatch via hardened getSwatchStyle",
+      "after": "    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3, mirrors emb/product-rows C32): childRowId numeric (getNextRowId), partNumber/size internal codes, colors escapeHtml-wrapped, swatches as escaped data attributes painted through CSSOM",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "                     style=\"max-width: 100%; max-height: 100%; object-fit: contain;\"",
+      "after": "                     class=\"qb-thumb-box-img\"",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "                    <span class=\"color-swatch\" style=\"${currentSwatchStyle}\"></span>",
+      "after": "                    <span class=\"color-swatch\" ${currentSwatchAttrs}></span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "    `;\n",
+      "after": "    `;\n    qbPaintSwatches(childRow);\n",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "// getSwatchStyle() — now provided by quote-builder-utils.js",
+      "after": "// getSwatchAttrs() / qbPaintSwatches() — now provided by quote-builder-utils.js",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/design-search.js",
+      "before": "        badgeHtml += '<br><span class=\"qb-hint-indigo\"><i class=\"fas fa-file-code\" aria-hidden=\"true\" style=\"margin-right:2px;\"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';",
+      "after": "        badgeHtml += '<br><span class=\"qb-hint-indigo\"><i class=\"fas fa-file-code design-dst-icon\" aria-hidden=\"true\"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/design-search.js",
+      "before": "        badgeHtml += '<br><span style=\"font-size:11px;color:#d97706;font-weight:600;\">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>'",
+      "after": "        badgeHtml += '<br><span class=\"design-extra-colors\">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>'",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/design-search.js",
+      "before": "            if (results) results.innerHTML = '<div class=\"design-search-empty\" style=\"display:flex;\"><i class=\"fas fa-folder-open\" aria-hidden=\"true\"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';",
+      "after": "            if (results) results.innerHTML = '<div class=\"design-search-empty is-gallery-empty\"><i class=\"fas fa-folder-open\" aria-hidden=\"true\"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/design-search.js",
+      "before": "            + (company ? '<div class=\"design-gallery-name\" title=\"' + escapeHtml(company) + '\" style=\"font-style:normal;color:#374151;font-weight:500;\">' + escapeHtml(company.length > 28 ? company.substring(0, 26) + '...' : company) + '</div>' : '')",
+      "after": "            + (company ? '<div class=\"design-gallery-name is-company\" title=\"' + escapeHtml(company) + '\">' + escapeHtml(company.length > 28 ? company.substring(0, 26) + '...' : company) + '</div>' : '')",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "   Event, cleanProductTitle, getSwatchStyle, productThumbnailModal, formatPrice,",
+      "after": "   Event, cleanProductTitle, getSwatchAttrs, qbPaintSwatches, productThumbnailModal, formatPrice,",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "            ${q ? `<div class=\"suggestion-item suggestion-add-nonsanmar\" data-call=\"addNonSanmarFromSearch\" style=\"cursor:pointer; color:#16a34a; font-weight:600;\"><span><i class=\"fas fa-plus-circle\" aria-hidden=\"true\"></i> Enter \"${escapeHtml(q)}\" manually — type the cost we pay</span></div>` : ''}`;",
+      "after": "            ${q ? `<div class=\"suggestion-item suggestion-add-nonsanmar\" data-call=\"addNonSanmarFromSearch\"><span><i class=\"fas fa-plus-circle\" aria-hidden=\"true\"></i> Enter \"${escapeHtml(q)}\" manually — type the cost we pay</span></div>` : ''}`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "                <span class=\"cap-badge\" id=\"cap-badge-${rowId}\" style=\"display: none;\">",
+      "after": "                <span class=\"cap-badge\" id=\"cap-badge-${rowId}\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "    `;\n",
+      "after": "    `;\n    // The cap badge starts hidden; its toggles write style.display.\n    /** @type {HTMLElement} */ (row.querySelector('.cap-badge')).style.display = 'none';\n",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "            <span class=\"service-style-badge\" style=\"display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: ${isCap ? '#dbeafe' : '#fef3c7'}; color: ${isCap ? '#1e40af' : '#92400e'}; border-radius: 4px; font-weight: 600; font-size: 12px;\">",
+      "after": "            <span class=\"service-style-badge${isCap ? ' is-cap' : ''}\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "            <div class=\"service-icon\" style=\"width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: ${isCap ? '#eff6ff' : '#fffbeb'}; border-radius: 6px;\">\n                <i class=\"fas ${meta.icon}\" aria-hidden=\"true\" style=\"font-size: 20px; color: ${isCap ? '#3b82f6' : '#f59e0b'};\"></i>",
+      "after": "            <div class=\"service-icon${isCap ? ' is-cap' : ''}\">\n                <i class=\"fas ${meta.icon}\" aria-hidden=\"true\"></i>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "                <span class=\"service-description\" style=\"font-size: 13px; color: #334155;\">${escapeHtml(displayDescription)}</span>\n                ${isCap ? '<span class=\"cap-badge\" style=\"display: inline-flex;\"><i class=\"fas fa-hat-cowboy\" aria-hidden=\"true\"></i> Cap</span>' : ''}",
+      "after": "                <span class=\"service-description\">${escapeHtml(displayDescription)}</span>\n                ${isCap ? '<span class=\"cap-badge\"><i class=\"fas fa-hat-cowboy\" aria-hidden=\"true\"></i> Cap</span>' : ''}",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "            <span style=\"color: #64748b; font-size: 12px;\">N/A</span>\n        </td>\n        <td colspan=\"6\" style=\"text-align: center; color: #94a3b8; font-size: 11px; font-style: italic;\">",
+      "after": "            <span class=\"service-na\">N/A</span>\n        </td>\n        <td colspan=\"6\" class=\"service-size-note\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "                   data-change=\"onServiceQtyChange\" data-change-args='[${rowId}]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'\n                   style=\"width: 60px; text-align: center;\">",
+      "after": "                   data-change=\"onServiceQtyChange\" data-change-args='[${rowId}]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)",
+      "after": "                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchAttrs (C32)",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "                        <span class=\"color-swatch\" style=\"${getSwatchStyle(c)}\"></span>\n                        <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>\n                    </div>\n                `).join('');",
+      "after": "                        <span class=\"color-swatch\" ${getSwatchAttrs(c)}></span>\n                        <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>\n                    </div>\n                `).join('');\n                qbPaintSwatches(pickerDropdown);",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)",
+      "after": "        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; fixed placeholder swatch",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "                <span class=\"color-swatch\" style=\"background-color: #ccc;\"></span>\n                <span class=\"color-name\">${escapeHtml(color)}</span>\n            </div>\n        `).join('');",
+      "after": "                <span class=\"color-swatch\" data-swatch-color=\"#ccc\"></span>\n                <span class=\"color-name\">${escapeHtml(color)}</span>\n            </div>\n        `).join('');\n        qbPaintSwatches(pickerDropdown);",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "// getSwatchStyle() — now provided by quote-builder-utils.js",
+      "after": "// getSwatchAttrs() / qbPaintSwatches() — now provided by quote-builder-utils.js",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "             data-call=\"selectChildColor\" data-args='[${childRowId}, ${parentRowId}, \"$this\"]'>\n            <span class=\"color-swatch\" style=\"${getSwatchStyle(c)}\"></span>\n            <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>",
+      "after": "             data-call=\"selectChildColor\" data-args='[${childRowId}, ${parentRowId}, \"$this\"]'>\n            <span class=\"color-swatch\" ${getSwatchAttrs(c)}></span>\n            <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "    // Build current color display — sanitize before interpolating into (CSS/attribute\n    // breakout); mirrors the hardened getSwatchStyle(). (review C32)\n    const _swUrl = String(parentSwatchUrl || '').replace(/[\"'()\\\\\\s]/g, '');\n    const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';\n    const currentSwatchStyle = /^https?:\\/\\//i.test(_swUrl)\n        ? `background-image: url('${_swUrl}'); background-size: cover; background-position: center;`\n        : `background-color: ${_swHex};`;",
+      "after": "    // Current color display — the same hardened swatch attributes as the options (review C32).\n    const currentSwatchAttrs = getSwatchAttrs({ COLOR_SQUARE_IMAGE: parentSwatchUrl, HEX_CODE: parentHex });",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "                    <span class=\"color-swatch\" style=\"${currentSwatchStyle}\"></span>",
+      "after": "                    <span class=\"color-swatch\" ${currentSwatchAttrs}></span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "        <td><input type=\"number\" class=\"cell-input size-input\" data-size=\"2XL\" aria-label=\"Quantity 2XL\" ${isSize05 ? '' : 'disabled'} value=\"${isSize05 ? qty : ''}\" placeholder=\"${isSize05 ? qty : ''}\" style=\"${isSize05 ? '' : 'background: #f5f5f5;'}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>\n        <td><input type=\"number\" class=\"cell-input size-input\" data-size=\"${size}\" aria-label=\"Quantity ${size}\" ${isSize06 ? '' : 'disabled'} value=\"${isSize06 ? qty : ''}\" placeholder=\"${isSize06 ? qty : ''}\" style=\"${isSize06 ? '' : 'background: #f5f5f5;'}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>",
+      "after": "        <td><input type=\"number\" class=\"cell-input size-input${isSize05 ? '' : ' size-input-off'}\" data-size=\"2XL\" aria-label=\"Quantity 2XL\" ${isSize05 ? '' : 'disabled'} value=\"${isSize05 ? qty : ''}\" placeholder=\"${isSize05 ? qty : ''}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>\n        <td><input type=\"number\" class=\"cell-input size-input${isSize06 ? '' : ' size-input-off'}\" data-size=\"${size}\" aria-label=\"Quantity ${size}\" ${isSize06 ? '' : 'disabled'} value=\"${isSize06 ? qty : ''}\" placeholder=\"${isSize06 ? qty : ''}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "    `;\n",
+      "after": "    `;\n    qbPaintSwatches(childRow);\n",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "        (o.ExtCustomerID ? ' <span style=\"color:#94a3b8;\">(ext ' + escapeHtml(String(o.ExtCustomerID)) + ')</span>' : '') +",
+      "after": "        (o.ExtCustomerID ? ' <span class=\"push-ext-id\">(ext ' + escapeHtml(String(o.ExtCustomerID)) + ')</span>' : '') +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "                (thumb ? '<img src=\"' + escapeHtml(thumb) + '\" alt=\"\" style=\"width:40px;height:40px;object-fit:contain;border:1px solid #e2e8f0;border-radius:4px;margin-right:8px;\">' : '') +",
+      "after": "                (thumb ? '<img src=\"' + escapeHtml(thumb) + '\" alt=\"\" class=\"push-design-thumb\">' : '') +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "            statusEl.innerHTML = '<div class=\"shopworks-import-preview active\" style=\"background:#eff6ff; border-color:#bfdbfe;\">' +",
+      "after": "            statusEl.innerHTML = '<div class=\"shopworks-import-preview active push-sent\">' +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "                '<div style=\"margin-top:10px; color:#475569;\">ShopWorks imports new orders on its own download cycle — ' +\n                'confirm it actually landed in OnSite:</div>' +\n                '<div id=\"emb-sw-import-result\" style=\"margin-top:8px; font-size:0.92em;\"></div>' +\n                '<button type=\"button\" id=\"emb-sw-verify-btn\" style=\"margin-top:8px; padding:6px 12px; background:#1a5276; ' +\n                'color:#fff; border:none; border-radius:6px; cursor:pointer;\">' +",
+      "after": "                '<div class=\"push-sent-note\">ShopWorks imports new orders on its own download cycle — ' +\n                'confirm it actually landed in OnSite:</div>' +\n                '<div id=\"emb-sw-import-result\" class=\"push-import-result\"></div>' +\n                '<button type=\"button\" id=\"emb-sw-verify-btn\" class=\"push-verify-btn\">' +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "            out.innerHTML = '<span style=\"color:#15803d; font-weight:600;\"><i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i> ' +",
+      "after": "            out.innerHTML = '<span class=\"push-confirmed\"><i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i> ' +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "   Event, APP_CONFIG, setLtmControlState, markAsUnsaved */",
+      "after": "   Event, APP_CONFIG, setLtmControlState, markAsUnsaved, qbPaintSwatches */",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "                    <span class=\"color-swatch\" style=\"background-color:#ccc\"></span>",
+      "after": "                    <span class=\"color-swatch\" data-swatch-color=\"#ccc\"></span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "                pickerDropdown.insertAdjacentHTML('afterbegin', optHtml);\n                selectNonSanmarColor(rowId, pickerDropdown.querySelector('.color-picker-option'));",
+      "after": "                pickerDropdown.insertAdjacentHTML('afterbegin', optHtml);\n                qbPaintSwatches(pickerDropdown);\n                selectNonSanmarColor(rowId, pickerDropdown.querySelector('.color-picker-option'));",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "    const pricingColor = data.pricingSource === 'caspio' ? '#28a745' : '#ffc107';",
+      "after": "    const pricingClass = data.pricingSource === 'caspio' ? 'is-live' : 'is-fallback';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "            <div class=\"preview-item-value\" style=\"color: ${pricingColor};\">${pricingIcon} ${data.pricingSource === 'caspio' ? 'Live API' : 'Fallback'}</div>",
+      "after": "            <div class=\"preview-item-value preview-pricing-source ${pricingClass}\">${pricingIcon} ${data.pricingSource === 'caspio' ? 'Live API' : 'Fallback'}</div>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "                           style=\"flex-shrink:0; width:16px; height:16px; cursor:pointer;\" title=\"Uncheck to exclude from import\">",
+      "after": "                           title=\"Uncheck to exclude from import\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "                        <span class=\"preview-product-style\" style=\"background: #fef3c7; color: #92400e;\">DECG</span>",
+      "after": "                        <span class=\"preview-product-style is-decg\">DECG</span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "                        <span class=\"preview-product-style\" style=\"background: #dbeafe; color: #1e40af;\">DECC</span>",
+      "after": "                        <span class=\"preview-product-style is-decc\">DECC</span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "        productsHtml += '<p style=\"font-size: 11px; color: #64748b; margin-top: 8px; font-style: italic;\"><i class=\"fas fa-info-circle\" aria-hidden=\"true\"></i> After import, you\\'ll be prompted to confirm stitch counts for accurate pricing</p>';",
+      "after": "        productsHtml += '<p class=\"preview-stitch-note\"><i class=\"fas fa-info-circle\" aria-hidden=\"true\"></i> After import, you\\'ll be prompted to confirm stitch counts for accurate pricing</p>';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "        productsHtml += '<h5 style=\"margin-top: 12px; color: #c2410c;\">Non-SanMar Products - Manual Pricing Required (' + data.customProducts.length + ')</h5><div class=\"preview-products-list\">';\n        for (const product of data.customProducts) {\n            const totalQty = Object.values(product.sizes || {}).reduce((sum, q) => sum + q, 0) || product.quantity || 0;\n            productsHtml += `\n                <div class=\"preview-product-item\" style=\"border-left: 3px solid #c2410c;\">\n                    <span class=\"preview-product-style\" style=\"background: #fed7aa; color: #c2410c;\">${escapeHtml(product.partNumber)}</span>\n                    <span class=\"preview-product-desc\">${escapeHtml(product.description || product.color || 'Unknown')}</span>\n                    <span class=\"preview-product-qty\" style=\"color: #c2410c;\">Qty: ${totalQty} - MANUAL</span>",
+      "after": "        productsHtml += '<h5 class=\"preview-custom-title\">Non-SanMar Products - Manual Pricing Required (' + data.customProducts.length + ')</h5><div class=\"preview-products-list\">';\n        for (const product of data.customProducts) {\n            const totalQty = Object.values(product.sizes || {}).reduce((sum, q) => sum + q, 0) || product.quantity || 0;\n            productsHtml += `\n                <div class=\"preview-product-item is-custom\">\n                    <span class=\"preview-product-style is-custom\">${escapeHtml(product.partNumber)}</span>\n                    <span class=\"preview-product-desc\">${escapeHtml(product.description || product.color || 'Unknown')}</span>\n                    <span class=\"preview-product-qty is-custom\">Qty: ${totalQty} - MANUAL</span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "                <div style=\"background: #fef2f2; border: 1px solid #ef4444; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; color: #b91c1c;\">",
+      "after": "                <div class=\"preview-decg-error\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "        let reviewHtml = '<h5 style=\"margin-top: 12px; color: #b45309;\"><i class=\"fas fa-search\" aria-hidden=\"true\"></i> Items for Review — Check to Import as Notes</h5>';\n        reviewHtml += '<div style=\"max-height: 150px; overflow-y: auto; padding: 4px 0;\">';\n        allReviewItems.forEach((item, i) => {\n            const hasPrice = item.unitPrice > 0;\n            reviewHtml += `<label style=\"display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; cursor: pointer;\">",
+      "after": "        let reviewHtml = '<h5 class=\"preview-review-title\"><i class=\"fas fa-search\" aria-hidden=\"true\"></i> Items for Review — Check to Import as Notes</h5>';\n        reviewHtml += '<div class=\"preview-review-list\">';\n        allReviewItems.forEach((item, i) => {\n            const hasPrice = item.unitPrice > 0;\n            reviewHtml += `<label class=\"preview-review-item\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "                html += `<td style=\"text-align:center; color:#94a3b8;\">&mdash;</td>`;",
+      "after": "                html += `<td class=\"spr-na-cell\">&mdash;</td>`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "            html += `<td style=\"text-align:center;\">${deltaBadgeHtml}</td>`;",
+      "after": "            html += `<td class=\"spr-delta-cell\">${deltaBadgeHtml}</td>`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "                html += `<details><summary style=\"cursor:pointer; font-size:11px; color:#64748b;\">${item._sourceItems.length} individual items</summary>`;\n                html += `<table style=\"width:100%; margin-top:4px;\">`;",
+      "after": "                html += `<details><summary class=\"spr-detail-summary\">${item._sourceItems.length} individual items</summary>`;\n                html += `<table class=\"spr-detail-table\">`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "        rowHtml += `<div style=\"display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;\">`;\n        if (thumbUrl) {\n            rowHtml += `<img src=\"${escapeHtml(thumbUrl)}\" alt=\"Design #${escapeHtml(num)}\" style=\"width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;\" data-onerror=\"hide\">`;\n        }\n        rowHtml += `<span id=\"spr-thumb-${escapeHtml(num)}\" style=\"display:none;\"></span>`;\n        rowHtml += `<strong>#${escapeHtml(num)}</strong>`;\n        if (designNameText) {\n            rowHtml += `<span style=\"color:#64748b;font-size:11px;font-style:italic;\">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;",
+      "after": "        rowHtml += `<div class=\"spr-design-row\">`;\n        if (thumbUrl) {\n            rowHtml += `<img src=\"${escapeHtml(thumbUrl)}\" alt=\"Design #${escapeHtml(num)}\" class=\"spr-design-row-thumb\" data-onerror=\"hide\">`;\n        }\n        rowHtml += `<span id=\"spr-thumb-${escapeHtml(num)}\" class=\"spr-thumb-slot\"></span>`;\n        rowHtml += `<strong>#${escapeHtml(num)}</strong>`;\n        if (designNameText) {\n            rowHtml += `<span class=\"spr-design-name\">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "                rowHtml += `<span style=\"color:#64748b;font-size:11px;\">${escapeHtml(fallbackInfo.designName)}</span>`;\n            }\n            rowHtml += '<span style=\"background:#d97706;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;\">No stitch data</span>';",
+      "after": "                rowHtml += `<span class=\"spr-design-name is-fallback\">${escapeHtml(fallbackInfo.designName)}</span>`;\n            }\n            rowHtml += '<span class=\"spr-design-flag\">No stitch data</span>';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "            rowHtml += '<span style=\"background:#94a3b8;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;\">Not in database</span>';",
+      "after": "            rowHtml += '<span class=\"spr-design-flag is-missing\">Not in database</span>';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "            rowHtml += `<select id=\"spr-design-assign-${escapeHtml(num)}\" data-design-num=\"${escapeHtml(num)}\" class=\"spr-design-assign\" style=\"margin-left:auto;padding:2px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;\">`;",
+      "after": "            rowHtml += `<select id=\"spr-design-assign-${escapeHtml(num)}\" data-design-num=\"${escapeHtml(num)}\" class=\"spr-design-assign\">`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "        bannerHtml += `<div style=\"font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;\"><i class=\"fas fa-object-group qb-mr4\" aria-hidden=\"true\"></i>Design Logo Assignment</div>`;",
+      "after": "        bannerHtml += `<div class=\"spr-banner-title\"><i class=\"fas fa-object-group qb-mr4\" aria-hidden=\"true\"></i>Design Logo Assignment</div>`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "    const headerText = st.showAssignment ? '' : '<div style=\"font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;\"><i class=\"fas fa-search qb-mr4\" aria-hidden=\"true\"></i>Design Stitch Lookup</div>';",
+      "after": "    const headerText = st.showAssignment ? '' : '<div class=\"spr-banner-title is-lookup\"><i class=\"fas fa-search qb-mr4\" aria-hidden=\"true\"></i>Design Stitch Lookup</div>';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/emb/spr-modal.js",
+      "before": "        st.designBanner.innerHTML = `<i class=\"fas fa-palette\" aria-hidden=\"true\" style=\"margin-right:6px;\"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;",
+      "after": "        st.designBanner.innerHTML = `<i class=\"fas fa-palette qb-mr-6\" aria-hidden=\"true\"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/persistence.js",
+      "before": "                colorCell.innerHTML = `<span class=\"color-swatch\" style=\"background: #ccc;\"></span>${escapeHtml(product.color || '')}`;",
+      "after": "                colorCell.innerHTML = `<span class=\"color-swatch\"></span>${escapeHtml(product.color || '')}`;\n                /** @type {HTMLElement} */ (colorCell.querySelector('.color-swatch')).style.background = '#ccc';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "   getSwatchStyle, productThumbnailModal, Event */",
+      "after": "   getSwatchAttrs, qbPaintSwatches, productThumbnailModal, Event */",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)",
+      "after": "                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchAttrs (C32)",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "                        <span class=\"color-swatch\" style=\"${getSwatchStyle(c)}\"></span>\n                        <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>\n                    </div>\n                `).join('');",
+      "after": "                        <span class=\"color-swatch\" ${getSwatchAttrs(c)}></span>\n                        <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>\n                    </div>\n                `).join('');\n                qbPaintSwatches(pickerDropdown);",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "// getSwatchStyle() — now provided by quote-builder-utils.js",
+      "after": "// getSwatchAttrs() / qbPaintSwatches() — now provided by quote-builder-utils.js",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "             data-call=\"selectChildColor\" data-args='[${childRowId}, ${parentRowId}, \"$this\"]'>\n            <span class=\"color-swatch\" style=\"${getSwatchStyle(c)}\"></span>\n            <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>",
+      "after": "             data-call=\"selectChildColor\" data-args='[${childRowId}, ${parentRowId}, \"$this\"]'>\n            <span class=\"color-swatch\" ${getSwatchAttrs(c)}></span>\n            <span class=\"color-name\">${escapeHtml(c.COLOR_NAME)}</span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "    // Build current color display — sanitize before interpolating into (CSS/attribute\n    // breakout); ports EMB's hardened block (review C32) that never synced here (1.4 audit).\n    const _swUrl = String(parentSwatchUrl || '').replace(/[\"'()\\\\\\s]/g, '');\n    const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';\n    const currentSwatchStyle = /^https?:\\/\\//i.test(_swUrl)\n        ? `background-image: url('${_swUrl}'); background-size: cover; background-position: center;`\n        : `background-color: ${_swHex};`;",
+      "after": "    // Current color display — the same hardened swatch attributes as EMB (review C32, 1.4 audit).\n    const currentSwatchAttrs = getSwatchAttrs({ COLOR_SQUARE_IMAGE: parentSwatchUrl, HEX_CODE: parentHex });",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "                    <span class=\"color-swatch\" style=\"${currentSwatchStyle}\"></span>",
+      "after": "                    <span class=\"color-swatch\" ${currentSwatchAttrs}></span>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "        <td><input type=\"number\" class=\"cell-input size-input\" data-size=\"2XL\" aria-label=\"Quantity 2XL\" ${isSize05 ? '' : 'disabled'} value=\"${isSize05 ? qty : ''}\" placeholder=\"${isSize05 ? qty : ''}\" style=\"${isSize05 ? '' : 'background: #f5f5f5;'}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>\n        <td><input type=\"number\" class=\"cell-input size-input\" data-size=\"${size}\" ${isSize06 ? '' : 'disabled'} value=\"${isSize06 ? qty : ''}\" placeholder=\"${isSize06 ? qty : ''}\" style=\"${isSize06 ? '' : 'background: #f5f5f5;'}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>",
+      "after": "        <td><input type=\"number\" class=\"cell-input size-input${isSize05 ? '' : ' size-input-off'}\" data-size=\"2XL\" aria-label=\"Quantity 2XL\" ${isSize05 ? '' : 'disabled'} value=\"${isSize05 ? qty : ''}\" placeholder=\"${isSize05 ? qty : ''}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>\n        <td><input type=\"number\" class=\"cell-input size-input${isSize06 ? '' : ' size-input-off'}\" data-size=\"${size}\" ${isSize06 ? '' : 'disabled'} value=\"${isSize06 ? qty : ''}\" placeholder=\"${isSize06 ? qty : ''}\" data-change=\"onChildSizeChange\" data-change-args='[${childRowId}, ${parentRowId}, \"${size}\"]' data-keydown=\"handleCellKeydown\" data-keydown-args='[\"$event\", \"$this\"]'></td>",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "    `;\n",
+      "after": "    `;\n    qbPaintSwatches(childRow);\n",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/customer-design-combobox.js",
+      "before": "                    '<div class=\"cdcb-empty\" style=\"padding:12px;color:#6b7280;font-style:italic;\">' +",
+      "after": "                    '<div class=\"cdcb-empty is-hint\">' +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/customer-design-combobox.js",
+      "before": "                    '<div class=\"cdcb-empty\" style=\"padding:12px;color:#6b7280;\">' +",
+      "after": "                    '<div class=\"cdcb-empty\">' +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/customer-design-combobox.js",
+      "before": "                    ? '<img src=\"' + escapeHtml(resolveBoxUrl(d.thumbnailUrl)) + '\" alt=\"\" class=\"cdcb-thumb\" style=\"width:40px;height:40px;object-fit:cover;border-radius:4px;background:#f3f4f6;flex-shrink:0;\">'\n                    : '<div class=\"cdcb-thumb cdcb-thumb-empty\" style=\"width:40px;height:40px;border-radius:4px;background:#f3f4f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:10px;\">No img</div>';",
+      "after": "                    ? '<img src=\"' + escapeHtml(resolveBoxUrl(d.thumbnailUrl)) + '\" alt=\"\" class=\"cdcb-thumb\">'\n                    : '<div class=\"cdcb-thumb cdcb-thumb-empty\">No img</div>';",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/customer-design-combobox.js",
+      "before": "                    '<div class=\"cdcb-row' + (isActive ? ' cdcb-row-active' : '') + '\" data-idx=\"' + idx + '\"' +\n                    ' style=\"display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--pnw-rule, rgba(31, 73, 34, 0.10));' +\n                    (isActive ? 'background:var(--pnw-mist, #e8eee7);' : '') +\n                    '\">' +\n                        thumb +\n                        '<div style=\"flex:1;min-width:0;\">' +\n                            '<div style=\"font-weight:600;color:var(--pnw-pine, #1a3517);\">' +\n                                '#' + escapeHtml(d.idDesign) +\n                                (d.designName ? ' — ' + escapeHtml(d.designName) : '') +\n                            '</div>' +\n                            (subline ? '<div style=\"font-size:11px;color:#6b7280;margin-top:2px;\">' + escapeHtml(subline) + '</div>' : '') +",
+      "after": "                    '<div class=\"cdcb-row' + (isActive ? ' cdcb-row-active' : '') + '\" data-idx=\"' + idx + '\">' +\n                        thumb +\n                        '<div class=\"cdcb-row-body\">' +\n                            '<div class=\"cdcb-row-title\">' +\n                                '#' + escapeHtml(d.idDesign) +\n                                (d.designName ? ' — ' + escapeHtml(d.designName) : '') +\n                            '</div>' +\n                            (subline ? '<div class=\"cdcb-row-sub\">' + escapeHtml(subline) + '</div>' : '') +",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/customer-design-combobox.js",
+      "before": "                ? '<div style=\"padding:8px;text-align:center;font-size:11px;color:#9ca3af;\">Showing first 50 of ' + filtered.length + ' — narrow your search</div>'",
+      "after": "                ? '<div class=\"cdcb-more\">Showing first 50 of ' + filtered.length + ' — narrow your search</div>'",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/embroidery-quote-pricing.js",
+      "before": "            <div style=\"font-size: 24px; margin-bottom: 10px;\">\n                ${icon} ${title} ${icon}\n            </div>\n            <div style=\"font-size: 16px; line-height: 1.5;\">\n                ${message}\n            </div>\n            <div style=\"margin-top: 15px;\">\n                <button onclick=\"location.reload()\" style=\"\n                    background: white;\n                    color: ${bgColor};\n                    border: none;\n                    padding: 10px 20px;\n                    margin: 0 5px;\n                    border-radius: 4px;\n                    font-weight: bold;\n                    cursor: pointer;\n                \">Try Again</button>\n                <button onclick=\"alert('Please contact IT support at erik@nwcustomapparel.com or call 253-922-5793.')\" style=\"\n                    background: white;\n                    color: ${bgColor};\n                    border: none;\n                    padding: 10px 20px;\n                    margin: 0 5px;\n                    border-radius: 4px;\n                    font-weight: bold;\n                    cursor: pointer;\n                \">Report Issue</button>\n            </div>\n        `;",
+      "after": "            <div class=\"api-warning-title\">\n                ${icon} ${title} ${icon}\n            </div>\n            <div class=\"api-warning-message\">\n                ${message}\n            </div>\n            <div class=\"api-warning-actions\">\n                <button onclick=\"location.reload()\">Try Again</button>\n                <button onclick=\"alert('Please contact IT support at erik@nwcustomapparel.com or call 253-922-5793.')\">Report Issue</button>\n            </div>\n        `;\n        // Styled through CSSOM like the banner itself: this script also runs on pages without\n        // embroidery-quote-pricing.css, and a style=\"\" attribute needs 'unsafe-inline'.\n        warningBanner.querySelector('.api-warning-title').style.cssText = 'font-size: 24px; margin-bottom: 10px;';\n        warningBanner.querySelector('.api-warning-message').style.cssText = 'font-size: 16px; line-height: 1.5;';\n        warningBanner.querySelector('.api-warning-actions').style.cssText = 'margin-top: 15px;';\n        warningBanner.querySelectorAll('.api-warning-actions button').forEach((button) => {\n            button.style.cssText = `background: white; color: ${bgColor}; border: none; padding: 10px 20px; margin: 0 5px; border-radius: 4px; font-weight: bold; cursor: pointer;`;\n        });",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/product-thumbnail-modal.js",
+      "before": "                    <div id=\"modal-product-meta\" style=\"display:none;\"></div>\n                </div>\n                <div id=\"modal-product-actions\" class=\"product-image-modal-actions\" style=\"display:none;\">",
+      "after": "                    <div id=\"modal-product-meta\"></div>\n                </div>\n                <div id=\"modal-product-actions\" class=\"product-image-modal-actions\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/product-thumbnail-modal.js",
+      "before": "        if (this._usesUnifiedUI()) {\n            modal.querySelectorAll('[style]').forEach(node => {\n                if (node.style.display === 'none') this._setDisplay(node, 'none');\n            });\n        }",
+      "after": "        // Meta lines and the download action start hidden (no style=\"\" attribute: it needs 'unsafe-inline').\n        modal.querySelectorAll('#modal-product-meta, #modal-product-actions').forEach(node => this._setDisplay(node, 'none'));",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/product-thumbnail-modal.js",
+      "before": "            <div class=\"product-thumbnail no-image\"\n                 title=\"No image available\"\n                 style=\"width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;\">",
+      "after": "            <div class=\"product-thumbnail no-image qb-thumb-box\"\n                 title=\"No image available\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": " * Generate inline CSS style string for a color swatch\n * Uses COLOR_SQUARE_IMAGE if available, falls back to HEX_CODE\n */\nfunction getSwatchStyle(color) {\n    if (color.COLOR_SQUARE_IMAGE) {\n        // Strip quotes/parens/backslashes/whitespace + require an http(s) URL so a crafted swatch value\n        // can't break out of the style=\"\" attribute or the url() (CSS/attribute injection). (review C32)\n        const safe = String(color.COLOR_SQUARE_IMAGE).replace(/[\"'()\\\\\\s]/g, '');\n        if (/^https?:\\/\\//i.test(safe)) {\n            return `background-image: url('${safe}'); background-size: cover; background-position: center;`;\n        }\n    }\n    const hex = (color.HEX_CODE && /^#[0-9a-fA-F]{3,8}$/.test(color.HEX_CODE)) ? color.HEX_CODE : '#ccc';\n    return `background-color: ${hex};`;",
+      "after": " * Swatch data attributes for a color: its COLOR_SQUARE_IMAGE, or HEX_CODE as the fallback.\n * Runtime markup carries no style=\"\" attribute (blocked without 'unsafe-inline'); call\n * qbPaintSwatches() on the inserted markup to apply them through CSSOM.\n */\nfunction getSwatchAttrs(color) {\n    if (color.COLOR_SQUARE_IMAGE) {\n        // Strip quotes/parens/backslashes/whitespace + require an http(s) URL so a crafted swatch value\n        // can't break out of the attribute or the url() (CSS/attribute injection). (review C32)\n        const safe = String(color.COLOR_SQUARE_IMAGE).replace(/[\"'()\\\\\\s]/g, '');\n        if (/^https?:\\/\\//i.test(safe)) {\n            return `data-swatch-image=\"${escapeHtml(safe)}\"`;\n        }\n    }\n    const hex = (color.HEX_CODE && /^#[0-9a-fA-F]{3,8}$/.test(color.HEX_CODE)) ? color.HEX_CODE : '#ccc';\n    return `data-swatch-color=\"${hex}\"`;\n}\n\n/** Paints the data-swatch-image / data-swatch-color elements inside root through CSSOM. */\nfunction qbPaintSwatches(root) {\n    if (!root) return;\n    root.querySelectorAll('[data-swatch-image], [data-swatch-color]').forEach((el) => {\n        if (el.dataset.swatchImage) {\n            el.style.backgroundImage = `url(${JSON.stringify(el.dataset.swatchImage)})`;\n            el.style.backgroundSize = 'cover';\n            el.style.backgroundPosition = 'center';\n        } else {\n            el.style.backgroundColor = el.dataset.swatchColor;\n        }\n    });",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "    module.exports = { parseQuickQuoteDecoration, getQuickQuotePrefill, escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };",
+      "after": "    module.exports = { parseQuickQuoteDecoration, getQuickQuotePrefill, escapeHtml, formatPrice, cleanProductTitle, getSwatchAttrs, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/quote-extended-sizes.js",
+      "before": "                <div class=\"size-popup-loading\" style=\"grid-column: 1 / -1;\">",
+      "after": "                <div class=\"size-popup-loading\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/quote-extended-sizes.js",
+      "before": "                <div class=\"size-popup-empty\" style=\"grid-column: 1 / -1;\">",
+      "after": "                <div class=\"size-popup-empty\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/quote-extended-sizes.js",
+      "before": "                        <div class=\"waist-sizes\" style=\"${isExpanded ? '' : 'display: none;'}\">",
+      "after": "                        <div class=\"waist-sizes\">",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/quote-extended-sizes.js",
+      "before": "            }).join('');\n        } else {",
+      "after": "            }).join('');\n            // Collapsed waists start hidden; toggleWaistGroup writes style.display.\n            grid.querySelectorAll('.pants-waist-group.collapsed .waist-sizes').forEach(el => { el.style.display = 'none'; });\n        } else {",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/safety-stripe-recs.js",
+      "before": "        + ' style=\"--swatch:' + hueHex(c.color_name) + '\"'",
+      "after": "        + ' data-swatch-hex=\"' + hueHex(c.color_name) + '\"'",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
+    },
+    {
+      "file": "shared_components/js/safety-stripe-recs.js",
+      "before": "        + '<div class=\"ssr-grid\">' + list.map(function (s) { return cardHtml(s, opts); }).join('') + '</div>';\n      wire(root, list, opts);",
+      "after": "        + '<div class=\"ssr-grid\">' + list.map(function (s) { return cardHtml(s, opts); }).join('') + '</div>';\n      // Dot colours go through CSSOM (a style=\"\" attribute needs 'unsafe-inline').\n      root.querySelectorAll('.ssr-swatch[data-swatch-hex]').forEach(function (dot) { dot.style.setProperty('--swatch', dot.dataset.swatchHex); });\n      wire(root, list, opts);",
+      "count": 1,
+      "stage": "builder-runtime-style-attributes-emb-scp-dtf-2026-09-17",
+      "reason": "Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens."
     }
   ]
 }
