@@ -71,4 +71,16 @@
  :where([data-ui="unified"][data-quote-workspace="dtf"]) .keyboard-hint { display:none; }
 }
 
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast { position:fixed; bottom:20px; left:50%; z-index:var(--z-toast); display:flex; align-items:center; gap:10px; max-width:min(480px, calc(100vw - 32px)); padding:14px 24px; border-radius:var(--radius-md); background:var(--ui-ink); color:var(--color-on-brand); box-shadow:var(--shadow-md); font-weight:500; opacity:0; transform:translate(-50%, 100px); transition:opacity .3s ease, transform .3s ease; }
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast.show { opacity:1; transform:translate(-50%, 0); }
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast i { font-size:var(--font-size-lg); }
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast-success { background:var(--color-brand-deep); }
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast-error { background:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast-warning { background:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast-info { background:var(--color-info-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+ :where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast { transition:none; }
+}
+
 }

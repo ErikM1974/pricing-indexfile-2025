@@ -1658,6 +1658,9 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/unit/headwear-builders.test.js — the EMB and SCP builders' isCapProduct equals the classifier on every fixture row; builder pages load the classifier first.
 - tests/dom/headwear-builders.test.js — builder onStyleChange inputs, ShopWorks size mapping and vendor filing, DTF search keeping today's caps, reopened-quote price notice.
 - tests/dom/pdp-headwear-routing.test.js — product page cap/flat/garment routing, Caps-only embroidery lock, single Front placement, conflict wording and toast text.
+- tests/dom/emb-import-summary.test.js — Embroidery ShopWorks import summary (shared alert, live region, keyboard item buttons, dismiss focus) and the non-SanMar price button and price editor.
+- tests/unit/builders/declared-globals.test.js — a builder module may not use another builder module's private function as a page global (the bug that dropped vendor import lines).
+- tests/unit/builders/emb-output-gates.test.js — save, print and copy refuse a vendor line with no price; Email and Push stop when the save they need was refused.
 - tests/unit/embroidery-calculator-headwear-gates.test.js — flat and cap embroidery calculator gates and search sorting on the classifier, missing-classifier error.
 
 - tests/unit/quick-quote-handoff.test.js — versioned decoration validation and legacy handoff compatibility.

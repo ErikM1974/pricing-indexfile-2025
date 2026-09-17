@@ -1569,6 +1569,27 @@ export function populateNonSanmarRow(row, rowId, product) {
  * Update the price cell display for non-SanMar rows with pencil edit affordance.
  * Shows pencil icon for priced items, warning icon for $0 items.
  */
+/**
+ * The price button for a non-SanMar row: a real button (keyboard + screen reader) that opens
+ * the price editor. $0.00 says, in words, that the product needs a price. The accessible name
+ * starts with the visible text and names the style.
+ * @param {number|string} rowId
+ * @param {number} price
+ * @param {string} [style]
+ * @returns {string}
+ */
+export function nsPriceButtonHtml(rowId, price, style) {
+    const id = escapeHtml(String(rowId));
+    const name = escapeHtml(style || 'this product');
+    const open = `<button type="button" class="ns-price-display ns-price-btn" data-call="enablePriceOverride" data-args="[${id}]"`;
+    const pencil = '<i class="fas fa-pencil-alt" aria-hidden="true"></i>';
+    if (price > 0) {
+        const text = `$${escapeHtml(price.toFixed(2))}`;
+        return `${open} aria-label="${text} — edit the unit price for ${name}">${text} ${pencil}</button>`;
+    }
+    return `${open} aria-label="$0.00 needs a price — set the unit price for ${name}">$0.00 <span class="is-unpriced">needs a price</span> ${pencil}</button>`;
+}
+
 export function updateNonSanmarPriceCell(row, rowId) {
     const priceCell = document.getElementById(`row-price-${rowId}`);
     if (!priceCell) return;
@@ -1583,15 +1604,15 @@ export function updateNonSanmarPriceCell(row, rowId) {
     }
 
     const sellPrice = parseFloat(row.dataset.sellPrice) || 0;
-    if (sellPrice > 0) {
-        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
-        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt" aria-hidden="true"></i></span>`;
-        priceCell.classList.remove('ns-price-zero');
-    } else {
-        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
-        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt" aria-hidden="true"></i></span>`;
-        priceCell.classList.add('ns-price-zero');
-        row.classList.add('price-warning');
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId, style escaped in nsPriceButtonHtml
+    priceCell.innerHTML = nsPriceButtonHtml(rowId, sellPrice, row.dataset.style);
+    priceCell.classList.toggle('ns-price-zero', !(sellPrice > 0));
+    row.classList.toggle('price-warning', !(sellPrice > 0));
+    if (!(sellPrice > 0)) {
+        // Nothing priced this line: drop any engine price left from a previous style.
+        delete priceCell.dataset.exactUnitPrice;
+        const totalCell = document.getElementById(`row-total-${rowId}`);
+        if (totalCell) totalCell.textContent = '-';
     }
 }
 
@@ -3095,6 +3116,8 @@ export function hideVariantOnlyParents() {
         const rowId = parseInt(/** @type {HTMLElement} */ (parentRow).dataset.rowId);
         if (!rowId || !embState.childRowMap[rowId]) return;
         if (/** @type {HTMLElement} */ (parentRow).dataset.isOsfaOnly === 'true') return;
+        // A vendor product's price is set on its parent row, so that row stays visible.
+        if (/** @type {HTMLElement} */ (parentRow).dataset.nonSanmar === 'true') return;
 
         // Check if ALL standard size inputs are empty/zero
         let standardTotal = 0;
@@ -3394,8 +3417,10 @@ export function clearExtendedSize(parentRowId, size) {
 /**
  * Reorder a product row based on type: garments first, caps below
  * Called after cap detection to maintain visual organization
+ * (exported 2026-09-16: the ShopWorks import called it as a page global, which never existed
+ * in the bundle, so every force-imported vendor product stopped before its color and sizes)
  */
-function reorderRowByProductType(row) {
+export function reorderRowByProductType(row) {
     if (!row) return;
 
     const tbody = document.getElementById('product-tbody');
@@ -3505,38 +3530,58 @@ export function enablePriceOverride(rowId) {
     // Already editing — don't re-enter
     if (priceCell.querySelector('.price-override-input')) return;
 
-    // Read current displayed price (strip $ and any reset button text)
-    const currentText = priceCell.textContent.replace(/[^0-9.]/g, '');
-    const currentPrice = parseFloat(currentText) || 0;
+    // Starting price. A fixed-price vendor row starts only from its own sell price (blank when it
+    // has none) — the cell may still carry an engine price from the style it replaced.
+    const vendorPriced = isNonSanmar && row.dataset.nsPricingMode !== 'costPlus';
+    const currentPrice = vendorPriced
+        ? (parseFloat(row.dataset.sellPrice) || 0)
+        : (parseFloat(row.dataset.sellPrice) || parseFloat(priceCell.dataset.exactUnitPrice)
+            || parseFloat(priceCell.textContent.replace(/[^0-9.]/g, '')) || 0);
 
     // Replace cell content with input
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price value + rowId only
     priceCell.innerHTML = `<input type="number" class="price-override-input"
-        step="0.01" min="0" value="${currentPrice.toFixed(2)}">`;
+        step="0.01" min="0" inputmode="decimal" value="${currentPrice > 0 ? currentPrice.toFixed(2) : ''}">`;
 
-    const input = priceCell.querySelector('.price-override-input');
-    /** @type {HTMLElement} */ (input).focus();
-    /** @type {HTMLInputElement} */ (input).select();
+    const input = /** @type {HTMLInputElement} */ (priceCell.querySelector('.price-override-input'));
+    input.setAttribute('aria-label', `Unit price for ${row.dataset.style || 'this product'}`);
+    input.focus();
+    input.select();
+
+    // After a keyboard commit or cancel, keyboard focus returns to the price button.
+    function afterRepaint(repricing, fromKeyboard) {
+        Promise.resolve(repricing).catch(() => {}).then(() => {
+            if (typeof window.syncImportSummary === 'function') window.syncImportSummary();
+            if (!fromKeyboard) return;
+            const button = /** @type {HTMLElement|null} */ (document.querySelector(`#row-price-${rowId} .ns-price-btn`));
+            if (button) button.focus();
+        });
+    }
 
     // Commit on Enter or blur
-    function commitOverride() {
-        const newPrice = parseFloat(/** @type {HTMLInputElement} */ (input).value);
+    function commitOverride(fromKeyboard) {
+        const typed = input.value.trim();
+        const newPrice = parseFloat(typed);
         if (isNaN(newPrice) || newPrice <= 0) {
-            cancelOverride();
+            if (typed !== '') showToast('Enter a price above $0.00.', 'warning');   // leaving it blank just closes
+            cancelOverride(fromKeyboard);
             return;
         }
 
         // Set the sell price override on the row
         row.dataset.sellPrice = newPrice.toString();
         markAsUnsaved();
-        recalculatePricing();
+        const repricing = recalculatePricing();
+        if (vendorPriced) updateNonSanmarPriceCell(row, rowId);
+        afterRepaint(repricing, fromKeyboard);
     }
 
     // Cancel on Escape — restore original display
-    function cancelOverride() {
-        // Remove input, let recalculatePricing restore the cell
-        // If there was an existing override, keep it; otherwise clear
-        recalculatePricing();
+    function cancelOverride(fromKeyboard) {
+        // A vendor row the engine can't price keeps its $0.00 button (the recalculation
+        // never repaints it); every other row is repainted by the recalculation.
+        if (vendorPriced) updateNonSanmarPriceCell(row, rowId);
+        afterRepaint(recalculatePricing(), fromKeyboard);
     }
 
     let committed = false;
@@ -3544,17 +3589,18 @@ export function enablePriceOverride(rowId) {
         if (/** @type {KeyboardEvent} */ (e).key === 'Enter') {
             e.preventDefault();
             committed = true;
-            commitOverride();
+            commitOverride(true);
         } else if (/** @type {KeyboardEvent} */ (e).key === 'Escape') {
             e.preventDefault();
             committed = true;
-            cancelOverride();
+            cancelOverride(true);
         }
     });
 
     input.addEventListener('blur', () => {
         if (!committed) {
-            commitOverride();
+            committed = true;
+            commitOverride(false);
         }
     });
 }

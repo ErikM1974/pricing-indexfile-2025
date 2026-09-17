@@ -1,5 +1,23 @@
 # LESSONS LEARNED
 
+## A CSS migration must carry the classes JavaScript adds at runtime (2026-09-16)
+
+- Problem/root cause: the September builder CSS release (v2026.09.13.2) replaced each builder's old sheets with the unified family, but the census only covered markup and static states. 47 classes that JavaScript adds later kept their only rules in the retired sheets: the Screen Print and DTF "Push to ShopWorks" dialog stayed `display:none` after `.show`, the pricing-error banner, fallback-price badge and "Updating prices…" pill rendered as plain text at the end of the page, the Embroidery monogram/manual-item dialogs and stitch estimator appeared below the footer, and $0 vendor rows, low-stock badges and review deltas lost their warning colours. Nobody saw it for three days because no browser test opened those states.
+- Solution: the rules are back, token-based and scoped (`quote-workspace.css` for shared pieces, `quote-<method>.css` for the rest), and the Embroidery import summary and $0 price are rebuilt as keyboard buttons. `tests/e2e/css-unification-quote-builder-workflows.spec.js` checks the computed style of every restored overlay/notice on all four builders and runs a full vendor import by keyboard.
+- Prevention: before retiring a sheet, list every class the page's JS applies (classList, className, template strings) and check a loaded sheet styles it; open each runtime state in a browser test. The audit list (52 cosmetic-only classes still unstyled) is in `memory/CSS_UNIFICATION_2026-09.md`.
+
+## A module-private function used as a page global fails only after bundling (2026-09-16)
+
+- Problem/root cause: `shopworks-import.js` called `reorderRowByProductType` as a bare global (listed in its `global` lint comment), but it is private to `product-rows.js`. esbuild renames the private copy so it can't shadow a global of the same name, so every ShopWorks import of a part number missing from SanMar threw a ReferenceError after creating the row: no color, no sizes, and the line silently dropped out of the quote total. The jsdom suites stubbed `reorderRowByProductType` on `globalThis`, which hid it.
+- Solution: the function is exported and imported. `tests/unit/builders/declared-globals.test.js` fails when a builder module declares as a global a name that is only a private declaration in another builder module (and not a real page global).
+- Prevention: don't stub a name in a DOM test that the code should import; prefer importing over the `global` comment. When a vendor line finally imported whole, the engine's "CRITICAL ERROR — contact IT" banner fired for an honest $0 row, so the engine now lists such lines as `unpricedProducts` instead of API failures — and save, print and copy refuse them (`vendorStylesWithoutPrice`), while Email and Push stop when the save they need was refused (`saveAndGetLink` returns true only on a complete save).
+
+## Staff tools warn about decoration rules; they don't block (2026-09-16)
+
+- Problem/root cause: Quick Quote refused screen print on a CornerStone safety vest because the Caspio `Decoration_Method_Rules` row for Workwear was embroidery-only — rules written for the customer product page. The quote builders never check them, and Quick Quote's own safety top-sellers list recommended the vest for print.
+- Solution (Erik): screen print and DTF are allowed for every garment category in Caspio (caps stay cap embroidery), and Quick Quote never limits them; DTG and embroidery outside a category's rule still price with a "check the garment" note, are never the lowest-price pick, and start unticked on the customer estimate.
+- Prevention: a staff surface uses the category rules as notes, never as a block the builders don't also enforce. Change the Caspio cells (no deploy) when the customer offer changes; `rules-before.json` in the session scratchpad holds the previous matrix.
+
 ## One product-type rule for every price surface (2026-09-16)
 
 - Problem/root cause: the builders, product page, public embroidery calculators and Quick Quote each decided cap vs garment embroidery their own way (style prefixes, substring keywords, category only). On 2,484 live styles they disagreed with Erik's rules on 85, 86, 297 and 8 rows: New Era/Richardson apparel priced as caps, every beanie priced as a cap on the product page, "capacity" bags sent to the cap calculator. The flat calculator also crashed (`hideLoading` never existed) whenever a cap opened it.
@@ -215,12 +233,6 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: blog styles referenced tokens their response never loaded; access notices interpolated raw staff names, and JSON-LD could close its script when a title contained HTML.
 - Solution: serve canonical tokens/components and scoped blog/status styles; escape names as text and encode less-than signs in serialized JSON-LD. Authorization and HTTP/SEO behavior stay with the original callers.
 - Prevention: preserve original response content, links and metadata; test malicious names/titles, anonymous and authorized gates, keyboard exits with unavailable CSS, four widths and every printed page. Keep reviewed server owners in the runtime census after closing their backlog entries.
-
-## Generated staff documents need physical geometry and readiness checks (2026-09-13)
-
-- Problem/root cause: call sheets, mailing labels and thread sheets carried isolated CSS and printed on a timer or load event; blocked windows and missing assets could fail silently. An imported thread run was inserted as HTML.
-- Solution: canonical tokens/components plus one staff-print sheet, with a shared promise for styles/fonts/images, visible failures in the parent and preview, and escaped thread text with validated color data. Keep Avery 5160 dimensions explicit in print media.
-- Prevention: real-window ready/blocked/delayed/missing-file cases; preserve original addresses, amounts and source hashes; test each label at 2.625 by 1 inch, 0.125-inch column gaps and all 32 labels across two pages. Inspect every screen scroll segment and PDF page. Baseline replay must reverse newer print edits before older family edits.
 
 ## Faded action notices must leave keyboard navigation (2026-09-13)
 

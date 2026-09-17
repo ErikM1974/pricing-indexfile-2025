@@ -118,4 +118,62 @@
  :where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-field-grid { gap:8px; }
 }
 
+/* Runtime dialogs, popovers and states the retired embroidery sheet styled (restored 2026-09-16). */
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .monogram-names-dialog { position:fixed; inset:0; z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:16px; background:color-mix(in srgb, var(--gray-900) 45%, transparent); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-card { width:min(440px, 100%); max-height:calc(100dvh - 32px); overflow:auto; padding:18px 20px; border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); box-shadow:var(--shadow-md); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-title { margin-bottom:4px; color:var(--ui-accent); font-size:var(--font-size-md); font-weight:700; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-hint { margin-bottom:10px; color:var(--ui-muted); font-size:var(--font-size-sm); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-input { margin-bottom:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-names { resize:vertical; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-apply,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-apply { border-color:var(--ui-accent); background:var(--ui-accent); color:var(--color-on-brand); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .mnd-apply:hover:not(:disabled),:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-apply:hover:not(:disabled) { border-color:var(--ui-accent-hover); background:var(--ui-accent-hover); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .stitch-estimator-pop { position:absolute; z-index:var(--z-overlay); width:min(260px, calc(100vw - 32px)); padding:12px; border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); box-shadow:var(--shadow-md); color:var(--ui-ink); font-size:var(--font-size-sm); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-title { margin-bottom:8px; font-weight:700; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-title i,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-result strong { color:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-row { display:flex; gap:8px; margin-bottom:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-row label { display:flex; flex:1; align-items:center; gap:5px; min-width:0; margin:0; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-row input[type="number"] { width:64px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-row select { flex:1; min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-result { margin:6px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-actions { display:flex; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-apply { flex:1; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .se-note { margin-top:6px; color:var(--ui-muted); font-size:var(--font-size-xs); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .thumb-modal-overlay { position:fixed; inset:0; z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:16px; background:color-mix(in srgb, var(--gray-900) 70%, transparent); cursor:zoom-out; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .thumb-modal-overlay img { max-width:100%; max-height:calc(100dvh - 32px); border-radius:var(--radius-md); background:var(--ui-surface); box-shadow:var(--shadow-md); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .product-table tr.variant-only-parent { display:none; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .emb-screen-notice { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:8px 16px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .emb-screen-notice > .btn-dismiss-banner { grid-column:2; grid-row:1; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .emb-screen-notice > :not(.btn-dismiss-banner) { grid-column:1; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .import-summary-list { margin:0; padding:0; list-style:none; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .import-summary-item { min-height:32px; padding:4px 0; border:0; background:none; color:inherit; font-weight:400; text-align:left; text-decoration:underline; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .import-summary-item:hover:not(:disabled) { border-color:transparent; background:none; text-decoration-thickness:2px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .is-unpriced { color:var(--color-danger-ink); font-weight:700; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .product-table tr.price-warning > td { background:var(--color-danger-bg); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .product-table tr.price-warning > td:first-child { box-shadow:inset 4px 0 0 var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .product-table tr.is-located > td { background:var(--color-warning-bg); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .ns-price-btn { min-height:32px; padding:4px 8px; white-space:nowrap; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .cell-price .price-override-input { min-width:6em; min-height:32px; padding:4px 8px; text-align:right; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-info-badge.design-info-warning { border:1px solid var(--color-warning); background:var(--color-warning-bg); color:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-info-badge.design-info-error { border:1px solid var(--color-danger-ink); background:var(--color-danger-bg); color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .btn-retry-pricing { min-height:32px; padding:3px 9px; border-color:var(--color-danger-ink); background:var(--color-danger-bg); color:var(--color-danger-ink); font-size:var(--font-size-sm); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .btn-retry-pricing:hover:not(:disabled) { border-color:var(--color-danger-ink); background:var(--color-danger-bg); text-decoration:underline; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-nudge { display:inline-flex; align-items:center; margin-left:8px; padding:2px 8px; border:1px dashed var(--color-warning); border-radius:var(--radius-pill); background:var(--color-warning-bg); color:var(--color-warning-ink); font-size:var(--font-size-xs); font-weight:600; white-space:nowrap; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-delta-badge { margin-left:6px; padding:1px 6px; border-radius:var(--radius-pill); font-size:var(--font-size-xs); font-weight:600; white-space:nowrap; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-delta-badge.ok { background:var(--color-success-bg); color:var(--color-brand-deep); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-delta-badge.review { background:var(--color-warning-bg); color:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-delta-badge.mismatch { background:var(--color-danger-bg); color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-delta-warning { display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:8px 12px; border:1px solid var(--color-warning); border-radius:var(--radius-sm); background:var(--color-warning-bg); color:var(--color-warning-ink); font-size:var(--font-size-sm); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-price-label.disabled { color:var(--ui-muted); text-decoration:line-through; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .spr-custom-input.spr-muted { background:var(--ui-canvas); color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-service-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1px solid var(--color-success); border-radius:var(--radius-pill); background:var(--color-success-bg); color:var(--color-brand-deep); font-size:var(--font-size-xs); font-weight:500; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .preview-service-badge.warning { border-color:var(--color-warning); background:var(--color-warning-bg); color:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .qb-amber-dark { color:var(--color-warning-ink); }
+
+@media print {
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .emb-screen-notice { display:none; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) button.ns-price-btn { display:inline; min-height:0; padding:0; border:0; background:none; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .ns-price-btn i { display:none; }
+}
+
 }

@@ -1,5 +1,7 @@
 # One headwear rule for every price surface — September 2026
 
+**LIVE v2026.09.16.4 / Heroku v2127 / main 1d6ed787 (2026-09-16).** Exact-source CI green (unit + parity, tsc, lint, Playwright); live `/api/version`, hashed classifier/product assets and Quick Quote "Version 2026.09.16.4" verified. Before deploy: 2,484-row cross-surface sample 0 mismatches, live surface parity 5/5, Quick Quote vs real EMB builder equal on 11 live styles, 269/269 browser tests. A release that bumps builder/product/calculator HTML needs `release-<version>` rows in BOTH ledgers (product.html + builders in the Quick Quote workflow ledger, calculators in core-calculators).
+
 **Why (Erik, 2026-09-16):** five surfaces decided "cap or garment embroidery?" their own way. Across 2,484 live styles the embroidery and screen print builders were wrong on 85 (New Era `NE*` apparel, Richardson apparel, "Capital"/"Crosshatch"/"Hatch" titles, Gildan 980, bandanas, blank-category visors, fleece headbands), the product page on 86 (every beanie priced as a cap; blank-category Richardson caps, visors and Youth/Ladies caps priced as garments), the public embroidery calculators on 297 ("capacity" in a bag description matched "cap"), and Quick Quote on 8. After the change all of them agree on all 2,484 (`tests/unit/headwear-surfaces-parity.test.js`, plus a one-off full-sample run).
 
 ## The rule

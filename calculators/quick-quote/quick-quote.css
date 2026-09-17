@@ -1852,16 +1852,20 @@
         padding-left: var(--space-5);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-elig-note, [id="qqDocumentStatus"].is-error) {
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-elig-note, .qq-card-caution, [id="qqDocumentStatus"].is-error) {
         color: var(--color-warning-ink);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-elig-note {
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-elig-note, .qq-card-caution) {
         margin: 0;
         padding: var(--space-2) var(--space-3);
         background: var(--color-warning-bg);
         border-radius: var(--radius-sm);
         font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-caution {
+        margin-top: var(--space-2);
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-line-quantity {

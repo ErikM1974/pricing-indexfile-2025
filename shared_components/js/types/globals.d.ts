@@ -173,6 +173,7 @@ interface Window {
     parseAndPreviewShopWorks?: () => Promise<void> | void;
     confirmShopWorksImport?: () => Promise<void>;
     dismissImportBanner?: () => void;
+    syncImportSummary?: () => void;
     scrollToProductRow?: (rowId: number | string) => void;
     /* persistence bridges (builders/emb/persistence.js, extraction #4) */
     initEmbroideryPersistence?: () => void;
@@ -192,7 +193,7 @@ interface Window {
     embEmailQuote?: () => Promise<void>;
     /* save-push bridges (builders/emb/save-push.js, extraction #6) */
     saveAndGetLink?: (opts?: any) => Promise<any>;
-    saveQuote?: () => Promise<void>;
+    saveQuote?: () => Promise<boolean | void>;
     updatePushButtonState?: () => void;
     getPushReadiness?: () => any;
     renderPushReadiness?: () => void;

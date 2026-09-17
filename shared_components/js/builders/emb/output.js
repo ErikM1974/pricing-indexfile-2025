@@ -21,7 +21,7 @@
    parseRatePercent, showLoading, EmbroideryInvoiceGenerator,
    hasUnsavedChanges, emailQuote */
 import { getServicePrice } from './pricing.js';
-import { buildLogoConfiguration, calculateDiscountableSubtotal, collectProductsFromTable, recalculatePricing, syncALRows, syncDECGRows } from './pricing-sync.js';
+import { buildLogoConfiguration, calculateDiscountableSubtotal, collectProductsFromTable, recalculatePricing, syncALRows, syncDECGRows, vendorStylesWithoutPrice } from './pricing-sync.js';
 import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { dateFromInputValue } from './product-rows.js';
@@ -658,6 +658,11 @@ export async function copyToClipboard() {
         showToast('Add products first', 'error');
         return;
     }
+    const unpriced = vendorStylesWithoutPrice(productList);
+    if (unpriced.length > 0) {
+        showToast(`Set a price for ${unpriced.join(', ')} before copying — it isn't in the total yet.`, 'error', 7000);
+        return;
+    }
 
     try {
         const text = generateEmbQuoteText(productList, serviceItems);
@@ -766,6 +771,12 @@ export async function printQuote() {
         showToast('Add products before printing', 'error');
         return;
     }
+    // A vendor line waiting for a price is left out of the total — never print it at $0.00.
+    const unpriced = vendorStylesWithoutPrice(allItems);
+    if (unpriced.length > 0) {
+        showToast(`Set a price for ${unpriced.join(', ')} before printing — it isn't in the total yet.`, 'error', 7000);
+        return;
+    }
 
     // Belt-and-braces $0-print guard (parity with DTF/SCP printQuote, 2026-07-04).
     // The pre-print recalc above already settled on-screen prices; if the grand total
@@ -852,7 +863,8 @@ export async function embEmailQuote() {
     const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : false;
     if (!quoteId || dirty) {
         showToast('Saving quote before emailing…', 'info', 2500);
-        await saveAndGetLink({ skipShareModal: true });
+        const saved = await saveAndGetLink({ skipShareModal: true });
+        if (saved !== true) return;   // blocked or partial save — never email the previous revision
         quoteId = (typeof embState.editingQuoteId !== 'undefined' && embState.editingQuoteId) || (typeof embState._pushQuoteId !== 'undefined' && embState._pushQuoteId);
         if (!quoteId) return;   // save failed/blocked — its error is already on screen
     }

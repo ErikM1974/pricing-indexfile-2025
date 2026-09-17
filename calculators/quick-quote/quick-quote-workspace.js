@@ -7,7 +7,7 @@
     // Matches quick-quote.js looksLikeStyle(): a style number has a digit and no spaces.
     const styleLike = value => /^[A-Z0-9._/-]{2,20}$/i.test(value) && /\d/.test(value);
     let bridge, scheduled = false, documentModel, busy = false, restoring = false, draftTimer, searchTimer, searchSeq = 0;
-    let recommendation = '', excluded = new Set(), context = '', lastOptions = '', lastMarkup = '', libraryPromise;
+    let recommendation = '', excluded = new Set(), cautioned = new Set(), context = '', lastOptions = '', lastMarkup = '', libraryPromise;
     let draftAvailable = false, searchInput = null, searchMatches = [], lastCopy = '', savedHome = '', printing = false;
     const doc = () => window.QuickQuoteDocument;
     function read(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; } }
@@ -29,15 +29,17 @@
         queueMicrotask(() => { scheduled = false; render(); });
     }
     function renderOptionControls(all, quick) {
-        const optionsKey = JSON.stringify([quick, all.map(o => [o.key, o.product.style, o.method, o.builderHref])]);
+        const optionsKey = JSON.stringify([quick, all.map(o => [o.key, o.product.style, o.method, o.builderHref, o.caution || ''])]);
         if (optionsKey !== lastOptions) {
             const options = $('qqDocumentOptions'); options.replaceChildren(); lastOptions = optionsKey;
             for (const o of all) {
                 const row = document.createElement('div'); row.className = 'qq-option-control';
-                const label = document.createElement('label'); label.className = 'qq-check'; label.hidden = all.length === 1;
+                const label = document.createElement('label'); label.className = 'qq-check'; label.hidden = all.length === 1 && !o.caution;
                 const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !excluded.has(o.key); check.dataset.option = o.key;
                 check.addEventListener('change', () => { if (check.checked) excluded.delete(o.key); else excluded.add(o.key); refresh(); });
-                label.append(check, document.createTextNode(quick ? doc().names[o.method] : o.product.style)); row.append(label);
+                label.append(check, document.createTextNode(quick ? doc().names[o.method] + (o.caution ? ' (check first)' : '') : o.product.style));
+                if (o.caution) label.title = o.caution;
+                row.append(label);
                 const recommend = button('Recommend', () => { recommendation = recommendation === o.key ? '' : o.key; refresh(); });
                 recommend.dataset.recommend = o.key; recommend.hidden = all.length === 1; row.append(recommend);
                 if (o.builderHref) { const link = document.createElement('a'); link.className = 'btn btn-ghost'; link.href = o.builderHref; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Full quote'; link.title = 'Open ' + o.product.style + ' with these decoration settings in the full Quote Builder'; row.append(link); }
@@ -50,8 +52,10 @@
         if (printing) return; // the print notice stays until the dialog closes
         const s = bridge.state, quick = s.mode === 'quick';
         const nextContext = s.mode + ':' + (quick ? s.product?.style || '' : s.lineMethod);
-        if (nextContext !== context) { context = nextContext; recommendation = ''; excluded = new Set(); lastOptions = ''; lastMarkup = null; }
+        if (nextContext !== context) { context = nextContext; recommendation = ''; excluded = new Set(); cautioned = new Set(); lastOptions = ''; lastMarkup = null; }
         const inputs = bridge.options();
+        // A method outside the category rules starts unticked on the customer estimate; the rep can tick it.
+        for (const o of inputs) if (o.caution && !cautioned.has(o.key)) { cautioned.add(o.key); excluded.add(o.key); }
         const all = inputs.map(o => ({ ...o, recommended: o.key === recommendation }));
         renderOptionControls(all, quick);
         const pending = bridge.pending(), errors = bridge.errors();

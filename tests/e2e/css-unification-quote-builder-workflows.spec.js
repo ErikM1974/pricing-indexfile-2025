@@ -1,6 +1,7 @@
 const {test,expect}=require('@playwright/test');
 const {open}=require('./helpers/quote-builders-browser');
 const {evidence}=require('./helpers/quote-builder-workflow-review');
+const AxeBuilder=require('@axe-core/playwright').default;
 const original=process.env.CAPTURE_QUOTE_BUILDERS_ORIGINAL==='1';
 test.setTimeout(120000);
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
@@ -275,4 +276,103 @@ for(const failed of [false,true])test('CSS quote builders: invoice '+(failed?'bl
   else await expect.poll(()=>invoice.evaluate(()=>window.__printCalls)).toBe(1);
   expect(e.writes).toEqual([]);expect(e.mutations).toEqual([]);expect(e.errors).toEqual([]);expect(e.unknown).toEqual([]);
  }finally{release();}
+});
+
+// Erik 2026-09-16: the September CSS release left runtime pieces unstyled. The import summary
+// and the non-SanMar $0.00 price are proven end to end here, keyboard only.
+const VENDOR_ORDER=['**************','Order #: 999001','Salesperson: Example Rep','Email: rep@example.invalid','**************','Customer #: 10001','Company: Example Co','**************','Order Information','Ordered by: Example Buyer','Email: buyer@example.invalid','Date Order Placed: 09/12/2026','Terms: Prepaid','**************','Items Purchased','Item 1 of 2','','Part Number: PC54','Description: Port & Company Core Cotton Tee, Jet Black','Item Quantity: 24','Unit Price: $12.00','Adult:Quantity','S:6','M:6','L:6','XL:6','','Item 2 of 2','','Part Number: VND100','Description: Vendor Performance Tee, Black','Item Quantity: 12','Unit Price: $0.00','Adult:Quantity','M:6','L:6','**************','Shipping Information','Ship Method: Customer Pick Up','Ship Address: Customer Pick Up','**************','Order Summary','Subtotal: $288.00','Sales Tax: $0.00','Shipping: $0.00','Total: $288.00'].join('\n');
+
+test('CSS quote builders: embroidery import summary and vendor price by keyboard',async({page})=>{
+ test.skip(original,'The original page never styled or exposed these controls.');
+ page.setDefaultTimeout(20000);
+ const e=await open(page,{vendor:['VND100'],url:'/quote-builders/embroidery-quote-builder.html'});
+ await page.locator('button[data-call="openShopWorksImportModal"]').first().click();
+ await page.locator('#shopworks-paste-area').fill(VENDOR_ORDER);
+ await page.locator('#btn-parse-import').click();
+ await page.locator('#btn-confirm-import').click();
+ const review=page.locator('#service-pricing-review-modal');
+ await expect(review.locator('#spr-embconfig-section')).toBeVisible();
+ await review.getByRole('button',{name:/Apply & Import/}).click();
+ const banner=page.locator('#import-summary-banner');
+ await expect(banner).toBeVisible({timeout:30000});
+ await expect(banner).toHaveClass('alert alert-warn emb-screen-notice');
+ expect(await banner.evaluate(el=>el.nextElementSibling?.classList.contains('product-table-wrapper'))).toBe(true);
+ expect(await banner.evaluate(el=>getComputedStyle(el).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)');
+ await expect(banner.locator('[role="status"]')).toContainText('1 SanMar product priced automatically. 1 non-SanMar product — 1 still needs a price before you can save.');
+ const item=banner.locator('button.import-summary-item');
+ await expect(item).toHaveText(/^VND100 \(.+\) — needs a price$/);
+ const row=page.locator('tr[data-style="VND100"]').first();
+ await expect(row).toHaveClass(/price-warning/);
+ // The vendor line came in whole (color and sizes), so it counts toward the quote once priced.
+ await expect(row.locator('input[data-size="M"]')).toHaveValue('6');
+ await expect(row.locator('input[data-size="L"]')).toHaveValue('6');
+ expect(await row.evaluate(r=>r.dataset.color)).toBe('Black');
+ await expect(page.locator('#total-qty')).toHaveText('36');
+ // Waiting for a price is not an API failure: no critical banner, quote controls stay usable.
+ await expect(page.locator('#pricing-api-warning')).toHaveCount(0);
+ const totalBefore=await page.locator('#grand-total-with-tax').textContent();
+ // Nothing leaves the builder while the line has no price.
+ let popups=0;page.on('popup',()=>{popups++;});
+ await page.locator('.guided-step[data-step="3"]').click();
+ await page.locator('button[data-call="printQuote"]').first().click();
+ await expect(page.locator('#toast-container')).toContainText('Set a price for VND100 before printing');
+ expect(popups).toBe(0);
+ await page.locator('.guided-step[data-step="0"]').click();
+ await expect(banner).toBeVisible();
+ const price=row.locator('button.ns-price-btn');
+ await expect(price).toHaveAccessibleName('$0.00 needs a price — set the unit price for VND100');
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:900});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+  await banner.screenshot({path:test.info().outputPath('import-summary-'+width+'.png')});
+ }
+ await page.setViewportSize({width:1440,height:900});
+ expect((await new AxeBuilder({page}).include('#import-summary-banner').include('tr[data-style="VND100"]').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);
+ // Keyboard: the item jumps to the price; Enter opens the labelled editor; a price clears the warning.
+ await item.focus();await page.keyboard.press('Enter');
+ await expect(price).toBeFocused();
+ await expect(row).toHaveClass(/is-located/);
+ await page.keyboard.press('Enter');
+ const editor=row.getByRole('spinbutton',{name:'Unit price for VND100'});
+ await expect(editor).toBeFocused();
+ await editor.fill('15');await page.keyboard.press('Enter');
+ await expect(row.locator('button.ns-price-btn')).toBeFocused();
+ await expect(row.locator('button.ns-price-btn')).toHaveAccessibleName('$15.00 — edit the unit price for VND100');
+ await expect(row).not.toHaveClass(/price-warning/);
+ await expect(banner).toHaveClass('alert alert-success emb-screen-notice');
+ await expect(banner.locator('[role="status"]')).toContainText('All non-SanMar products now have a price.');
+ await expect(item).toHaveText(/— \$15\.00 each$/);
+ await expect(page.locator('#grand-total-with-tax')).not.toHaveText(totalBefore);
+ // On paper the working notice is gone and the price still shows.
+ await page.emulateMedia({media:'print'});
+ await expect(banner).toBeHidden();
+ await expect(row.locator('button.ns-price-btn')).toBeVisible();
+ await page.emulateMedia({media:'screen'});
+ // Dismiss returns focus to the products.
+ await banner.locator('.btn-dismiss-banner').focus();await page.keyboard.press('Enter');
+ await expect(banner).toHaveCount(0);
+ await expect(page.locator('.product-table-wrapper')).toBeFocused();
+ expect(e.mutations.map(m=>m.path)).toEqual(['/api/non-sanmar-products']);
+ expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);
+});
+
+// Every runtime overlay, notice and warning state the retired sheets styled has a real style again.
+for(const method of ['embroidery','screenprint','dtf','dtg'])test('CSS quote builders: '+method+' runtime overlays and warning states are styled',async({page})=>{
+ test.skip(original,'The original page loaded the retired sheets.');
+ await open(page,{url:'/quote-builders/'+method+'-quote-builder.html'});
+ const styles=await page.evaluate(()=>{
+  const probe=(cls,tag='div')=>{const el=document.createElement(tag);el.className=cls;el.textContent='x';document.body.appendChild(el);const c=getComputedStyle(el);const r={position:c.position,display:c.display,bg:c.backgroundColor,width:c.width};el.remove();return r;};
+  const out={error:probe('qb-error-banner'),fallback:probe('qb-fallback-badge'),repricing:probe('repricing-indicator'),accepted:probe('accepted-quote-banner'),prWarn:probe('pr-item pr-warn')};
+  for(const id of ['scp-push-modal','dtf-push-modal']){const m=document.getElementById(id);if(m){m.classList.add('show');out.push=getComputedStyle(m).display;m.classList.remove('show');}}
+  out.monogram=probe('monogram-names-dialog');out.estimator=probe('stitch-estimator-pop');out.thumb=probe('thumb-modal-overlay');out.toast=probe('dtf-toast dtf-toast-warning');out.oosDot=probe('dtg-size-oos-dot','span');
+  return out;
+ });
+ expect(styles.error.position).toBe('sticky');expect(styles.error.bg).not.toBe('rgba(0, 0, 0, 0)');
+ expect(styles.fallback.position).toBe('fixed');expect(styles.repricing.position).toBe('fixed');
+ expect(styles.accepted.display).toBe('flex');expect(styles.accepted.bg).not.toBe('rgba(0, 0, 0, 0)');
+ expect(styles.prWarn.bg).not.toBe('rgba(0, 0, 0, 0)');
+ if(method==='screenprint'||method==='dtf')expect(styles.push).toBe('flex');
+ if(method==='embroidery'){expect(styles.monogram.position).toBe('fixed');expect(styles.estimator.position).toBe('absolute');expect(styles.thumb.position).toBe('fixed');}
+ if(method==='dtf')expect(styles.toast.position).toBe('fixed');
+ if(method==='dtg')expect(styles.oosDot.width).toBe('6px');
 });

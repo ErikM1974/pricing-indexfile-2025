@@ -91,7 +91,7 @@
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-price,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-warn { font-size:11px; line-height:1.4; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-na { display:grid; place-items:center; min-height:44px; background:var(--ui-canvas); color:var(--ui-muted); border-radius:var(--radius-sm); }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-price--oos,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-warn,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-row-color-warn { color:var(--color-danger-ink); }
-:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-row-color-invalid input,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-cell--overflow input { border-color:var(--color-danger); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-row-color-invalid input,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-cell--overflow input,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-cell--oos input { border-color:var(--color-danger); }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-foot { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:14px; padding-top:12px; border-top:1px solid var(--ui-line); font-size:13px; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-total { font-weight:700; color:var(--ui-accent); margin-left:auto; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-add-row-btn { width:100%; margin-top:16px; border-style:dashed; }
@@ -212,7 +212,7 @@
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .tsr-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-section-label { font-weight:600; margin-bottom:8px; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-sizes,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-colors,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-top-picks-grid,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-size-list { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-rule-note,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-brand,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-sales,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-best-for,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-meta,:where([data-ui="unified"][data-quote-workspace="dtg"]) .wsr-domain { font-size:12px; color:var(--ui-muted); }
-:where([data-ui="unified"][data-quote-workspace="dtg"]) .top-seller-card.has-thumb { display:grid; grid-template-columns:64px minmax(0,1fr); gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .top-seller-card.has-thumb { display:grid; grid-template-columns:auto 64px minmax(0,1fr); gap:12px; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-thumb img { width:64px; height:80px; object-fit:contain; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-color-chip { display:inline-flex; gap:6px; align-items:center; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-color-chip .swatch,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-top-pick-swatch { display:inline-block; width:24px; height:24px; background-size:cover; border:1px solid var(--ui-line); }
@@ -294,5 +294,16 @@
  :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-titleblock { padding:8px 12px 4px; }
  :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-foot { margin-top:8px; padding:8px; }
 }
+
+/* Stock and colour warnings and rank badges the retired DTG sheets styled (restored 2026-09-16). */
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-oos-dot { display:inline-block; flex:0 0 auto; width:6px; height:6px; border-radius:50%; background:var(--color-danger); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .color-swatch.warning { border-color:var(--color-warning); background:var(--color-warning-bg); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .color-swatch.warning .cs-img::after { content:"⚠"; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .top-seller-card.has-thumb .ts-body { grid-column:3; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-rank-badge { display:flex; flex-shrink:0; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:var(--ui-accent); color:var(--color-on-brand); font-weight:700; font-variant-numeric:tabular-nums; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-rank-badge.gold { background:var(--amber-700); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-rank-badge.silver { background:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-rank-badge.bronze { background:color-mix(in srgb, var(--amber-700) 60%, var(--gray-900)); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .product-details-card .pd-color-warning { margin-top:8px; padding:8px 10px; border-left:3px solid var(--color-warning); border-radius:var(--radius-sm); background:var(--color-warning-bg); color:var(--color-warning-ink); font-size:var(--font-size-xs); line-height:1.4; }
 
 }
