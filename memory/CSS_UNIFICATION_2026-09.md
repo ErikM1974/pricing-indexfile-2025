@@ -2045,6 +2045,8 @@ Two legacy print owners are explicitly inactive in the manifest: QuoteFormatter 
 
 ## Builder runtime classes restored — September 16, 2026
 
+**LIVE v2026.09.16.5 (Heroku v2128, main c4e582bb).** Exact-source CI green. Note: `CAPTURE_QUOTE_BUILDERS_ORIGINAL=1` fails ~30 states on this machine for reasons unrelated to CSS (random artwork-upload ids, the fixtures' `localhost:3414` share URL, toast timing, three screenprint-fast contrast readings) — the same states fail on the pre-change commit; the Quick Quote capture mode passes.
+
 The September 13 release left classes that JavaScript adds at runtime styled only in the retired builder sheets. An audit of all four builders (page scripts + ES modules vs loaded sheets) found 47 that mattered; all are restored with tokens:
 - Shared (`quote-workspace.css`): pricing-error banner (sticky), fallback-price badge and "Updating prices…" pill (fixed), accepted-quote banner, More Sizes picker, keyboard-highlighted customer suggestion, stock badges (good/low/out/unknown), push-checklist warning, and for Screen Print/DTF the push-preview dialog open state (`.modal-overlay.show` — the dialog was invisible) and the company-lookup dropdown width.
 - Embroidery (`quote-embroidery.css`): monogram/manual-item dialogs, stitch estimator, design thumbnail viewer, hidden variant-only parent rows, import summary and reopened-quote notice layout (`.emb-screen-notice`, hidden in print), $0 vendor row/price button/price editor, design-lookup warning/error badges, pricing retry button, digitizing nudge, pricing-review deltas, disabled price and muted custom input, preview service badges.
