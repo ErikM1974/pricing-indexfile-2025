@@ -209,6 +209,12 @@
       "value": "Full Front"
     },
     {
+      "id": "gsf-loc-size-0",
+      "name": "",
+      "type": "select-one",
+      "value": "standard"
+    },
+    {
       "id": "gsf-loc-w-0",
       "name": "",
       "type": "number",
