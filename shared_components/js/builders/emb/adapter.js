@@ -157,7 +157,19 @@ export class EmbAdapter {
 
             const applyContact = (contact) => {
                 /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
-                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
+                // Email: NEVER blank an address we already have. This used to be an
+                // unconditional `= contact.ContactNumbersEmail || ''`, so picking a
+                // ShopWorks customer with no email on file silently WIPED the address
+                // the rep already had — including one prefilled from a lead, which then
+                // saved the quote under a different email and made it invisible to that
+                // lead's "Recent quotes for this email" panel (Taneisha 2026-09-17).
+                // Keeping it is not silent either: a kept address may belong to the
+                // PREVIOUS customer, so the toast below says so and asks them to verify.
+                // (design-search.js + shopworks-import.js already guard the same way.)
+                const _emailEl = /** @type {HTMLInputElement} */ (document.getElementById('customer-email'));
+                const _priorEmail = (_emailEl.value || '').trim();
+                const _contactEmail = (contact.ContactNumbersEmail || '').trim();
+                if (_contactEmail) _emailEl.value = _contactEmail;
                 /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
                 // Fill customer number (ShopWorks ID)
                 /** @type {HTMLInputElement} */ (document.getElementById('customer-number')).value = contact.id_Customer || '';
@@ -220,7 +232,13 @@ export class EmbAdapter {
 
                 renderOrderRecap();  // customer set → refresh the bottom Order Recap
                 updatePushButtonState();  // customer # set programmatically (no 'input' event) → re-enable Push + refresh checklist (review C9 2026-06-05)
-                showToast('Customer info loaded', 'success');
+                if (!_contactEmail && _priorEmail) {
+                    // Kept address + no ShopWorks email = the one case a rep must eyeball.
+                    showToast('Customer info loaded — this ShopWorks contact has no email on file, so ' +
+                        _priorEmail + ' was kept. Verify it belongs to this customer.', 'warning', 8000);
+                } else {
+                    showToast('Customer info loaded', 'success');
+                }
 
                 // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —
                 // shared showRecentCustomerOrders() in quote-builder-utils.js. (item #13, 2026-07-05)
