@@ -10,7 +10,7 @@
 /* global ArtworkUpload, StaffAuthHelper, CustomerLookupService,
    EmbroideryPricingCalculator, EmbroideryQuoteService, initLogoStatusChips,
    initMethodSwitchMenu, checkForEditMode, getQuickQuotePrefill,
-   clearQuickQuoteParams, takeMethodSwitchPrefill, applyMethodSwitchCustomer,
+   clearQuickQuoteParams, takeMethodSwitchPrefill, applyMethodSwitchCustomer, applyContactEmail,
    setQuoteDateDefaults, setupBeforeUnloadGuard, showRecentCustomerOrders,
    removeRecentOrdersPanel, renderOrderRecap, showToast,
    setupKeyboardShortcuts, history */
@@ -157,7 +157,7 @@ export class EmbAdapter {
 
             const applyContact = (contact) => {
                 /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
-                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
+                const _email = applyContactEmail(document.getElementById('customer-email'), contact.ContactNumbersEmail);
                 /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
                 // Fill customer number (ShopWorks ID)
                 /** @type {HTMLInputElement} */ (document.getElementById('customer-number')).value = contact.id_Customer || '';
@@ -220,7 +220,7 @@ export class EmbAdapter {
 
                 renderOrderRecap();  // customer set → refresh the bottom Order Recap
                 updatePushButtonState();  // customer # set programmatically (no 'input' event) → re-enable Push + refresh checklist (review C9 2026-06-05)
-                showToast('Customer info loaded', 'success');
+                showToast(_email.message, _email.type, _email.duration);
 
                 // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —
                 // shared showRecentCustomerOrders() in quote-builder-utils.js. (item #13, 2026-07-05)
