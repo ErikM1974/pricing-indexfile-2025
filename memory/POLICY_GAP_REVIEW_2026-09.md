@@ -119,4 +119,32 @@ was wrong.
 `JDS-LOGO2` $3.16, `JDS-LTM` $50, `JDS-MARGIN` 0.53), and the page now says to quote from there
 rather than from itself.
 
-⏭️ Still open from this review: the showroom banner 12-piece minimum.
+⏭️ Still open from this review: the showroom banner 12-piece minimum — see the check below.
+
+## Showroom banner 12-piece minimum — CHECKED 2026-09-18 (needs an Erik decision, not an edit)
+
+**The banner itself is physical signage.** "Group Orders … 12-piece minimum" appears nowhere in the
+repo (no `GROUP ORDERS` string in any html/js/json/md) and in no live policy. Nothing to edit here —
+if the sign is wrong it needs reprinting.
+
+🔑 **"12 pieces" is NOT globally wrong** — it is correct in at least three other places, so never
+blanket-replace it: JDS drinkware LTM (`laser-tumbler-mockup.js` `LTM_THRESHOLD = 12`, matching
+Caspio `JDS-LTM` "per order under 12 pieces"), 3-Day Tees LTM (`3DT-LTM` $75 under 12), and the
+customer-supplied embroidery minimum (sales-coordinator manual + training schedule).
+
+### What the check actually turned up: `csr-faqs` vs the LTM thresholds
+
+`csr-faqs` is live and customer-facing. Its minimum table disagrees with
+`ltm-order-decision-algorithm` on two rows that cost money:
+
+| Method | csr-faqs "minimum" | LTM fee clears at | Verdict |
+|---|---|---|---|
+| Embroidery garments | 12 pieces | 8 | Defensible — FAQ calls these "recommended minimums for the best pricing" |
+| **Embroidery caps** | **24 caps** | **8** | 🔴 3× the real threshold. The LTM doc says "our minimum for caps is just 8 pieces, and at that point the per-hat price drops a lot" — the FAQ turns away profitable 8–23 cap orders |
+| DTG | 24 shirts | 24 | ✅ agrees |
+| **DTF** | **10 pieces** | **24** | 🔴 FAQ is LOWER than the fee threshold. A customer told "10 is fine" gets a surprise $50 prorated LTM fee — Erik's #1 rule territory |
+| Screen printing | 72 shirts | 48 | Defensible — the LTM doc prefers 72+ for best per-piece price |
+
+**Decision needed:** are the FAQ numbers deliberate soft minimums (they are framed that way — "we
+can sometimes run smaller"), or should caps and DTF be corrected to match the fee thresholds? DTF is
+the urgent one: as written it promises a price the quote will not honour.
