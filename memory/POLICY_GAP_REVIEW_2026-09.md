@@ -46,7 +46,7 @@
 - Prices re-checked against Caspio and the live cards won over both documents: LTM $50 at ≤7 pieces for standard/AL/DECG (5 Feb "1–23" slide stale); DECG-FB $100 LTM at ≤7, min 25,000 stitches; AS-Garm/AS-CAP bands (≤10K incl., +$4 to 15K, +$10 to 25K) are live for the first logo, AL/DECG use $1.25 per 1K above 8,000 (caps $1.00 above 5,000 AL / 8,000 DECG); contract card 2 Sep 2026 = no fee, $250 min, 72+ 8K example $6.80; sticker 3x3@50 = $98 (slide $128 was a typo), 4x4/5x5 500 and 1,000 columns filled from the live grid, >6" = custom decal $12/sq ft $90 min; banners $10/sq ft $40 min; golf digitizing = standard $100 DD, free on $2,000+ (slides' $189/$109 superseded); GRT-75 $75/h confirmed; plate engraving $25 has NO Service_Codes row (kept as taught).
 - "Newer wins" where Caspio has no value: box fee $4.00 (Shipping Procedures corrected from $4.50 in the same edit; its Summary field was corrected to $4.00 on 2026-09-18 (verified live)); Christmas window = opens Oct 1, best orders in before October, final order date Nov 2; Holiday Gift Box close Oct 15 added to the calendar.
 - Every "confirm with Erik / to be settled / verify before publishing" line was rewritten into published wording; the dry-run diff of all 17 patches was reviewed before applying.
-- Still conflicting in already-published pages (not drafts): ShopWorks Cheat Sheet ES stitch rule ($0.75/1K over 12K, not in Caspio), Promotional Products & Drinkware (pre-JDS mug-press text), showroom banner 12-piece minimum.
+- Still conflicting in already-published pages (not drafts): Promotional Products & Drinkware (pre-JDS mug-press text), showroom banner 12-piece minimum.
 
 ## Box fee — CLOSED 2026-09-18
 
@@ -81,3 +81,24 @@ SHOP-MACHINE-QH $37.50/quarter-hour = $150/hour.
 
 ⏭️ `SHOP-JOB-MIN` ($100) exists in Caspio but was deliberately NOT added to the guide — Erik did
 not ask for a job minimum in the contract terms.
+
+## ShopWorks Cheat Sheet ES stitch rule — CLOSED 2026-09-18
+
+The ES row read "Over 12,000 stitches — $0.75 per 1,000 extra stitches". Verified against
+Caspio: **no service code implements that rule**. The only per-1K code is `VOL-THREAD-PER-1K`
+($0.02), an internal thread/material cost input for Volume Quote — not a customer charge.
+
+🔑 **Two stitch models are in force, and they are both legitimate** — the cheat sheet had a third,
+retired one:
+
+1. **First logo on goods NWCA supplies** → the Caspio "Stitch Surcharges" rail, `AS-Garm` /
+   `AS-CAP`, three active+visible rows each: ≤10,000 included ($0), 10,001–15,000 **+$4.00**,
+   15,001–25,000 **+$10.00**.
+2. **Add Logo and customer-supplied** → per 1,000 above a base: **$1.25/1,000 above 8,000** on
+   garments; **$1.00/1,000 above 5,000** on Add Logo caps and **above 8,000** on customer-supplied
+   caps.
+
+Both were already resolved on 15 Sep 2026 and written into the live
+`embroidery-pricing-structure-2026`, which states outright that the cheat sheet rule "is not in
+Caspio and should not be quoted" — the cheat sheet simply never got the edit. Now carries both
+models with the AS codes cited. `ES` appears in no other live policy.
