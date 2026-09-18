@@ -242,6 +242,12 @@
       "value": "Full Back"
     },
     {
+      "id": "gsf-loc-size-1",
+      "name": "",
+      "type": "select-one",
+      "value": "standard"
+    },
+    {
       "id": "gsf-loc-w-1",
       "name": "",
       "type": "number",
