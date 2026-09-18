@@ -3912,7 +3912,7 @@
   }
 
   :where([data-ui="unified"][data-garment-designer]) .designer-print-active .gsf-loc-grid {
-    grid-template-columns: 1.4fr 80px 80px 2fr;
+    grid-template-columns: 1.4fr 196px 2fr;
   }
 
   :where([data-ui="unified"][data-garment-designer]) .designer-print-active .art-details-section {

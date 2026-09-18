@@ -112,6 +112,13 @@ var GarmentSubmitForm = (function () {
         'Cap Side (Left)', 'Cap Side (Right)', 'Pocket', 'Yoke / Upper Back',
         'Nape of Neck', 'Pant Leg', 'Tote / Bag', 'Other (describe in notes)'
     ];
+    // How the size for a placement was decided. 'standard' = Steve uses his
+    // standard size for that placement (the normal case); 'specified' = the
+    // customer asked for these exact inches, so the number is binding.
+    var SIZE_MODES = [
+        { value: 'standard', label: 'Standard size' },
+        { value: 'specified', label: 'Customer specified' }
+    ];
     // The AE final checklist. Each item is { key, label }. The "approved" item
     // is only enforced when Approval Status = customer-approved.
     var CHECKLIST_ITEMS = [
@@ -121,7 +128,7 @@ var GarmentSubmitForm = (function () {
         { key: 'decoration', label: 'Decoration method is selected' },
         { key: 'garment', label: 'Garment style and color are entered' },
         { key: 'placement', label: 'Artwork placement is entered' },
-        { key: 'size', label: 'Art size is entered in inches' },
+        { key: 'size', label: 'Art size is entered in inches, or left on standard' },
         { key: 'colors', label: 'Ink / PMS / thread / color direction is entered' },
         { key: 'spelling', label: 'Exact wording has been checked for spelling' },
         { key: 'prev', label: 'Previous order / design number is included (if a repeat or revision)' },
@@ -174,7 +181,8 @@ var GarmentSubmitForm = (function () {
         if (pf && pf.garmentColor) garmentRows[0].colorName = pf.garmentColor;
         if (pf && Array.isArray(pf.locations) && pf.locations.length) {
             artworkLocations = pf.locations.map(function (l) {
-                return { placement: l.placement || '', width: (l.width != null && l.width !== '') ? String(l.width) : '', height: '', notes: '' };
+                var w = (l.width != null && l.width !== '') ? String(l.width) : '';
+                return { placement: l.placement || '', width: w, height: '', notes: '', sizeMode: w ? 'specified' : 'standard' };
             });
         }
         renderForm();
@@ -228,7 +236,7 @@ var GarmentSubmitForm = (function () {
         return { style: '', colorName: '', catalogColor: '', swatch: '', image: '', colors: [], custom: false };
     }
     function newLocation() {
-        return { placement: '', width: '', height: '', notes: '' };
+        return { placement: '', width: '', height: '', notes: '', sizeMode: 'standard' };
     }
 
     function renderForm() {
@@ -482,10 +490,10 @@ var GarmentSubmitForm = (function () {
     }
 
     function buildLocationsSection() {
-        return sectionHeader('5', 'Artwork Placement &amp; Size', 'One block per print location. Give the placement and the final print size in inches.')
+        return sectionHeader('5', 'Artwork Placement &amp; Size', 'One block per print location. Placement is required. Leave the size on Standard unless the customer asked for an exact size.')
             + '<div id="gsf-locations"></div>'
             + '<button type="button" class="gsf-add-btn" id="gsf-add-location">+ Add another location</button>'
-            + '<span class="gsf-err" id="gsf-location-error">Add at least one location with a placement and width</span>'
+            + '<span class="gsf-err" id="gsf-location-error">Add at least one location with a placement</span>'
             + '</div>';
     }
 
@@ -831,11 +839,27 @@ var GarmentSubmitForm = (function () {
         wireLabels(); // the mini-labels inside each new location row
     }
 
+    // The W/H inputs belong to 'Customer specified' only; on 'Standard' the row
+    // shows the hint instead, so a blank size reads as a decision, not an omission.
+    function applyLocationSizeMode(idx) {
+        var loc = artworkLocations[idx];
+        var specified = !!(loc && loc.sizeMode === 'specified');
+        var dims = document.getElementById('gsf-loc-dims-' + idx);
+        var hint = document.getElementById('gsf-loc-hint-' + idx);
+        if (dims) dims.hidden = !specified;
+        if (hint) hint.hidden = specified;
+    }
+
     function buildLocationHtml(loc, idx) {
         var num = idx + 1;
         var placeOpts = '<option value="">- placement -</option>';
         PLACEMENTS.forEach(function (p) {
             placeOpts += '<option value="' + escapeAttr(p) + '"' + (p === loc.placement ? ' selected' : '') + '>' + escapeHtml(p) + '</option>';
+        });
+        var specified = (loc.sizeMode === 'specified');
+        var sizeOpts = '';
+        SIZE_MODES.forEach(function (m) {
+            sizeOpts += '<option value="' + m.value + '"' + (m.value === (loc.sizeMode || 'standard') ? ' selected' : '') + '>' + escapeHtml(m.label) + '</option>';
         });
         var removeBtn = artworkLocations.length > 1
             ? '<button type="button" class="gsf-row-remove" data-locidx="' + idx + '" title="Remove location">×</button>'
@@ -846,13 +870,21 @@ var GarmentSubmitForm = (function () {
             + '    <label class="gsf-mini-label">Placement <span class="gsf-req">*</span></label>'
             + '    <select class="gsf-select gsf-loc-placement" id="gsf-loc-place-' + idx + '">' + placeOpts + '</select>'
             + '  </div>'
-            + '  <div class="gsf-field gsf-loc-dim">'
-            + '    <label class="gsf-mini-label">Width" <span class="gsf-req">*</span></label>'
-            + '    <input type="number" class="gsf-input gsf-loc-width" id="gsf-loc-w-' + idx + '" placeholder="W" min="0.1" step="0.1" value="' + escapeAttr(loc.width) + '">'
-            + '  </div>'
-            + '  <div class="gsf-field gsf-loc-dim">'
-            + '    <label class="gsf-mini-label">Height"</label>'
-            + '    <input type="number" class="gsf-input gsf-loc-height" id="gsf-loc-h-' + idx + '" placeholder="H" min="0.1" step="0.1" value="' + escapeAttr(loc.height) + '">'
+            + '  <div class="gsf-field gsf-loc-size">'
+            + '    <label class="gsf-mini-label">Size</label>'
+            + '    <select class="gsf-select gsf-loc-sizemode" id="gsf-loc-size-' + idx + '">' + sizeOpts + '</select>'
+            + '    <div class="gsf-loc-dims" id="gsf-loc-dims-' + idx + '"' + (specified ? '' : ' hidden') + '>'
+            + '      <div class="gsf-loc-dim">'
+            + '        <label class="gsf-mini-label" for="gsf-loc-w-' + idx + '">Width&quot;</label>'
+            + '        <input type="number" class="gsf-input gsf-loc-width" id="gsf-loc-w-' + idx + '" min="0.1" step="0.1" value="' + escapeAttr(loc.width) + '">'
+            + '      </div>'
+            + '      <div class="gsf-loc-dim">'
+            + '        <label class="gsf-mini-label" for="gsf-loc-h-' + idx + '">Height&quot;</label>'
+            + '        <input type="number" class="gsf-input gsf-loc-height" id="gsf-loc-h-' + idx + '" min="0.1" step="0.1" value="' + escapeAttr(loc.height) + '">'
+            + '      </div>'
+            + '    </div>'
+            + '    <span class="gsf-hint gsf-loc-std-hint" id="gsf-loc-hint-' + idx + '"' + (specified ? ' hidden' : '') + '>Steve uses his standard size for this placement.</span>'
+            + '    <span class="gsf-err" id="gsf-loc-w-' + idx + '-error">Enter the size the customer asked for</span>'
             + '  </div>'
             + '  <div class="gsf-field gsf-loc-notes">'
             + '    <label class="gsf-mini-label">Placement instructions</label>'
@@ -871,6 +903,18 @@ var GarmentSubmitForm = (function () {
         if (w) w.addEventListener('input', function () { artworkLocations[idx].width = w.value.trim(); });
         if (h) h.addEventListener('input', function () { artworkLocations[idx].height = h.value.trim(); });
         if (n) n.addEventListener('input', function () { artworkLocations[idx].notes = n.value.trim(); });
+        var sm = document.getElementById('gsf-loc-size-' + idx);
+        if (sm) sm.addEventListener('change', function () {
+            artworkLocations[idx].sizeMode = sm.value;
+            if (sm.value !== 'specified') {
+                artworkLocations[idx].width = ''; artworkLocations[idx].height = '';
+                if (w) w.value = ''; if (h) h.value = '';
+                clearError('gsf-loc-w-' + idx);
+            }
+            applyLocationSizeMode(idx);
+            updateProgress();
+        });
+        applyLocationSizeMode(idx);
         var removeBtn = document.querySelector('.gsf-row-remove[data-locidx="' + idx + '"]');
         if (removeBtn) {
             removeBtn.addEventListener('click', function () {
@@ -1413,11 +1457,15 @@ var GarmentSubmitForm = (function () {
             clearError('gsf-patch-shape'); clearError('gsf-patch-width'); clearError('gsf-patch-attach');
         }
 
-        // At least one location with placement + width
+        // At least one location with a placement. The size is Steve's standard
+        // unless the rep marked it customer-specified — then the width is binding.
         syncLocationsFromDom();
-        var hasLoc = artworkLocations.some(function (l) { return l.placement && l.width; });
+        var hasLoc = artworkLocations.some(function (l) { return !!l.placement; });
         showInlineError('gsf-location-error', !hasLoc);
         if (!hasLoc) valid = false;
+        artworkLocations.forEach(function (l, i) {
+            req('gsf-loc-w-' + i, !(l.sizeMode === 'specified' && !l.width));
+        });
 
         // Exact text required unless "no text"
         var noText = document.getElementById('gsf-no-text');
@@ -1469,10 +1517,14 @@ var GarmentSubmitForm = (function () {
             var w = document.getElementById('gsf-loc-w-' + idx);
             var h = document.getElementById('gsf-loc-h-' + idx);
             var n = document.getElementById('gsf-loc-n-' + idx);
+            var sm = document.getElementById('gsf-loc-size-' + idx);
             if (place) loc.placement = place.value;
+            if (sm) loc.sizeMode = sm.value;
             if (w) loc.width = w.value.trim();
             if (h) loc.height = h.value.trim();
             if (n) loc.notes = n.value.trim();
+            // Standard size = no inches, whatever was typed before the switch.
+            if (loc.sizeMode !== 'specified') { loc.width = ''; loc.height = ''; }
         });
     }
 
@@ -1589,9 +1641,15 @@ var GarmentSubmitForm = (function () {
         var patchSpec = isPatch ? buildPatchSpec() : null;
         var keptLocs = artworkLocations.filter(function (l) { return l.placement || l.width; });
         var locsOut = keptLocs.map(function (l) {
-            var o = { placement: l.placement, width: l.width, height: l.height, notes: l.notes };
+            // sizeSource tells Steve whether the size is binding ('specified' —
+            // the customer asked for it) or his own standard for the placement.
+            // A width with no mode (older draft / quote hand-off) counts as specified.
+            var o = {
+                placement: l.placement, width: l.width, height: l.height, notes: l.notes,
+                sizeSource: (l.sizeMode === 'specified' || l.width) ? 'specified' : 'standard'
+            };
             if (isPatch && patchSpec) {
-                if (!o.width && patchSpec.width) o.width = patchSpec.width;
+                if (!o.width && patchSpec.width) { o.width = patchSpec.width; o.sizeSource = 'specified'; }
                 if (!o.height && patchSpec.height) o.height = patchSpec.height;
                 o.patch = patchSpec;
             }
@@ -1599,7 +1657,7 @@ var GarmentSubmitForm = (function () {
         });
         // Patch picked but no placement entered → keep the specs from being lost.
         if (isPatch && patchSpec && locsOut.length === 0) {
-            locsOut.push({ placement: 'Cap Front', width: patchSpec.width || '', height: patchSpec.height || '', notes: '', patch: patchSpec });
+            locsOut.push({ placement: 'Cap Front', width: patchSpec.width || '', height: patchSpec.height || '', notes: '', sizeSource: patchSpec.width ? 'specified' : 'standard', patch: patchSpec });
         }
 
         var notesOut = getVal('gsf-notes');
@@ -1971,7 +2029,10 @@ var GarmentSubmitForm = (function () {
             need('gsf-patch-attach', !!getVal('gsf-patch-attach'), 'Patch attachment');
         }
         syncLocationsFromDom();
-        need('gsf-loc-place-0', artworkLocations.some(function (l) { return l.placement && l.width; }), 'Artwork placement + width');
+        need('gsf-loc-place-0', artworkLocations.some(function (l) { return !!l.placement; }), 'Artwork placement');
+        artworkLocations.forEach(function (l, i) {
+            need('gsf-loc-w-' + i, !(l.sizeMode === 'specified' && !l.width), 'Customer-specified size');
+        });
         need('gsf-color-mode', !!getVal('gsf-color-mode'), 'Color direction');
         var noText = document.getElementById('gsf-no-text');
         need('gsf-exact-text', !!getVal('gsf-exact-text') || !!(noText && noText.checked), 'Exact text');
@@ -2056,7 +2117,7 @@ var GarmentSubmitForm = (function () {
         return {
             v: 1, savedAt: Date.now(), fields: fields, checks: checks, isRush: isRush,
             garments: garmentRows.map(function (r) { return { style: r.style, colorName: r.colorName, catalogColor: r.catalogColor, swatch: r.swatch, image: r.image, custom: !!r.custom }; }),
-            locations: artworkLocations.map(function (l) { return { placement: l.placement, width: l.width, height: l.height, notes: l.notes }; })
+            locations: artworkLocations.map(function (l) { return { placement: l.placement, width: l.width, height: l.height, notes: l.notes, sizeMode: l.sizeMode }; })
         };
     }
     function saveDraft() {
@@ -2101,7 +2162,7 @@ var GarmentSubmitForm = (function () {
             garmentRows.forEach(function (r, i) { if (r.style && !r.custom) loadColorsForRow(i, r.style); });
         }
         if (Array.isArray(d.locations) && d.locations.length) {
-            artworkLocations = d.locations.map(function (l) { return { placement: l.placement || '', width: l.width || '', height: l.height || '', notes: l.notes || '' }; });
+            artworkLocations = d.locations.map(function (l) { return { placement: l.placement || '', width: l.width || '', height: l.height || '', notes: l.notes || '', sizeMode: l.sizeMode || (l.width ? 'specified' : 'standard') }; });
             renderLocations();
         }
         if (d.isRush) {

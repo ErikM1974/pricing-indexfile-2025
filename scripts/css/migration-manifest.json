@@ -513,7 +513,7 @@
         "rawCssBytes": 352636,
         "localCssRequests": 12
       },
-      "measuredRawCssBytes": 282594,
+      "measuredRawCssBytes": 283314,
       "maxCssBytes": 284642,
       "estimatedGzipCssBytes": 37576
     },
@@ -6807,7 +6807,7 @@
         "visible-action-toast-contrast-and-hidden-action-keyboard-exclusion"
       ],
       "test": "tests/e2e/css-unification-garment-designer.spec.js",
-      "measuredRawCssBytes": 274101,
+      "measuredRawCssBytes": 274817,
       "maxCssBytes": 275965,
       "baseline": {
         "commit": "8763d6dba64bec28ea82a3bf4887cf5625ca4033",
