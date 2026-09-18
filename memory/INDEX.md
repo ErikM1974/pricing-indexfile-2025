@@ -4,7 +4,7 @@ Repo `/memory/` is the CANONICAL tree (git-tracked). The machine-local auto-memo
 `~/.claude/projects/<slug>/memory/` holds `MEMORY.md` (the auto-loaded index) plus per-fact
 files; where a topic exists in both, **the repo copy wins** and auto-memory keeps a pointer.
 
-Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shipped-log compressed to one-liners, detail verified in SHOP_HOURLY_RATE / CUSTOMER_PORTAL / EMBROIDERY_STITCH_COST / VOLUME_QUOTE topic files; homepage-revert gotchas + VQ sequence note + DTG0831 post-import facts moved into their topic files before deletion; LESSONS 267→~200 (bonus-dial, staff-dashboard-hardening, inventorylevels archived); cross-tree copies verified as pointers)
+Last Updated: 2026-09-18 (/memory-maintain: MEMORY.md 23.6→17.4 KB — top shipped-log compressed to one-liners, detail verified present in all 12 topic files first; LESSONS 271→219 (10 resolved CSS-pass fixes archived, the exact-totals pricing invariant deliberately kept active); repos moved off OneDrive, so 6 stale absolute repo paths and 4 cross-tree pointers were repointed at C:\dev; 5 unlinked topic files indexed)
 
 | File | What it holds |
 |---|---|
@@ -51,6 +51,11 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 | [`pricing-analysis-data.json`](pricing-analysis-data.json) | Data behind the GENERATED Pricing Analysis page (edit Python+JSON, never HTML) |
 | [`proxy-security-2026-08.md`](proxy-security-2026-08.md) | August 2026 proxy/app file-exposure + gating work |
 | [`sample-request-routing.md`](sample-request-routing.md) | Free-sample request → Leads routing; the 12-place form-ID vocabulary |
+| [`ART_FORM_SIZE_2026-09.md`](ART_FORM_SIZE_2026-09.md) | AE art request optional size (`sizeSource`) — and the SIX lock/fixture systems any change to that shared garment form must update |
+| [`DEAD_FILES_2026-09-06.md`](DEAD_FILES_2026-09-06.md) | The 69 dead files deleted by the 2026-09-06 census; `repo-hygiene-final.test.js` asserts they stay gone |
+| [`EMAIL_STYLE_CONTRACT_2026-09.md`](EMAIL_STYLE_CONTRACT_2026-09.md) | Email styling and externally hosted UI — what may be inlined and why |
+| [`POLICY_GAP_REVIEW_2026-09.md`](POLICY_GAP_REVIEW_2026-09.md) | 164 Canva meeting/huddle decks vs the 95 published policies; what was written to the hub |
+| [`december-finish-line.md`](december-finish-line.md) | December 2026 Finish Line admin page — the dedicated `admin` gate on its data, report and downloads |
 
 - [Holiday Gift Box 2026](HOLIDAY_GIFT_BOX_2026.md) — campaign owner, actual inventory/pricing, shared invitation code, Quotes/inbox review, confirmations and release prerequisites.
 
@@ -116,7 +121,6 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
   overlaps `CASPIO_QUOTA_2026-07.md` (27 Jul–1 Aug) in SUBJECT but not in DATE RANGE.
   Not collapsed — folding it into the repo copy would drop the wave-2 record. Reconcile
   deliberately, do not just delete.
-- `ART_FORM_SIZE_2026-09.md` — AE art request optional size (`sizeSource`), and the six lock/fixture systems any change to that shared form must update.
 - `DEAD_FILES_2026-09-06.md` — the 69 files the 2026-09-06 census verified dead (zero references), why each group is dead, and the one `git rm` command Erik runs to remove them.
 
 - [`HANDOVER_EXECUTION_2026-09.md`](HANDOVER_EXECUTION_2026-09.md) — active handover execution checklist and release evidence.
