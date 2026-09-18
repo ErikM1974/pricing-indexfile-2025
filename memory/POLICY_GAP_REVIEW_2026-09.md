@@ -48,16 +48,21 @@
 - Every "confirm with Erik / to be settled / verify before publishing" line was rewritten into published wording; the dry-run diff of all 17 patches was reviewed before applying.
 - Still conflicting in already-published pages (not drafts): Contract Embroidery Guide $40/hr, ShopWorks Cheat Sheet ES stitch rule ($0.75/1K over 12K, not in Caspio), Promotional Products & Drinkware (pre-JDS mug-press text), showroom banner 12-piece minimum.
 
-## Box fee — remaining occurrence (2026-09-18)
+## Box fee — CLOSED 2026-09-18
 
 A full scan of all 158 live policies for `$4.50` / `$4.00` (2026-09-18) found the retired
 box fee in ONE more published document: **`onboarding-department-tour`** ("New-Hire Department
 Tour & Factory Training Guide") — body text, one occurrence, in both `Body_Plain` and
 `Body_HTML`: "Calculate freight (add the $4.50/box handling fee if it is not added
-automatically)". It is the guide new hires are trained from, so it actively teaches the wrong
-number. NOT changed — Erik asked only for the Shipping Procedures summary.
+automatically)". It is the guide new hires are trained from, so it actively taught the wrong
+number. CORRECTED to $4.00 on 2026-09-18 (Body_HTML, verified; the server re-derived Body_Plain).
 
 The other `$4.50` hits are unrelated: `pricing-negotiation-policy` uses it as a 15%-discount
 example. `$4.00` in `embroidery-pricing-structure-2026` is a stitch upcharge, not the box fee.
 
 No Employee Handbook policy mentions the per-box fee, so there is no handbook conflict.
+
+**Re-scanned all 158 live policies after both edits: every box-fee reference now reads $4.00.**
+The only surviving `$4.50` strings are correct — `pricing-negotiation-policy` uses it as a
+15%-discount example, and `shipping-charges-and-conversations` records the history of this very
+correction. Both Shipping Procedures fields (Summary + body) and the new-hire guide agree.
