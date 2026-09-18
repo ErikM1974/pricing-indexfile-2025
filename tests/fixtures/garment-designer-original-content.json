@@ -335,6 +335,24 @@
       "before": "  }\n\n  :where([data-ui=\"unified\"][data-garment-designer]) .designer-print-active .gsf-loc-grid {\n    grid-template-columns: 1.4fr 80px 80px 2fr;\n  }\n\n  :where([data-ui=\"unified\"][data-garment-designer]) .designer-print-active .art-details-section {",
       "after": "  }\n\n  :where([data-ui=\"unified\"][data-garment-designer]) .designer-print-active .gsf-loc-grid {\n    grid-template-columns: 1.4fr 196px 2fr;\n  }\n\n  :where([data-ui=\"unified\"][data-garment-designer]) .designer-print-active .art-details-section {",
       "count": 1
+    },
+    {
+      "file": "pages/garment-designer.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.12.1\">\n<link rel=\"stylesheet\" href=\"/shared_components/css/utilities.css?v=2026.09.12.1\">\n<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap\">\n<link rel=\"stylesheet\" href=\"/pages/css/garment-designer.css?v=2026.09.13.2\">\n<link rel=\"stylesheet\" href=\"/shared_components/css/art-intake.css?v=2026.09.13.2\">\n<!-- Text tool — curated decoration fonts -->\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>",
+      "after": "<link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.12.1\">\n<link rel=\"stylesheet\" href=\"/shared_components/css/utilities.css?v=2026.09.12.1\">\n<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap\">\n<link rel=\"stylesheet\" href=\"/pages/css/garment-designer.css?v=2026.09.18.2\">\n<link rel=\"stylesheet\" href=\"/shared_components/css/art-intake.css?v=2026.09.18.2\">\n<!-- Text tool — curated decoration fonts -->\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>",
+      "count": 1
+    },
+    {
+      "file": "pages/garment-designer.html",
+      "before": "<script src=\"/shared_components/js/design-name-picker.js?v=2026.09.06.31\"></script>\n<script src=\"/shared_components/js/work-order-picker.js?v=2026.09.06.31\"></script>\n<script src=\"/shared_components/js/staff-auth-helper.js?v=2026.09.06.37\"></script>\n<script src=\"/shared_components/js/garment-submit-form.js?v=2026.09.13.2\"></script>\n<script src=\"/shared_components/js/garment-text-engine.js?v=2026.06.20.13\"></script>\n    <script src=\"/shared_components/js/data-call-delegator.js?v=2026.09.06.27\"></script>\n<script src=\"/pages/js/garment-designer-ui.js?v=2026.09.13.2\"></script>",
+      "after": "<script src=\"/shared_components/js/design-name-picker.js?v=2026.09.06.31\"></script>\n<script src=\"/shared_components/js/work-order-picker.js?v=2026.09.06.31\"></script>\n<script src=\"/shared_components/js/staff-auth-helper.js?v=2026.09.06.37\"></script>\n<script src=\"/shared_components/js/garment-submit-form.js?v=2026.09.18.2\"></script>\n<script src=\"/shared_components/js/garment-text-engine.js?v=2026.06.20.13\"></script>\n    <script src=\"/shared_components/js/data-call-delegator.js?v=2026.09.06.27\"></script>\n<script src=\"/pages/js/garment-designer-ui.js?v=2026.09.13.2\"></script>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/garment-submit-form.css",
+      "before": "/* Compatibility URL for the lead and quote lazy loaders.\n * All garment form and contact picker rules belong to art-intake.css. */\n@import url(\"/shared_components/css/art-intake.css?v=2026.09.12.1\");\n",
+      "after": "/* Compatibility URL for the lead and quote lazy loaders.\n * All garment form and contact picker rules belong to art-intake.css. */\n@import url(\"/shared_components/css/art-intake.css?v=2026.09.18.2\");\n",
+      "count": 1
     }
   ],
   "notes": "Original sources before garment designer migration; real embedded model photos preserved in source, synthetic artwork and contacts in browser fixtures.",
