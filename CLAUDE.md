@@ -55,7 +55,7 @@ Memory updates are part of completing the task — not a separate ask-permission
 | One-line "shipped / decided / gotcha" | **MEMORY.md** index (< 24 KB; age old lines down) |
 | > 2 lines of feature/domain detail | **topic file** in `/memory` + add to `INDEX.md` + 1-line pointer in MEMORY.md |
 
-Procedures → a **skill** in `.claude/skills/`. **Code = pointers, not bodies** (`file:line` + WHY + gotcha; re-fetch with Grep/Explore). **Repo `/memory` is canonical** over the volatile `~/.claude` auto-memory (repo copy wins when a topic is in both; auto-memory keeps a 1-line pointer). Commit repo memory edits immediately (OneDrive reverts). Run `/memory-maintain` when MEMORY.md > 22 KB or LESSONS > 250 lines.
+Procedures → a **skill** in `.claude/skills/`. **Code = pointers, not bodies** (`file:line` + WHY + gotcha; re-fetch with Grep/Explore). **Repo `/memory` is canonical** over the volatile `~/.claude` auto-memory (repo copy wins when a topic is in both; auto-memory keeps a 1-line pointer). Commit repo memory edits promptly. Run `/memory-maintain` when MEMORY.md > 22 KB or LESSONS > 250 lines.
 
 ## File-Lifecycle Automation
 
@@ -87,13 +87,34 @@ try {
 }
 ```
 
+## 🔴 Working directories (moved off OneDrive 2026-09-18)
+
+Work in these paths. They are plain local folders — **no OneDrive, no sync**.
+
+| Project | Path |
+|---|---|
+| **Pricing Index** (this repo) | `C:\dev\pricing-index` |
+| **caspio-pricing-proxy** | `C:\dev\caspio-pricing-proxy` |
+| **inksoft-transform** (was "Python Inksoft") | `C:\dev\inksoft-transform` |
+
+The old copies under `OneDrive - Northwest Custom Apparel\2025\` are **RETIRED** and carry a
+`RETIRED-MOVED-TO-C-DEV.md` marker. If you find yourself in one, stop and switch.
+
+🔴 **Never run a git repo from OneDrive.** It truncated the index (1,323 files reported deleted
+while they sat on disk), forked tracked files into `-Eriklaptop` conflict copies from a second
+machine, and left a duplicate `develop` 94 commits stale.
+
+🔑 A checkout with no `.env` **silently skips 22 credential-dependent unit tests** (26 skipped vs
+4), so a gate run there is weaker than it looks. Both `.env` files are gitignored and live only on
+this machine — most keys are recoverable from `heroku config`, the rest from Anthropic/Stripe/Postman.
+
 ## Related Projects (Sibling Repos)
 
 | Project | Location | URL / Port |
 |---|---|---|
 | **Pricing Index** (this repo) | `.` | port 3000 local / Heroku `sanmar-inventory-app` |
 | **caspio-pricing-proxy** (backend API) | `../caspio-pricing-proxy` | `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com` · port 3002 local |
-| **Python Inksoft** (InkSoft → ShopWorks) | `../Python Inksoft` | `https://inksoft-transform-8a3dc4e38097.herokuapp.com` · Flask · deploy `git subtree push --prefix web heroku main` |
+| **Python Inksoft** (InkSoft → ShopWorks) | `../inksoft-transform` | `https://inksoft-transform-8a3dc4e38097.herokuapp.com` · Flask · deploy `git subtree push --prefix web heroku main` |
 
 **Cross-project sync**: When modifying ManageOrders push logic, check if the same change applies in Python Inksoft (`web/`). Shared patterns: size suffixes (`_2X`, `_3XL`), OnSite payload, `TaxTotal=0`, gift certs as line items.
 

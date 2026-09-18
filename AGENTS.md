@@ -90,7 +90,7 @@ try {
 |---|---|---|
 | **Pricing Index** (this repo) | `.` | port 3000 local / Heroku `sanmar-inventory-app` |
 | **caspio-pricing-proxy** (backend API) | `../caspio-pricing-proxy` | `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com` · port 3002 local |
-| **Python Inksoft** (InkSoft → ShopWorks) | `../Python Inksoft` | `https://inksoft-transform-8a3dc4e38097.herokuapp.com` · Flask · deploy `git subtree push --prefix web heroku main` |
+| **Python Inksoft** (InkSoft → ShopWorks) | `../inksoft-transform` | `https://inksoft-transform-8a3dc4e38097.herokuapp.com` · Flask · deploy `git subtree push --prefix web heroku main` |
 
 **Cross-project sync**: When modifying ManageOrders push logic, check if the same change applies in Python Inksoft (`web/`). Shared patterns: size suffixes (`_2X`, `_3XL`), OnSite payload, `TaxTotal=0`, gift certs as line items.
 
