@@ -24,6 +24,7 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 | [`EMBROIDERY_PRICING_REALIZATION.md`](EMBROIDERY_PRICING_REALIZATION.md) | 85% realization, the $442K gap — pricing is sound, it is not being charged |
 | [`EMBROIDERY_STITCH_COST_2026-09.md`](EMBROIDERY_STITCH_COST_2026-09.md) | Cost per 1,000 stitches, 5K vs 8K logo, handling/setup fit from logs, worst-case multiplier, full absorption |
 | [`HEADWEAR_ALIGNMENT_2026-09.md`](HEADWEAR_ALIGNMENT_2026-09.md) | One cap/flat/garment rule (shared classifier) across builders, product page, calculators and Quick Quote — Erik's rules, what is wired where, second-pass list |
+| [`LEAD_QUOTE_LINKAGE_2026-09.md`](LEAD_QUOTE_LINKAGE_2026-09.md) | Why a saved quote didn't show on its lead — proxy cache fix (LIVE) + the UNFINISHED app half on `fix/lead-quote-cache`, its two red CI gates, and the missing quote→lead back-link |
 | [`QUICK_QUOTE_2026-09.md`](QUICK_QUOTE_2026-09.md) | Quick Quote: classic line sheet restore, version line/What's new, release fixture rules, small-order display decisions |
 | [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) | Active bug log — problem/root cause/fix/prevention (cap 300 lines) |
 | [`LESSONS_LEARNED_ARCHIVE.md`](LESSONS_LEARNED_ARCHIVE.md) | Aged-out lessons (unbounded) |
