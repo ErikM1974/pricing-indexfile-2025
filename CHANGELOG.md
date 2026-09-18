@@ -1,3 +1,16 @@
+## v2026.09.18.1 (2026.09.18)
+
+- Browser snapshots: read settled layout inside closed details
+- Memory: failed Playwright expects leave closed details with stale layout
+- Point dependency PRs at develop; restore the December Finish Line pointer
+- Fix: lead quote lookup bypasses cache; customer search stops wiping the email
+- Memory: lead→quote cache-invalidation + email-wipe lessons (2026-09-17)
+- Cache-bust v2026.09.17.3: lead-workspace.js
+- Revert "Cache-bust v2026.09.17.3: lead-workspace.js"
+- Revert "Fix: lead quote lookup bypasses cache; customer search stops wiping the email"
+- Memory: lead→quote linkage handoff (proxy live, app half unfinished)
+- Lead panel finds a just-saved quote; customer lookup stops wiping the email
+
 ## v2026.09.17.2 (2026.09.17)
 
 - Memory: builder cosmetic states live (v2026.09.17.1)
