@@ -1,5 +1,17 @@
 # LESSONS LEARNED
 
+## A read cache must be invalidated by EVERY writer, not just the destructive one (2026-09-17)
+
+- Problem/root cause: `GET /api/quote_sessions` caches list reads per-filter for 5 minutes, but only DELETE cleared it — POST, PUT and the three ShopWorks push routes left it warm. Opening a lead in the Leads workspace runs the `CustomerEmail` lookup and caches the EMPTY "no quotes yet" answer; the rep then saves a quote and comes back, and "check again" re-reads the same key and still says "No quotes for … yet". Guaranteed wrong for the first 5 minutes after saving — exactly when a rep looks — then self-heals, so it reads as random and never gets reported. Reported by Taneisha with a screenshot of the lead beside her saved $1,736.75 quote.
+- Solution: cache moved to `proxy src/utils/quote-sessions-cache.js` so all four writing files can reach the invalidator; POST/PUT/DELETE and the EMB/DTF/SCP push routes all call it. `dashboards/js/lead-workspace.js` also passes `refresh=true` — the proxy cache is PER-DYNO, so invalidation alone is not sufficient on a multi-dyno app. Locked by `tests/jest/quote-sessions-cache-invalidation.test.js`, which walks the exact Leads sequence and was verified to FAIL with the POST invalidation removed.
+- Prevention: when adding a response cache, enumerate every writer of that table — grep the table name, not just the route file — and invalidate in each. A per-process cache never fully invalidates across dynos, so an explicit user action ("check again", "refresh") must bypass rather than trust invalidation. Erik's durable gotcha restated: "works after refresh" = a cold path behind a response cache.
+
+## A customer lookup must never blank a field the rep already filled (2026-09-17)
+
+- Problem/root cause: `applyContact` in all 4 builders did `customer-email.value = contact.ContactNumbersEmail || ''`, so picking a ShopWorks customer with no email on file silently WIPED the address already there — including one prefilled from a lead. The quote then saved under a different email and became invisible to that lead's "Recent quotes for this email" panel; EMB also requires an email to save, so it just blocked reps. The same codebase already guarded correctly in `emb/design-search.js` and `emb/shopworks-import.js` (`if (!emailInput.value.trim())`) — only the lookup didn't.
+- Solution: preserve a non-empty existing address, and because a kept address may belong to the PREVIOUS customer, say so in a warning toast asking the rep to verify. Synced across EMB/SCP/DTF `applyContact` + DTG `crm.applyContact` (Rule 8).
+- Prevention: `x = incoming || ''` is a data-destroying idiom whenever the field can already hold user input — use `if (incoming) x = incoming`. Neither silently keeping nor silently blanking is acceptable; the ambiguous case gets a visible notice (Erik's #1 rule).
+
 ## Push must not disable the button its own preview gate reads (2026-09-17)
 
 - Problem/root cause: embroidery `pushToShopWorks()` disabled `#emb-push-shopworks-btn` before awaiting, and `openPushPreview()` bails on a disabled button. It only ever worked because the silent save re-enabled it, so a quote with nothing to save (just saved, or reopened for editing) opened no preview and showed no message — Push looked dead.
