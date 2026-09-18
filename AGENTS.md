@@ -2,6 +2,26 @@
 
 Guidance for Codex when working in this repository.
 
+## 🔴 Working directories (moved off OneDrive 2026-09-18)
+
+Work in these paths. They are plain local folders — **no OneDrive, no sync**.
+
+| Project | Path |
+|---|---|
+| **Pricing Index** (this repo) | `C:\dev\pricing-index` |
+| **caspio-pricing-proxy** | `C:\dev\caspio-pricing-proxy` |
+| **inksoft-transform** (was "Python Inksoft") | `C:\dev\inksoft-transform` |
+
+The old copies under `OneDrive - Northwest Custom Apparel\2025\` are **RETIRED** and
+carry a `RETIRED-MOVED-TO-C-DEV.md` marker. If you find yourself in one, stop and switch.
+
+🔴 **Never run a git repo from OneDrive.** It truncated the git index (1,323 files reported
+deleted while they sat on disk), forked tracked files into `-Eriklaptop` conflict copies from a
+second machine, and left a duplicate `develop` 94 commits stale.
+
+🔑 A checkout with no `.env` **silently skips 22 credential-dependent unit tests** (26 skipped
+vs 4), so a gate run there is weaker than it looks.
+
 ## CSS for every new or changed page
 
 Read [the current design-system guide](shared_components/css/NWCA-2026-GUIDE.md#creating-or-changing-a-page) before writing page markup or styles. This applies to Astra and every other coding agent working here.
