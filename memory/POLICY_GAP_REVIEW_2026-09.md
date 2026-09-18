@@ -145,6 +145,12 @@ customer-supplied embroidery minimum (sales-coordinator manual + training schedu
 | **DTF** | **10 pieces** | **24** | 🔴 FAQ is LOWER than the fee threshold. A customer told "10 is fine" gets a surprise $50 prorated LTM fee — Erik's #1 rule territory |
 | Screen printing | 72 shirts | 48 | Defensible — the LTM doc prefers 72+ for best per-piece price |
 
-**Decision needed:** are the FAQ numbers deliberate soft minimums (they are framed that way — "we
-can sometimes run smaller"), or should caps and DTF be corrected to match the fee thresholds? DTF is
-the urgent one: as written it promises a price the quote will not honour.
+**DECIDED by Erik 2026-09-18: caps -> 8, DTF -> 24.** Both corrected in `csr-faqs` and verified live.
+Garments (12) and screen print (72) deliberately left as-is — the page frames its table as
+"recommended minimums for the best pricing", which legitimately sits above a fee threshold, and DTG
+(24) already agreed. A re-scan of all 158 live policies found no other page stating "24 caps" or a
+10-piece DTF minimum; the only remaining "10 pieces" is a correct worked example in `ltm-fee-policy`
+that reinforces DTF = 24.
+
+The FAQ minimum table now reads: embroidery garments 12 · **embroidery caps 8** · DTG 24 ·
+**DTF 24** · screen printing 72 · customer-supplied at discretion · promo varies.
