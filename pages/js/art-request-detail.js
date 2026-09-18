@@ -1731,6 +1731,11 @@ var artrequdetaLog = ARTREQUDETA_LOG_ON ? console.log.bind(console) : function (
                 if (l.width && l.height) size = l.width + '" × ' + l.height + '"';
                 else if (l.width) size = l.width + '" wide';
                 else if (l.height) size = l.height + '" tall';
+                // sizeSource (2026-09-18): 'standard' = Steve's standard size for the
+                // placement; 'specified' = the customer asked for it, so it is binding.
+                // Older requests carry neither and just show the inches.
+                if (size && l.sizeSource === 'specified') size += ' (customer)';
+                else if (!size && l.sizeSource === 'standard') size = 'Standard';
                 html += '<tr><td>' + escapeHtml(l.placement || '—') + '</td>'
                     + '<td>' + escapeHtml(size || '—') + '</td>'
                     + '<td>' + escapeHtml(l.notes || '—') + '</td></tr>';
@@ -1849,6 +1854,8 @@ var artrequdetaLog = ARTREQUDETA_LOG_ON ? console.log.bind(console) : function (
                 if (l.width && l.height) size = l.width + '" × ' + l.height + '"';
                 else if (l.width) size = l.width + '" W';
                 else if (l.height) size = l.height + '" H';
+                if (size && l.sizeSource === 'specified') size += ' (customer)';
+                else if (!size && l.sizeSource === 'standard') size = 'Standard';
                 locHtml += '<tr><td>' + escapeHtml(l.placement || '—') + '</td><td>' + escapeHtml(size || '—') + '</td><td>' + escapeHtml(l.notes || '—') + '</td></tr>';
             });
             locHtml += '</tbody></table>';

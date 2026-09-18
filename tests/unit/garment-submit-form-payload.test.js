@@ -75,8 +75,8 @@ describe('GarmentSubmitForm payload contract', () => {
                 { style: 'PC90H', colorName: 'Black', catalogColor: 'Black', swatch: '', image: '' }
             ],
             artworkLocations: [
-                { placement: 'Left Chest', width: '3.5', height: '2', notes: 'centered' },
-                { placement: 'Full Back', width: '11', height: '9', notes: '2.5" below collar' }
+                { placement: 'Left Chest', width: '3.5', height: '2', notes: 'centered', sizeMode: 'specified' },
+                { placement: 'Full Back', width: '11', height: '9', notes: '2.5" below collar', sizeMode: 'specified' }
             ],
             uploaded: [{ fileName: 'logo.ai' }]
         });
@@ -107,7 +107,7 @@ describe('GarmentSubmitForm payload contract', () => {
         var locs = JSON.parse(payload.Artwork_Locations);
         expect(Array.isArray(locs)).toBe(true);
         expect(locs).toHaveLength(2);
-        expect(locs[0]).toMatchObject({ placement: 'Left Chest', width: '3.5', height: '2' });
+        expect(locs[0]).toMatchObject({ placement: 'Left Chest', width: '3.5', height: '2', sizeSource: 'specified' });
 
         // Primary placement back-compat with the single Garment_Placement field
         expect(payload.Garment_Placement).toBe('Left Chest');
@@ -292,8 +292,8 @@ describe('GarmentSubmitForm payload contract', () => {
             companyName: 'X', aeName: 'Erik', aeEmail: 'e@e.com', salesRep: 'Erik', isRush: false,
             garmentRows: [{ style: '', colorName: '', swatch: '', image: '' }],
             artworkLocations: [
-                { placement: 'Left Chest', width: '3', height: '', notes: '' },
-                { placement: '', width: '', height: '', notes: '' } // empty → dropped
+                { placement: 'Left Chest', width: '3', height: '', notes: '', sizeMode: 'specified' },
+                { placement: '', width: '', height: '', notes: '', sizeMode: 'standard' } // empty → dropped
             ],
             uploaded: []
         });
@@ -302,5 +302,61 @@ describe('GarmentSubmitForm payload contract', () => {
         // Empty garment row → no style column written
         expect(payload.GarmentStyle).toBeUndefined();
         expect(payload.Order_Type_Source).toBe('');
+    });
+
+    // 2026-09-18: width is no longer required. A placement with no inches is a
+    // deliberate 'use Steve's standard size', and sizeSource says so — downstream
+    // surfaces must be able to tell that apart from a size the customer demanded.
+    test('Standard size: placement with no inches records sizeSource standard', () => {
+        global.document = makeDoc({
+            'gsf-company': 'X', 'gsf-customer-id': '', 'gsf-contact-name': '',
+            'gsf-contact-email': '', 'gsf-due-date': '', 'gsf-design-num': '', 'gsf-order-num': '',
+            'gsf-prelim': '', 'gsf-artwork-status': 'New artwork from scratch',
+            'gsf-approval-status': '', 'gsf-color-mode': '', 'gsf-underbase': '',
+            'gsf-pms': '', 'gsf-thread': '', 'gsf-exact-text': '', 'gsf-no-text': { checked: false },
+            'gsf-prev-order': '', 'gsf-prev-design': '', 'gsf-keep-same': '', 'gsf-change': '',
+            'gsf-file-type': '', 'gsf-notes': ''
+        }, ['Embroidery']);
+
+        var payload = GarmentSubmitForm._buildPayloadForTest({
+            companyName: 'X', aeName: 'Erik', aeEmail: 'e@e.com', salesRep: 'Erik', isRush: false,
+            garmentRows: [{ style: 'PC54', colorName: 'Navy', swatch: '', image: '' }],
+            artworkLocations: [
+                { placement: 'Left Chest', width: '', height: '', notes: '', sizeMode: 'standard' },
+                { placement: 'Full Back', width: '11', height: '', notes: '', sizeMode: 'specified' }
+            ],
+            uploaded: []
+        });
+
+        var locs = JSON.parse(payload.Artwork_Locations);
+        expect(locs).toHaveLength(2);
+        // Kept even with no inches, and marked as Steve's standard.
+        expect(locs[0]).toMatchObject({ placement: 'Left Chest', width: '', height: '', sizeSource: 'standard' });
+        expect(locs[1]).toMatchObject({ placement: 'Full Back', width: '11', sizeSource: 'specified' });
+        // Back-compat single-placement column still points at the first placement.
+        expect(payload.Garment_Placement).toBe('Left Chest');
+    });
+
+    // A legacy draft / quote hand-off has a width but no sizeMode — a real size
+    // the customer saw, so it must not be downgraded to 'standard'.
+    test('Legacy location with a width but no sizeMode counts as customer-specified', () => {
+        global.document = makeDoc({
+            'gsf-company': 'X', 'gsf-customer-id': '', 'gsf-contact-name': '',
+            'gsf-contact-email': '', 'gsf-due-date': '', 'gsf-design-num': '', 'gsf-order-num': '',
+            'gsf-prelim': '', 'gsf-artwork-status': 'New artwork from scratch',
+            'gsf-approval-status': '', 'gsf-color-mode': '', 'gsf-underbase': '',
+            'gsf-pms': '', 'gsf-thread': '', 'gsf-exact-text': '', 'gsf-no-text': { checked: false },
+            'gsf-prev-order': '', 'gsf-prev-design': '', 'gsf-keep-same': '', 'gsf-change': '',
+            'gsf-file-type': '', 'gsf-notes': ''
+        }, ['DTG']);
+
+        var payload = GarmentSubmitForm._buildPayloadForTest({
+            companyName: 'X', aeName: 'Erik', aeEmail: 'e@e.com', salesRep: 'Erik', isRush: false,
+            garmentRows: [{ style: 'PC54', colorName: '', swatch: '', image: '' }],
+            artworkLocations: [{ placement: 'Full Front', width: '10', height: '', notes: '' }],
+            uploaded: []
+        });
+
+        expect(JSON.parse(payload.Artwork_Locations)[0].sizeSource).toBe('specified');
     });
 });
