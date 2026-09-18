@@ -249,15 +249,7 @@ export const lifecycleMethods = {
 
             const applyContact = (contact) => {
                 /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
-                // Email: NEVER blank an address we already have — a ShopWorks contact
-                // with no email on file used to silently wipe it (incl. one prefilled
-                // from a lead, which then hid the quote from that lead's panel).
-                // Kept addresses are flagged in the toast below. Synced with EMB/SCP/DTG
-                // (Rule 8) — Taneisha 2026-09-17.
-                const _emailEl = /** @type {HTMLInputElement} */ (document.getElementById('customer-email'));
-                const _priorEmail = (_emailEl.value || '').trim();
-                const _contactEmail = (contact.ContactNumbersEmail || '').trim();
-                if (_contactEmail) _emailEl.value = _contactEmail;
+                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
                 /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
 
                 // ShopWorks Customer # — the lookup already holds it, yet DTF made the
@@ -297,12 +289,7 @@ export const lifecycleMethods = {
                     });
                 }
 
-                if (!_contactEmail && _priorEmail) {
-                    this.showToast('Customer info loaded — this ShopWorks contact has no email on file, so ' +
-                        _priorEmail + ' was kept. Verify it belongs to this customer.', 'warning', 8000);
-                } else {
-                    this.showToast('Customer info loaded', 'success');
-                }
+                this.showToast('Customer info loaded', 'success');
                 if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
 
                 // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —

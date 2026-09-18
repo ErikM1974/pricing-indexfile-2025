@@ -2,7 +2,7 @@
  * DTG inline form — crm module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-/* global showToast */
+/* global */
 import { syncDesignThumbnail } from './catalog-search.js';
 import { updateSubmitEnabled } from './form-core.js';
 import { scheduleStateSave } from './persistence.js';
@@ -208,14 +208,7 @@ export function wireHistoryPillHandlers() {
 export function applyContact(ct) {
     state.customer.firstName = ct.NameFirst || '';
     state.customer.lastName = ct.NameLast || '';
-    // Email: NEVER blank an address we already have — a contact with no email on
-    // file used to silently wipe it (incl. one prefilled from a lead, which then
-    // hid the saved quote from that lead's "Recent quotes for this email" panel).
-    // Kept addresses are flagged below. Synced with EMB/SCP/DTF (Rule 8) — 2026-09-17.
-    const _priorEmail = (state.customer.email || '').trim();
-    const _contactEmail = (ct.Email || ct.ContactNumbersEmail || '').trim();
-    const _keptPriorEmail = !_contactEmail && !!_priorEmail;
-    state.customer.email = _contactEmail || _priorEmail;
+    state.customer.email = ct.Email || ct.ContactNumbersEmail || '';
     // Phone priority (Erik 2026-05-23): Phone_Best (curated "best phone
     // for this contact" in CompanyContactsMerge2026) → Phone → Company_Phone.
     // Phone_Best is the field reps should treat as authoritative when
@@ -233,10 +226,6 @@ export function applyContact(ct) {
     // Keep the contact picker in sync (highlights which contact is active)
     const picker = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgContactPicker'));
     if (picker && state.customer.contactId) picker.value = state.customer.contactId;
-    if (_keptPriorEmail && typeof showToast === 'function') {
-        showToast('This contact has no email on file, so ' + _priorEmail +
-            ' was kept. Verify it belongs to this customer.', 'warning', 8000);
-    }
     updateSubmitEnabled();
 }
 

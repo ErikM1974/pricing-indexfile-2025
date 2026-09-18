@@ -916,14 +916,7 @@
         if (!box) return;
         if (!lead.Email) { box.innerHTML = '<span class="ld-muted">No email on this lead — link by Quote ID below.</span>'; return; }
         box.innerHTML = '<span class="ld-muted">Checking recent quotes…</span>';
-        // refresh=true is REQUIRED, not an optimisation. GET /api/quote_sessions caches
-        // per-filter for 5 minutes, and opening this lead runs this very lookup — so the
-        // EMPTY "no quotes yet" answer gets cached BEFORE the rep goes off to build one.
-        // Without the bypass, "check again" re-reads that cached empty array and keeps
-        // saying "No quotes for … yet" for up to 5 minutes after the quote was saved
-        // (reported by Taneisha 2026-09-17). The proxy now also invalidates on write, but
-        // that cache is per-dyno while this bypass is not — keep both.
-        sameOriginJson('/api/quote_sessions?refresh=true&customerEmail=' + encodeURIComponent(lead.Email))
+        sameOriginJson('/api/quote_sessions?customerEmail=' + encodeURIComponent(lead.Email))
             .then(function (body) {
                 var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
                 var seen = {};

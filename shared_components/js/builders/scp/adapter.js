@@ -315,15 +315,7 @@ export class ScpAdapter {
                 // same downstream fields + surface the same CRM context.
                 const applyContact = (contact) => {
                     /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
-                    // Email: NEVER blank an address we already have — a ShopWorks contact
-                    // with no email on file used to silently wipe it (incl. one prefilled
-                    // from a lead, which then hid the quote from that lead's panel).
-                    // Kept addresses are flagged in the toast below. Synced with EMB/DTF/DTG
-                    // (Rule 8) — Taneisha 2026-09-17.
-                    const _emailEl = /** @type {HTMLInputElement} */ (document.getElementById('customer-email'));
-                    const _priorEmail = (_emailEl.value || '').trim();
-                    const _contactEmail = (contact.ContactNumbersEmail || '').trim();
-                    if (_contactEmail) _emailEl.value = _contactEmail;
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
                     /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
                     // ShopWorks customer # — so the pushed order attaches to the real
                     // customer instead of the no-customer fallback (2026-06-01).
@@ -356,12 +348,7 @@ export class ScpAdapter {
                         });
                     }
 
-                    if (!_contactEmail && _priorEmail) {
-                        showToast('Customer info loaded — this ShopWorks contact has no email on file, so ' +
-                            _priorEmail + ' was kept. Verify it belongs to this customer.', 'warning', 8000);
-                    } else {
-                        showToast('Customer info loaded', 'success');
-                    }
+                    showToast('Customer info loaded', 'success');
                     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
 
                     // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —
