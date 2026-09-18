@@ -1,3 +1,12 @@
+## v2026.09.18.2 (2026.09.18)
+
+- Memory: lead→quote linkage COMPLETE — app half live v2026.09.18.1 / Heroku 2131
+- Art request: width/height optional, size source recorded
+- Deploy v2026.09.18.2: 6 files (ae-dashboard.html,art-request-detail.html,garment-designer.html,...)
+- Record the location Size select in the CI-enforced browser fixtures
+- Deploy v2026.09.18.2: re-run release gate after browser-fixture update
+- Deploy v2026.09.18.2: record the second location's Size select
+
 ## v2026.09.18.1 (2026.09.18)
 
 - Browser snapshots: read settled layout inside closed details
