@@ -14,7 +14,7 @@
    CustomerDesignCombobox, ScreenPrintPricingService, ScreenPrintQuoteService,
    QuoteOrderSummary, SafetyStripeRecs, initLogoStatusChips,
    initMethodSwitchMenu, checkForEditMode, getQuickQuotePrefill,
-   takeMethodSwitchPrefill, loadServiceCodePrices, getServicePrice,
+   takeMethodSwitchPrefill, applyContactEmail, loadServiceCodePrices, getServicePrice,
    setupBeforeUnloadGuard, showRecentCustomerOrders, removeRecentOrdersPanel,
    renderOrderShippingFields, initOrderShippingListeners,
    setupKeyboardShortcuts, showToast */
@@ -315,7 +315,7 @@ export class ScpAdapter {
                 // same downstream fields + surface the same CRM context.
                 const applyContact = (contact) => {
                     /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
-                    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
+                    const _email = applyContactEmail(document.getElementById('customer-email'), contact.ContactNumbersEmail);
                     /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
                     // ShopWorks customer # — so the pushed order attaches to the real
                     // customer instead of the no-customer fallback (2026-06-01).
@@ -348,7 +348,7 @@ export class ScpAdapter {
                         });
                     }
 
-                    showToast('Customer info loaded', 'success');
+                    showToast(_email.message, _email.type, _email.duration);
                     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
 
                     // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —

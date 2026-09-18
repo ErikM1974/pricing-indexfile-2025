@@ -927,6 +927,13 @@
       "before": "    function esc(value) {\n",
       "after": "    // Only a well-formed PNG data URL from the signature pad is ever rendered (payload text is customer-supplied).\n    function isSafePngDataUrl(value) {\n        return typeof value === 'string' && value.length <= 60000 && /^data:image\\/png;base64,[A-Za-z0-9+/]+=*$/.test(value);\n    }\n\n    function esc(value) {\n",
       "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        box.innerHTML = '<span class=\"ld-muted\">Checking recent quotes…</span>';\n        sameOriginJson('/api/quote_sessions?customerEmail=' + encodeURIComponent(lead.Email))\n            .then(function (body) {",
+      "after": "        box.innerHTML = '<span class=\"ld-muted\">Checking recent quotes…</span>';\n        // refresh=true is REQUIRED, not an optimisation. GET /api/quote_sessions caches\n        // per-filter for 5 minutes, and opening this lead runs this very lookup — so the\n        // EMPTY \"no quotes yet\" answer gets cached BEFORE the rep goes off to build one.\n        // Without the bypass, \"check again\" re-reads that cached empty array and keeps\n        // saying \"No quotes for … yet\" for up to 5 minutes after the quote was saved\n        // (reported by Taneisha 2026-09-17). The proxy now also invalidates on write, but\n        // that cache is per-dyno while this bypass is not — keep both.\n        sameOriginJson('/api/quote_sessions?refresh=true&customerEmail=' + encodeURIComponent(lead.Email))\n            .then(function (body) {",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
     }
   ],
   "retiredStyles": [

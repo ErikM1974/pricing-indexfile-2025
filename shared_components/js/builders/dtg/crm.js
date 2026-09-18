@@ -2,7 +2,7 @@
  * DTG inline form — crm module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-/* global */
+/* global resolveContactEmail, showToast */
 import { syncDesignThumbnail } from './catalog-search.js';
 import { updateSubmitEnabled } from './form-core.js';
 import { scheduleStateSave } from './persistence.js';
@@ -208,7 +208,11 @@ export function wireHistoryPillHandlers() {
 export function applyContact(ct) {
     state.customer.firstName = ct.NameFirst || '';
     state.customer.lastName = ct.NameLast || '';
-    state.customer.email = ct.Email || ct.ContactNumbersEmail || '';
+    // Never blank an address we already hold — see resolveContactEmail() in
+    // quote-builder-utils.js for why (a contact with no email on file used to wipe
+    // a lead-prefilled address and hide the saved quote from that lead).
+    const _email = resolveContactEmail(state.customer.email, ct.Email || ct.ContactNumbersEmail);
+    state.customer.email = _email.value;
     // Phone priority (Erik 2026-05-23): Phone_Best (curated "best phone
     // for this contact" in CompanyContactsMerge2026) → Phone → Company_Phone.
     // Phone_Best is the field reps should treat as authoritative when
@@ -226,6 +230,7 @@ export function applyContact(ct) {
     // Keep the contact picker in sync (highlights which contact is active)
     const picker = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgContactPicker'));
     if (picker && state.customer.contactId) picker.value = state.customer.contactId;
+    if (_email.kept && typeof showToast === 'function') showToast(_email.message, _email.type, _email.duration);
     updateSubmitEnabled();
 }
 

@@ -182,6 +182,7 @@ These files are the single source of truth across all 3 NWCA projects.
 
 ## Documentation Entry Points
 
+- [December Finish Line project guide](memory/december-finish-line.md) — attached planning folders, current financial reports, assumptions, and website integration notes; read when working on 2026 profit, Q4 sales, or December Finish Line.
 - [/memory/CROSS_PROJECT_HUB.md](memory/CROSS_PROJECT_HUB.md) — start here for cross-project work
 - [/memory/LESSONS_LEARNED.md](memory/LESSONS_LEARNED.md) — check first when debugging
 - [/memory/INDEX.md](memory/INDEX.md) — master navigation

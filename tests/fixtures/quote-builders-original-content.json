@@ -1721,6 +1721,104 @@
       "after": "/shared_components/js/embroidery-quote-invoice.js?v=2026.09.13.2",
       "count": 1,
       "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "/**\n * Fill the shared customer fields from a switch payload (all builders use the",
+      "after": "/**\n * Decide the customer email when a looked-up contact is applied, WITHOUT ever\n * blanking an address the rep already has.\n *\n * All 4 builders used to do `emailEl.value = contact.ContactNumbersEmail || ''`,\n * so choosing a ShopWorks customer with no email on file silently WIPED the\n * address already in the field — including one prefilled from a Leads handoff.\n * The quote then saved under a different email and went invisible to that lead's\n * \"Recent quotes for this email\" panel, and since EMB refuses to save without an\n * email it also just blocked reps. (Taneisha, 2026-09-17.)\n *\n * Keeping the prior address silently is not safe either — it may belong to the\n * PREVIOUS customer — so the caller shows `message`/`type`, which say what was\n * kept and ask the rep to verify it (Erik's #1 rule: never a silent wrong value).\n *\n * Pure so the DTG builder, which holds email in module state rather than reading\n * the input, can use the same rule. DOM callers want applyContactEmail() below.\n *\n * @param {string} priorEmail    what the form/state already holds\n * @param {string} incomingEmail the looked-up contact's email (may be empty)\n * @returns {{value:string, kept:string, message:string, type:string, duration:number}}\n */\nfunction resolveContactEmail(priorEmail, incomingEmail) {\n    const prior = (priorEmail || '').trim();\n    const incoming = (incomingEmail || '').trim();\n    const kept = !incoming && prior ? prior : '';\n    return {\n        value: incoming || prior,\n        kept,\n        message: kept\n            ? `Customer info loaded — this ShopWorks contact has no email on file, so ${kept} was kept. Verify it belongs to this customer.`\n            : 'Customer info loaded',\n        type: kept ? 'warning' : 'success',\n        duration: kept ? 8000 : 3000,\n    };\n}\n\n/**\n * DOM wrapper for resolveContactEmail() — reads the input, writes the resolved\n * address back, and hands the caller the toast to show.\n * @param {HTMLInputElement|null} emailEl\n * @param {string} incomingEmail\n */\nfunction applyContactEmail(emailEl, incomingEmail) {\n    const r = resolveContactEmail(emailEl ? emailEl.value : '', incomingEmail);\n    if (emailEl) emailEl.value = r.value;\n    return r;\n}\n\n/**\n * Fill the shared customer fields from a switch payload (all builders use the",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "    window.applyMethodSwitchCustomer = applyMethodSwitchCustomer;\n}",
+      "after": "    window.applyMethodSwitchCustomer = applyMethodSwitchCustomer;\n    window.resolveContactEmail = resolveContactEmail;\n    window.applyContactEmail = applyContactEmail;\n}",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/emb/adapter.js",
+      "before": "   initMethodSwitchMenu, checkForEditMode, getQuickQuotePrefill,\n   clearQuickQuoteParams, takeMethodSwitchPrefill, applyMethodSwitchCustomer,\n   setQuoteDateDefaults, setupBeforeUnloadGuard, showRecentCustomerOrders,",
+      "after": "   initMethodSwitchMenu, checkForEditMode, getQuickQuotePrefill,\n   clearQuickQuoteParams, takeMethodSwitchPrefill, applyMethodSwitchCustomer, applyContactEmail,\n   setQuoteDateDefaults, setupBeforeUnloadGuard, showRecentCustomerOrders,",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/emb/adapter.js",
+      "before": "                /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';\n                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';\n                /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';",
+      "after": "                /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';\n                const _email = applyContactEmail(document.getElementById('customer-email'), contact.ContactNumbersEmail);\n                /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/emb/adapter.js",
+      "before": "                updatePushButtonState();  // customer # set programmatically (no 'input' event) → re-enable Push + refresh checklist (review C9 2026-06-05)\n                showToast('Customer info loaded', 'success');\n",
+      "after": "                updatePushButtonState();  // customer # set programmatically (no 'input' event) → re-enable Push + refresh checklist (review C9 2026-06-05)\n                showToast(_email.message, _email.type, _email.duration);\n",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/scp/adapter.js",
+      "before": "   initMethodSwitchMenu, checkForEditMode, getQuickQuotePrefill,\n   takeMethodSwitchPrefill, loadServiceCodePrices, getServicePrice,\n   setupBeforeUnloadGuard, showRecentCustomerOrders, removeRecentOrdersPanel,",
+      "after": "   initMethodSwitchMenu, checkForEditMode, getQuickQuotePrefill,\n   takeMethodSwitchPrefill, applyContactEmail, loadServiceCodePrices, getServicePrice,\n   setupBeforeUnloadGuard, showRecentCustomerOrders, removeRecentOrdersPanel,",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/scp/adapter.js",
+      "before": "                    /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';\n                    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';\n                    /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';",
+      "after": "                    /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';\n                    const _email = applyContactEmail(document.getElementById('customer-email'), contact.ContactNumbersEmail);\n                    /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/scp/adapter.js",
+      "before": "\n                    showToast('Customer info loaded', 'success');\n                    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick",
+      "after": "\n                    showToast(_email.message, _email.type, _email.duration);\n                    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-lifecycle.js",
+      "before": "   removeRecentOrdersPanel, setupBeforeUnloadGuard, getServicePrice, updateAdditionalCharges,\n   updateFeeTableRows, applyMethodSwitchCustomer, history, clearQuickQuoteParams,\n   assertQuoteEditable, setLtmControlState, getLtmControlState, isValidEmail,",
+      "after": "   removeRecentOrdersPanel, setupBeforeUnloadGuard, getServicePrice, updateAdditionalCharges,\n   updateFeeTableRows, applyMethodSwitchCustomer, applyContactEmail, history, clearQuickQuoteParams,\n   assertQuoteEditable, setLtmControlState, getLtmControlState, isValidEmail,",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-lifecycle.js",
+      "before": "                /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';\n                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';\n                /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';",
+      "after": "                /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';\n                const _email = applyContactEmail(document.getElementById('customer-email'), contact.ContactNumbersEmail);\n                /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-lifecycle.js",
+      "before": "\n                this.showToast('Customer info loaded', 'success');\n                if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick",
+      "after": "\n                this.showToast(_email.message, _email.type, _email.duration);\n                if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/dtg/crm.js",
+      "before": " */\n/* global */\nimport { syncDesignThumbnail } from './catalog-search.js';",
+      "after": " */\n/* global resolveContactEmail, showToast */\nimport { syncDesignThumbnail } from './catalog-search.js';",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/dtg/crm.js",
+      "before": "    state.customer.lastName = ct.NameLast || '';\n    state.customer.email = ct.Email || ct.ContactNumbersEmail || '';\n    // Phone priority (Erik 2026-05-23): Phone_Best (curated \"best phone",
+      "after": "    state.customer.lastName = ct.NameLast || '';\n    // Never blank an address we already hold — see resolveContactEmail() in\n    // quote-builder-utils.js for why (a contact with no email on file used to wipe\n    // a lead-prefilled address and hide the saved quote from that lead).\n    const _email = resolveContactEmail(state.customer.email, ct.Email || ct.ContactNumbersEmail);\n    state.customer.email = _email.value;\n    // Phone priority (Erik 2026-05-23): Phone_Best (curated \"best phone",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
+    },
+    {
+      "file": "shared_components/js/builders/dtg/crm.js",
+      "before": "    if (picker && state.customer.contactId) picker.value = state.customer.contactId;\n    updateSubmitEnabled();",
+      "after": "    if (picker && state.customer.contactId) picker.value = state.customer.contactId;\n    if (_email.kept && typeof showToast === 'function') showToast(_email.message, _email.type, _email.duration);\n    updateSubmitEnabled();",
+      "count": 1,
+      "reason": "Lead-quote linkage fix (Taneisha 2026-09-17): the customer lookup no longer blanks an email the rep already has — shared resolveContactEmail/applyContactEmail in quote-builder-utils.js, called by all 4 builders; the lead panel's quote lookup bypasses the proxy's 5-minute read cache."
     }
   ]
 }

@@ -7,7 +7,7 @@
    initMethodSwitchMenu, getQuickQuotePrefill, takeMethodSwitchPrefill, StaffAuthHelper,
    CustomerLookupService, updateTaxCalculation, showRecentCustomerOrders,
    removeRecentOrdersPanel, setupBeforeUnloadGuard, getServicePrice, updateAdditionalCharges,
-   updateFeeTableRows, applyMethodSwitchCustomer, history, clearQuickQuoteParams,
+   updateFeeTableRows, applyMethodSwitchCustomer, applyContactEmail, history, clearQuickQuoteParams,
    assertQuoteEditable, setLtmControlState, getLtmControlState, isValidEmail,
    QuoteShareModal, showSaveModal, confirm, showDtfPushButton, updateDtfPushButtonState */
 import { dtfState } from './state.js';
@@ -249,7 +249,7 @@ export const lifecycleMethods = {
 
             const applyContact = (contact) => {
                 /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
-                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
+                const _email = applyContactEmail(document.getElementById('customer-email'), contact.ContactNumbersEmail);
                 /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
 
                 // ShopWorks Customer # — the lookup already holds it, yet DTF made the
@@ -289,7 +289,7 @@ export const lifecycleMethods = {
                     });
                 }
 
-                this.showToast('Customer info loaded', 'success');
+                this.showToast(_email.message, _email.type, _email.duration);
                 if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
 
                 // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —

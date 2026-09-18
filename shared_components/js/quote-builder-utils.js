@@ -2052,6 +2052,55 @@ function takeMethodSwitchPrefill() {
 }
 
 /**
+ * Decide the customer email when a looked-up contact is applied, WITHOUT ever
+ * blanking an address the rep already has.
+ *
+ * All 4 builders used to do `emailEl.value = contact.ContactNumbersEmail || ''`,
+ * so choosing a ShopWorks customer with no email on file silently WIPED the
+ * address already in the field — including one prefilled from a Leads handoff.
+ * The quote then saved under a different email and went invisible to that lead's
+ * "Recent quotes for this email" panel, and since EMB refuses to save without an
+ * email it also just blocked reps. (Taneisha, 2026-09-17.)
+ *
+ * Keeping the prior address silently is not safe either — it may belong to the
+ * PREVIOUS customer — so the caller shows `message`/`type`, which say what was
+ * kept and ask the rep to verify it (Erik's #1 rule: never a silent wrong value).
+ *
+ * Pure so the DTG builder, which holds email in module state rather than reading
+ * the input, can use the same rule. DOM callers want applyContactEmail() below.
+ *
+ * @param {string} priorEmail    what the form/state already holds
+ * @param {string} incomingEmail the looked-up contact's email (may be empty)
+ * @returns {{value:string, kept:string, message:string, type:string, duration:number}}
+ */
+function resolveContactEmail(priorEmail, incomingEmail) {
+    const prior = (priorEmail || '').trim();
+    const incoming = (incomingEmail || '').trim();
+    const kept = !incoming && prior ? prior : '';
+    return {
+        value: incoming || prior,
+        kept,
+        message: kept
+            ? `Customer info loaded — this ShopWorks contact has no email on file, so ${kept} was kept. Verify it belongs to this customer.`
+            : 'Customer info loaded',
+        type: kept ? 'warning' : 'success',
+        duration: kept ? 8000 : 3000,
+    };
+}
+
+/**
+ * DOM wrapper for resolveContactEmail() — reads the input, writes the resolved
+ * address back, and hands the caller the toast to show.
+ * @param {HTMLInputElement|null} emailEl
+ * @param {string} incomingEmail
+ */
+function applyContactEmail(emailEl, incomingEmail) {
+    const r = resolveContactEmail(emailEl ? emailEl.value : '', incomingEmail);
+    if (emailEl) emailEl.value = r.value;
+    return r;
+}
+
+/**
  * Fill the shared customer fields from a switch payload (all builders use the
  * same ids) + reveal the manual panel + refresh recap/push state.
  */
@@ -2078,6 +2127,8 @@ if (typeof window !== 'undefined') {
     window.stashMethodSwitchPrefill = stashMethodSwitchPrefill;
     window.takeMethodSwitchPrefill = takeMethodSwitchPrefill;
     window.applyMethodSwitchCustomer = applyMethodSwitchCustomer;
+    window.resolveContactEmail = resolveContactEmail;
+    window.applyContactEmail = applyContactEmail;
 }
 
 // ============================================================

@@ -1692,3 +1692,41 @@ Admin-only dashboard, encrypted generated report package, live read-only sales a
 - `tests/fixtures/finish-line-source-mappings.json`
 - `tests/e2e/css-unification-december-finish-line.spec.js`
 - `memory/december-finish-line.md`
+
+## Lead → quote linkage fix (2026-09-18)
+
+A quote saved for a lead never appeared on that lead. Two causes: the proxy cached
+`GET /api/quote_sessions` per filter for 5 minutes and only `DELETE` invalidated it
+(fixed and LIVE in caspio-pricing-proxy `v2026.09.17.1`), and all 4 builders' customer
+lookup blanked the email field when the ShopWorks contact had none — destroying a
+lead-prefilled address and hiding the quote a second way.
+
+Changed:
+
+- `shared_components/js/quote-builder-utils.js` — new `resolveContactEmail()` (pure) and
+  `applyContactEmail()` (DOM wrapper); browser globals only, like `applyMethodSwitchCustomer`.
+- `shared_components/js/builders/{emb/adapter.js,scp/adapter.js,dtf/methods-lifecycle.js}` —
+  `applyContact` calls the shared helper (one line each, so DTF's `init` stays under the
+  150-line ratchet); a kept address is flagged in the toast.
+- `shared_components/js/builders/dtg/crm.js` — same rule via the pure resolver (DTG holds
+  email in module state, not the input).
+- `dashboards/js/lead-workspace.js` — the lead's quote lookup sends `refresh=true`; the proxy
+  cache is per-dyno, so invalidation alone can still miss.
+- `shared_components/js/types/globals.d.ts` — declares the two helpers as bare globals.
+
+Added:
+
+- `scripts/record-content-lock-change.js` — computes the `{before, after, count}` ledger rows
+  that the content-lock suites need for an intentional edit, replaying each fixture's own
+  pre-transform chain (quick-quote mappings) so the snippets match what the test sees, and
+  refusing to write unless the rows reverse to the pre-edit source exactly. Use it for
+  `tests/fixtures/{quote-builders,lead-records}-original-content.json`; the external
+  `qq-classic-checkpoint/gen_mappings.py` remains the tool for ledgers with no pre-transform.
+- `tests/unit/contact-email-preserve.test.js` — locks the never-blank-a-filled-email rule.
+
+Updated fixtures: `tests/fixtures/quote-builders-original-content.json`,
+`tests/fixtures/lead-records-original-content.json` (recorded rows for the above).
+
+No cache-bust needed: all 4 builder pages and `dashboards/lead.html` are in
+`lib/hashed-pages.js`, so `scripts/build.js` content-hashes their assets and the `?v=` is
+stripped at build time.

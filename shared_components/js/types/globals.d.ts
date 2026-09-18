@@ -399,6 +399,8 @@ declare const SafetyStripeRecs: any; // T4 lift — bare-global page contract
 declare const StaffAuthHelper: any; // T4 lift — bare-global page contract
 declare const addNewRow: any; // T4 lift — bare-global page contract
 declare const applyMethodSwitchCustomer: any; // T4 lift — bare-global page contract
+declare const applyContactEmail: any; // T4 lift — bare-global page contract
+declare const resolveContactEmail: any; // T4 lift — bare-global page contract
 declare const autoExpandFeesOnFirstCharge: any; // T4 lift — bare-global page contract
 declare const childRowId: any; // T4 lift — bare-global page contract
 declare const cleanProductTitle: any; // T4 lift — bare-global page contract

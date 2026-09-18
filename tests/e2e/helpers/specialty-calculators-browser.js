@@ -116,7 +116,19 @@ async function open(page, state = {}) {
 
 async function snapshot(page) {
     return page.evaluate(() => {
-        const visible = (node) => !!node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden';
+        // Inside a closed <details>, Chrome can answer the first layout query with no boxes after other code
+        // walked that content (the whole-page ARIA snapshot Playwright records when an expect on a hidden
+        // element fails). Read until two answers agree so visibility is the settled layout, not the stale one.
+        const boxes = (node) => {
+            let count = node.getClientRects().length;
+            for (let read = 0; read < 3; read++) {
+                const next = node.getClientRects().length;
+                if (next === count) break;
+                count = next;
+            }
+            return count;
+        };
+        const visible = (node) => boxes(node) > 0 && getComputedStyle(node).visibility !== 'hidden';
         const norm = (text) => text.replace(/\s+/g, ' ').trim(), ids = {};
         for (const node of document.querySelectorAll('[id]')) {
             if (visible(node) && !node.querySelector('[id]') && !['SCRIPT', 'STYLE'].includes(node.tagName)) ids[node.id] = norm(node.innerText || node.textContent);
