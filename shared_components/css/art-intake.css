@@ -2427,12 +2427,36 @@
         display: grid;
         gap: 12px;
         min-width: 0;
-        grid-template-columns: minmax(0, 1.3fr) minmax(88px, 0.55fr) minmax(88px, 0.55fr) minmax(0, 1.8fr);
+        grid-template-columns: minmax(0, 1.2fr) minmax(196px, 0.85fr) minmax(0, 1.7fr);
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field {
         margin-bottom: 0;
         gap: 5px;
+    }
+
+    @media (width <= 1000px) {
+        :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    :where([data-ui="unified"][data-art-intake]) .gsf-loc-dims {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-art-intake]) .gsf-loc-dim {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-art-intake]) .gsf-loc-dims[hidden],
+    :where([data-ui="unified"][data-art-intake]) .gsf-loc-std-hint[hidden] {
+        display: none;
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-row-remove {
@@ -3541,7 +3565,7 @@
             grid-row: 2;
         }
 
-        :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field:first-child, :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field:last-child {
+        :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field:first-child, :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field:last-child, :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-loc-size {
             grid-column: 1 / -1;
         }
 

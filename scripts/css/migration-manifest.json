@@ -513,7 +513,7 @@
         "rawCssBytes": 352636,
         "localCssRequests": 12
       },
-      "measuredRawCssBytes": 282594,
+      "measuredRawCssBytes": 283314,
       "maxCssBytes": 284642,
       "estimatedGzipCssBytes": 37576
     },
@@ -4563,7 +4563,7 @@
       "test": "tests/e2e/css-unification-lead-records.spec.js",
       "maxCssBytes": 131624,
       "measuredRawCssBytes": 129576,
-      "measuredTriggeredCssBytes": 248147,
+      "measuredTriggeredCssBytes": 248867,
       "baseline": {
         "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
         "rawCssBytes": 186763,
@@ -5574,7 +5574,7 @@
         "rawCssBytes": 159871,
         "localCssRequests": 4
       },
-      "measuredTriggeredCssBytes": 247718,
+      "measuredTriggeredCssBytes": 248438,
       "runtimeBoundary": {
         "status": "reviewed",
         "note": "Shared garment form uses scoped art-intake.css through the existing compatibility import. AE, lead, Quote View and designer reviewed at four widths with original prefill, complete scrolling, keyboard/focus and every print page. Original successful payloads preserved; no business writes."
@@ -6846,7 +6846,7 @@
         "visible-action-toast-contrast-and-hidden-action-keyboard-exclusion"
       ],
       "test": "tests/e2e/css-unification-garment-designer.spec.js",
-      "measuredRawCssBytes": 274101,
+      "measuredRawCssBytes": 274817,
       "maxCssBytes": 275965,
       "baseline": {
         "commit": "8763d6dba64bec28ea82a3bf4887cf5625ca4033",

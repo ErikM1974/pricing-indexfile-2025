@@ -2,17 +2,24 @@
 
 Taneisha reported that a quote she built and saved for the **Velco Electrical** lead never
 appeared on that lead — the panel kept saying *"No quotes for velasco.d26@gmail.com yet."*
-Two independent defects. **Half is live; half is unfinished.** This file is the resume point.
+Two independent defects. **Both halves are now LIVE.**
 
-## Status
+## Status — COMPLETE
 
 | Half | State |
 |---|---|
 | Proxy — cache invalidation | ✅ **LIVE** `v2026.09.17.1` / Heroku **v1135** (`/api/health` verified) |
-| App — `refresh=true` + email preserve | ⏭️ **UNFINISHED** on `origin/fix/lead-quote-cache`, CI RED |
+| App — `refresh=true` + email preserve | ✅ **LIVE** `v2026.09.18.1` / Heroku **v2131** (`a90dafc3`) |
 
-`develop` was `git revert`'d back to green after the red CI (code byte-identical to the last
-green commit `570902cd`); the LESSONS commit stayed. **Nothing app-side reached production.**
+Live proof for the app half: `https://www.teamnwca.com/dist/shared_components/js/quote-builder-utils.f2da768a00.js`
+serves the minified `resolveContactEmail`. The hash is content-derived, so its presence *is* the
+proof the new file shipped.
+
+The app half took two attempts. The first (2026-09-17) went red on CI and was `git revert`'d off
+`develop`; the second rebuilt it against the content locks and the function-length ratchet. The
+reverts are still in `develop`'s history, so **never merge the old `fix/lead-quote-cache` branch** —
+merging a branch whose commits `develop` reverted re-undoes the fix. It was rebuilt as one clean
+commit (`1cce56f8`) on top of the reverts instead.
 
 ## Defect 1 — stale read cache (FIXED, live)
 
@@ -45,29 +52,44 @@ Fix on the branch: preserve a non-empty address; because a kept address may belo
 PREVIOUS customer, a warning toast says so and asks the rep to verify (never silent).
 Sites: `emb/adapter.js`, `scp/adapter.js`, `dtf/methods-lifecycle.js`, `dtg/crm.js` (Rule 8).
 
-## To finish (next session)
+## How it was finished — the two gates, and how to clear them next time
 
-Branch `origin/fix/lead-quote-cache` — worktree at `C:\Users\erik\wt-lead-quote-fix`.
-Cache-bust `2026.09.17.3` is already applied (only `lead-workspace.js` carries a `?v=`; the
-builder modules are ESM imports served through the content-hashed bundle, and Heroku's
-`heroku-postbuild` → `scripts/build.js` rehashes them).
+Both are legitimate repo guards, not flakes:
 
-CI is red on two gates, both legitimate:
+1. **`tests/unit/builders-function-length.test.js`** — the added lines pushed DTF's
+   `init()` to 157 (limit 150, `dtf` allowlist is empty). Fixed properly by extracting the
+   rule into ONE shared helper so each builder's edit is a single line — `init()` went back
+   under without an allowlist entry. Prefer that over freezing a new entry.
 
-1. **`tests/unit/builders-function-length.test.js`** — the ~10 added lines push DTF's
-   `applyContact` past the 150-line ratchet. Extract a helper (preferred) or allowlist it.
-2. **Content-lock drift guards** — `quote-builders-content`, `lead-records-content` and
-   `crm-workspaces-content` hash-lock these files ("preserves original builder logic …
-   outside **recorded** presentation changes"). The four changed files need re-recording in
-   the fixture ledger, same process as hash-locked HTML.
+2. **Content-lock drift guards** (`quote-builders-content`, `lead-records-content`,
+   `crm-workspaces-content`) — these hash each locked file back to a recorded original, and an
+   intentional edit is legal only with a `{before, after, count}` row that reverses it. Rows are
+   replayed in REVERSE array order, so a new row is APPENDED and reversed first.
+   Use **`scripts/record-content-lock-change.js <base-ref> [--write] [--only=…]`** (added with
+   this fix): it computes the rows from the real sources, replays each fixture's own
+   pre-transform chain, and refuses to write unless they reverse exactly.
 
-🔑 **App `node_modules` is EMPTY** in the OneDrive checkout — no local jest or eslint, so CI is
-the only gate and content locks surface only *after* pushing. Install deps first, or expect a
-push/fix cycle.
+🔑 **Two ledgers, and one of them THROWS.** `tests/helpers/quick-quote-source-mappings.js` runs
+BEFORE the quote-builders ledger and throws `Quick Quote workflow mapping drift` if any of its
+rows' counts change. Editing the `module.exports` line of `quote-builder-utils.js` tripped it —
+the helpers were left as browser globals instead (which matches `applyMethodSwitchCustomer`, and
+a jsdom test loads the file via a `<script>` tag to cover them). For a ledger with no
+pre-transform, the external `qq-classic-checkpoint/gen_mappings.py` is the tool.
 
-🔴 The OneDrive checkout is chronically stale (was 86 commits behind) and shows ~3,482
-"modified" files that are **pure CRLF churn, no content change**. Work from a worktree; commit
-path-scoped (`git commit -- <paths>`) because its index holds thousands of pre-staged files.
+🔑 **No `?v=` cache-bust was needed, and adding one is actively harmful here.** All 4 builder
+pages AND `dashboards/lead.html` are in `lib/hashed-pages.js`, so `scripts/build.js` strips the
+`?v=` and content-hashes the asset; Heroku's `heroku-postbuild` rebuilds on every deploy. Bumping
+`?v=` only edits locked HTML and drags in the second ledger for no benefit. Check
+`lib/hashed-pages.js` before bumping anything.
+
+🔑 **`dist/` wrecks local test runs.** A local `npm run build` leaves 27 MB that quadrupled
+file-scan time (58s → 220s) and timed out `css-runtime-inventory` and `emb-edit-reload-roundtrip`
+— which reads exactly like a regression. It is gitignored; `rm -rf dist` before running
+`npm run test:unit`.
+
+🔑 **The app checkout's `node_modules` was empty**, which is why the locks only surfaced in CI the
+first time. `npm ci` in a worktree outside OneDrive gives a real local gate (lint, typecheck,
+unit, dom, a11y) — do that first.
 
 ## Still open — the real design gap
 
