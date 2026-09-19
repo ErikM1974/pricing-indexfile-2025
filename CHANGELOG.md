@@ -1,3 +1,7 @@
+## v2026.09.19.2 (2026.09.19)
+
+- Deploy v2026.09.19.2: add staff-reviewed ShopWorks push for embroidery web quotes
+
 ## v2026.09.19.1 (2026.09.19)
 
 - Memory: AE art request optional size + the six systems locking that form
