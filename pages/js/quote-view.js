@@ -2393,6 +2393,15 @@ class QuoteViewPage {
         const isProcessed = status === 'Processed' || status === 'Processed - ShopWorks Failed';
         const isCancelled = status === 'Cancelled_in_ShopWorks';
 
+        // Old sync probes wrote Pending even when a WQ was never submitted.
+        // Only an actual submission marker or linked order proves a push.
+        const wqPush = (this.quoteId || '').startsWith('WQ')
+            ? data?.sessionRaw?.PushedToShopWorks || this.quoteData?.PushedToShopWorks : null;
+        if ((this.quoteId || '').startsWith('WQ') && !wqPush && !sw?.orderNumber) {
+            strip.hidden = true;
+            return;
+        }
+
         // CANCELLED state — show the dedicated banner instead of the sync strip.
         const cancelledBanner = document.getElementById('sw-cancelled-banner');
         if (isCancelled && cancelledBanner) {
@@ -2410,7 +2419,7 @@ class QuoteViewPage {
         if (cancelledBanner) cancelledBanner.hidden = true;
 
         // Hide the strip on legacy quotes (never pushed, no sync info available).
-        if (!isProcessed && !sw) {
+        if (!isProcessed && !sw && !wqPush) {
             strip.hidden = true;
             return;
         }
@@ -2434,6 +2443,10 @@ class QuoteViewPage {
             variant = 'imported';
             pillText.textContent = `ShopWorks #${sw.orderNumber}`;
             pillIcon.textContent = '✓';
+        } else if (String(wqPush || '').startsWith('WQ-REVIEW:')) {
+            variant = 'unknown';
+            pillText.textContent = 'Submission needs verification';
+            pillIcon.textContent = '?';
         } else if (swStatus === 'Pending') {
             variant = 'pending';
             pillText.textContent = 'Pending import';
@@ -5282,6 +5295,7 @@ class QuoteViewPage {
      */
     _pushRoute() {
         const id = this.quoteId || '';
+        if (id.startsWith('WQ')) return { api: '/api/web-quote-push/push-quote', extPrefix: 'NWCA', itemFilter: null };
         if (id.startsWith('EMB')) return { api: '/api/embroidery-push/push-quote', extPrefix: 'NWCA-EMB', itemFilter: (i) => i.EmbellishmentType === 'embroidery' };
         if (id.startsWith('SP')) return { api: '/api/scp-push/push-quote', extPrefix: 'NWCA-SCP', itemFilter: null };
         if (id.startsWith('DTF')) return { api: '/api/dtf-push/push-quote', extPrefix: 'NWCA-DTF', itemFilter: null };
@@ -5310,6 +5324,8 @@ class QuoteViewPage {
     async handlePushClick() {
         const btn = document.getElementById('push-shopworks-btn');
         if (!btn || btn.disabled) return;
+
+        if ((this.quoteId || '').startsWith('WQ')) return this.openWebQuotePush();
 
         const route = this._pushRoute();
         if (!route) return;
@@ -5385,6 +5401,11 @@ class QuoteViewPage {
         const label = document.getElementById('push-shopworks-label');
         if (!btn || !label) return;
 
+        if (String(timestamp || '').startsWith('WQ-REVIEW:')) {
+            label.textContent = 'Check ShopWorks submission';
+            btn.disabled = true;
+            return;
+        }
         const dateStr = timestamp ? this.formatDate(timestamp) : '';
         label.textContent = dateStr ? `Pushed ${dateStr}` : 'Pushed';
         btn.disabled = true;
@@ -5398,6 +5419,91 @@ class QuoteViewPage {
     showPushToast(message, type = 'info') {
         const show = window.ToastNotifications[type] || window.ToastNotifications.info;
         show.call(window.ToastNotifications, message);
+    }
+
+    openWebQuotePush() {
+        if (!this.isStaff) return;
+        const dialog = document.getElementById('wq-push-dialog');
+        const customer = document.getElementById('wq-customer-number');
+        const previewButton = document.getElementById('wq-preview-btn');
+        const submit = document.getElementById('wq-push-submit');
+        const cancel = document.getElementById('wq-push-cancel');
+        const confirmBox = document.getElementById('wq-push-confirm');
+        const confirmLabel = document.getElementById('wq-push-confirm-label');
+        const output = document.getElementById('wq-push-preview');
+        const error = document.getElementById('wq-push-error');
+        let preview = null;
+        let busy = false;
+        let locked = false;
+        const reset = () => { preview = null; output.hidden = true; confirmLabel.hidden = true; confirmBox.checked = false; submit.disabled = true; };
+        const showError = (message) => { error.textContent = message; error.hidden = false; };
+        const setBusy = (value) => {
+            busy = value; customer.disabled = value || locked; previewButton.disabled = value || locked;
+            cancel.disabled = value; confirmBox.disabled = value || locked;
+            submit.disabled = value || locked || !preview || !confirmBox.checked;
+        };
+        const request = async (operation, body) => {
+            const response = await fetch(`/api/web-quote-push/${operation}`, {
+                method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quoteId: this.quoteId, ...body })
+            });
+            const data = await response.json();
+            if (!response.ok) throw Object.assign(new Error(data.error || 'Unable to complete this action.'), { code: data.code });
+            return data;
+        };
+        reset(); error.hidden = true;
+        customer.value = this.quoteData.CustomerNumber || '';
+        setBusy(false);
+        customer.oninput = reset;
+        confirmBox.onchange = () => setBusy(false);
+        const dismiss = () => { if (!busy) this.closeDialog(dialog); };
+        cancel.onclick = dismiss;
+        document.getElementById('wq-push-form').onsubmit = async (event) => {
+            event.preventDefault();
+            if (busy || locked) return;
+            reset(); error.hidden = true; setBusy(true);
+            previewButton.textContent = 'Loading preview…';
+            try {
+                preview = await request('preview', { customerNumber: customer.value.trim() });
+                output.replaceChildren();
+                const heading = document.createElement('p');
+                heading.textContent = `${preview.customerName} — ShopWorks #${preview.customerNumber}. Reference: ${preview.extOrderId}`;
+                output.append(heading);
+                const list = document.createElement('ul');
+                for (const item of preview.items) {
+                    const row = document.createElement('li');
+                    const sizes = item.sizes ? Object.entries(item.sizes).map(([size, qty]) => `${size}: ${qty}`).join(', ') : '';
+                    row.textContent = `${item.style} · ${item.color || item.description || ''} · ${sizes || 'Qty: ' + item.quantity} · ${item.location || 'Service'} · $${Number(item.total).toFixed(2)}`;
+                    list.append(row);
+                }
+                output.append(list);
+                const total = document.createElement('p');
+                total.textContent = `Saved subtotal: $${Number(preview.subtotal).toFixed(2)} · Artwork files: ${preview.artworkCount}. Tax and shipping require review.`;
+                output.append(total); output.hidden = false; confirmLabel.hidden = false;
+            } catch (e) { showError(e.message); }
+            finally { previewButton.textContent = 'Preview order'; setBusy(false); }
+        };
+        submit.onclick = async () => {
+            if (busy || locked || !preview || !confirmBox.checked) return;
+            setBusy(true); error.hidden = true; submit.textContent = 'Submitting…';
+            try {
+                const data = await request('push-quote', { customerNumber: preview.customerNumber, previewToken: preview.previewToken });
+                this.quoteData.PushedToShopWorks = data.timestamp;
+                this.setPushButtonPushedState(data.timestamp);
+                this.showPushToast(`Submitted ${data.extOrderId} for import on hold.`, 'success');
+                if (this.fullData) this.renderSyncStrip({ ...this.fullData, shopWorks: { status: 'Pending' }, sessionRaw: this.quoteData });
+                this.closeDialog(dialog);
+            } catch (e) {
+                reset();
+                // A lost response can follow a successful submission. Block this
+                // dialog until a fresh page/server check; never blindly retry.
+                if (e.code !== 'PREVIEW_CHANGED') {
+                    locked = true;
+                    showError(`${e.message} Check ShopWorks before trying again. Reload this quote to check its saved submission status.`);
+                } else showError(e.message);
+            } finally { submit.textContent = 'Push to ShopWorks'; setBusy(false); }
+        };
+        this.openDialog(dialog, dismiss, '#wq-customer-number');
     }
 }
 

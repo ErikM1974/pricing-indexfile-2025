@@ -598,6 +598,32 @@
             </footer>
         </div>
 
+        <!-- Staff web-quote review; customer quotes remain frozen. -->
+        <dialog id="wq-push-dialog" class="ui-dialog modal qv-dialog" aria-labelledby="wq-push-title">
+            <div class="modal-content">
+                <div class="modal-header"><h2 id="wq-push-title">Review ShopWorks import</h2></div>
+                <div class="modal-body">
+                    <p>Embroidery web quotes import on hold. Confirm artwork, tax, shipping and payment in ShopWorks before releasing the order.</p>
+                    <form id="wq-push-form">
+                        <div class="form-group">
+                            <label for="wq-customer-number">ShopWorks customer number</label>
+                            <input id="wq-customer-number" class="field-input" inputmode="numeric" pattern="[1-9][0-9]{0,8}" required autocomplete="off">
+                        </div>
+                        <button class="btn btn-secondary" id="wq-preview-btn" type="submit">Preview order</button>
+                    </form>
+                    <p id="wq-push-error" class="qv-form-error" role="alert" hidden></p>
+                    <div id="wq-push-preview" aria-live="polite" hidden></div>
+                    <label class="choice" id="wq-push-confirm-label" hidden>
+                        <input type="checkbox" id="wq-push-confirm"> I verified the customer, items and subtotal. Import this order on hold.
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="wq-push-cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="wq-push-submit" disabled>Push to ShopWorks</button>
+                </div>
+            </div>
+        </dialog>
+
         <!-- Accept Quote Modal -->
         <dialog id="accept-modal" class="ui-dialog modal qv-dialog" aria-label="Accept Quote">
             <div class="modal-content">
@@ -681,6 +707,6 @@
     <script src="/shared_components/js/toast-notifications.js?v=2026.09.08.3"></script>
     <!-- Proxy host for product-image lookups (Rule 6) -->
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/quote-view.js?v=2026.09.13.6"></script>
+    <script src="/pages/js/quote-view.js?v=2026.09.19.2"></script>
 </body>
 </html>

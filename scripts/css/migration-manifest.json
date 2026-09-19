@@ -5564,7 +5564,11 @@
         "change-notice-severities",
         "four-widths",
         "print",
-        "holiday-request-priced-complimentary-draft"
+        "holiday-request-priced-complimentary-draft",
+        "web-quote-push-preview",
+        "web-quote-push-on-hold",
+        "web-quote-push-uncertain",
+        "web-quote-push-customer-validation"
       ],
       "test": "tests/e2e/css-unification-quote-view.spec.js",
       "maxCssBytes": 131115,

@@ -382,5 +382,11 @@ for (const method of ['embroidery', 'dtf', 'scp']) {
     quotePushForward((req) => `${method}-push/preview/${encodeURIComponent(req.params.quoteId)}`));
 }
 
+// WQ preview also takes the selected customer number; both operations are staff-only.
+for (const operation of ['preview', 'push-quote']) {
+  app.post(`/api/web-quote-push/${operation}`, requireStaff, quotePlaneWriteLimiter,
+    quotePushForward(() => `web-quote-push/${operation}`));
+}
+
 // =============================================================================
 };

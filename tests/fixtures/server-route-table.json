@@ -471,6 +471,7 @@
   "get /api/quote-sequence/:prefix [quoteSequenceLimiter]",
   "post /api/${method}-push/push-quote [requireStaff, quotePushForward(() => `${method}-push/push-quote`)] (nested)",
   "get /api/${method}-push/preview/:quoteId [requireStaff, quotePushForward((req) => `${method}-push/preview/${encodeUR] (nested)",
+  "post /api/web-quote-push/${operation} [requireStaff, quotePlaneWriteLimiter, quotePushForward(() => `web-quote-push/${operation}`)] (nested)",
   "post /api/garment-waiver/send-link [requireStaff, sendLinkLimiter] (nested)",
   "post /api/garment-waiver/signed [signedLimiter] (nested)",
   "get /api/quote_items/quote/:quoteId []",

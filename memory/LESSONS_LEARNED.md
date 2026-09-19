@@ -231,3 +231,10 @@ Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHI
 - Root cause: packaged-app LocalAppData redirection, Windows PowerShell 5.1 long-path limits, and worktree .git pointer files that reference history outside the checkout. OneDrive cloud placeholders are reparse points but are not directory junctions.
 - Solution: install under C:\Users\erik\.nwca-code-backup, run PowerShell 7, include uncovered Git common directories, skip actual links, encrypt with a separate recovery key, and decrypt/extract/hash-check every file before publishing to OneDrive.
 - Prevention: test the actual scheduled action with default arguments and long paths. Treat placement in the OneDrive folder separately from confirmed cloud upload. Save the recovery key off this computer; local-only keys cannot recover a lost device.
+
+## Web quotes need their own ShopWorks mapping and submission evidence (2026-09-19)
+
+- Problem: a WQ could show Pending import without ever having a push option; treating it as a staff EMB quote can lose options/artwork or alter rounded totals.
+- Root cause: sync probes persisted Pending, while WQ keeps decoration groups and artwork in Notes JSON and authoritative cents in each LineTotal.
+- Solution: staff-only WQ preview/confirmed push, active customer lookup, exact-cent size expansion, catalog-color validation and on-hold import. CAS reservation persists before sending, with visible verification state after uncertain outcomes; no force retry.
+- Prevention: distinguish queued submission from verified import, reject unroutable lines and recorded payments, bind confirmation to fresh data, and test concurrent requests/timeouts without real orders. See MANAGEORDERS_COMPLETE_REFERENCE.md.
