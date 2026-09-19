@@ -1,4 +1,5 @@
 const restorePreHoliday = require('../helpers/holiday-source-mappings');
+const restorePreWebQuotePush = require('../helpers/web-quote-push-source-mappings');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {JSDOM}=require('jsdom');
 const {scenes,posts,denied,retired,serverFunctions}=require('../e2e/helpers/server-pages-scenes');
@@ -17,7 +18,7 @@ test('server styles use defined tokens without important overrides',()=>{
 });
 
 test.each(Object.keys(original.hashes))('%s preserves source outside documented response/style edits',file=>{
- let source=restorePreHoliday(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));
+ let source=restorePreHoliday(file, restorePreWebQuotePush(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n')));
  for(const change of original.changes.filter(c=>c.file===file).reverse()){
   expect(source.split(change.after).length-1).toBe(change.count);
   source=source.split(change.after).join(change.before);

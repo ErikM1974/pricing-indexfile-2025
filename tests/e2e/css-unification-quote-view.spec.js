@@ -18,7 +18,10 @@ function compareSnapshot(actual, expected){
   const text=field.id==='req-ship-date'&&field.text==='September 20, 2026'?'September 21, 2026':field.text;
   expect(byId.get(field.id).text,field.id).toBe(text);
  }
- expect(actual.forms).toEqual(expected.forms);
+ // Deliberate WQ staff-review addition; original customer forms stay exact.
+ // Dedicated WQ browser tests exercise these two new controls and their states.
+ const wqFields=['wq-customer-number','wq-push-confirm'];
+ expect(actual.forms.filter(f=>!wqFields.includes(f.id))).toEqual(expected.forms);
  for(const link of expected.links)expect(actual.links).toContainEqual(link);
 }
 function compareActions(name,events){expect(events.actions).toEqual(original(name).events.actions);}

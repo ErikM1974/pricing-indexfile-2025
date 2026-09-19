@@ -69,6 +69,8 @@ describe('quote_analytics postures', () => {
 });
 
 describe('sequence + push relays', () => {
+    assertRegistration(/app\.post\(`\/api\/web-quote-push\/\$\{operation\}`,\s*requireStaff,\s*quotePlaneWriteLimiter/,
+        'WQ preview and push require staff and rate limiting');
     assertRegistration(/app\.get\('\/api\/quote-sequence\/:prefix',\s*quoteSequenceLimiter/,
         'quote-sequence mint relay is rate-limited (staff skip)');
     assertRegistration(/app\.post\(`\/api\/\$\{method\}-push\/push-quote`,\s*requireStaff/,

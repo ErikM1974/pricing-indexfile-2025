@@ -8,6 +8,7 @@ Last Updated: 2026-09-18 (/memory-maintain: MEMORY.md 23.6→17.4 KB — top shi
 
 | File | What it holds |
 |---|---|
+| [`MANAGEORDERS_COMPLETE_REFERENCE.md`](MANAGEORDERS_COMPLETE_REFERENCE.md) | Current WQ embroidery preview/push, exact totals, persistent duplicate guard and recovery; historical master remains archived |
 | [`253gear-analytics-access.md`](253gear-analytics-access.md) | 253gear Google/GA4 property access — who owns what, why never to re-verify |
 | [`253gear-publisher.md`](253gear-publisher.md) | 253Gear design publisher — built + deployed, awaiting first real design |
 | [`253gear-store-metrics.md`](253gear-store-metrics.md) | 253gear Shopify store metrics, catalogue fixes, ShopifyQL gotchas |

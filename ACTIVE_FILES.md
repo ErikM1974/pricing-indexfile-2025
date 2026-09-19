@@ -1,5 +1,11 @@
 # Active Files Registry
 
+- `tests/helpers/web-quote-push-source-mappings.js` and `tests/fixtures/web-quote-push-source-mappings.json` — reversible mappings for the deliberate WQ feature addition; historical source hashes are unchanged.
+- `memory/MANAGEORDERS_COMPLETE_REFERENCE.md` — current WQ integration implementation and recovery procedure; notes the earlier reference's archived status.
+
+- `tests/e2e/css-unification-web-quote-push.spec.js` — synthetic staff WQ import preview, customer confirmation, error/duplicate states and four-width dialog checks. No live order submissions.
+- WQ push uses existing `pages/quote-view.html`, `pages/js/quote-view.js` and staff relays in `routes/quote-delete.js`; backend owners: `C:/dev/caspio-pricing-proxy/lib/web-quote-push.js` and `src/routes/web-quote-push.js`.
+
 - `shared_components/js/builders/shared/modal-dialog.js` — **NEW (2026-09-17)** native modal dialog helper for the quote builders (focus wrap, one Escape, focus return); used by the DTG confirms and the embroidery goods, names and manual-item dialogs. Listed in docs/active-files/services-and-components.md.
 
 - `email-templates/holiday-box-customer.html` and `email-templates/holiday-box-sales.html` — shared-theme sources for server-sent holiday request confirmations; provider IDs `holiday_box_customer` / `holiday_box_sales`.
