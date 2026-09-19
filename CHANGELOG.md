@@ -1,3 +1,19 @@
+## v2026.09.19.1 (2026.09.19)
+
+- Memory: AE art request optional size + the six systems locking that form
+- Docs: canonical working directories after the move off OneDrive
+- Docs: tell Codex the canonical working directories too
+- Memory: /memory-maintain pass — index compacted, 10 lessons archived, paths repointed
+- Skill: point /memory-maintain at the live auto-memory slug
+- Memory: Shipping Procedures summary corrected to $4.00; one box-fee occurrence left
+- Memory: box fee settled at $4.00 across every live policy
+- Memory: Contract Embroidery Guide rates corrected from Caspio
+- Memory: ShopWorks Cheat Sheet ES stitch rule corrected
+- Memory: Promotional Products & Drinkware brought in line with JDS
+- Memory: banner minimum checked — the real finding is csr-faqs vs the LTM thresholds
+- Memory: csr-faqs minimums aligned to the LTM thresholds
+- Deploy v2026.09.19.1: finalize local repository paths and backup recovery guidance
+
 ## v2026.09.18.2 (2026.09.18)
 
 - Memory: lead→quote linkage COMPLETE — app half live v2026.09.18.1 / Heroku 2131
