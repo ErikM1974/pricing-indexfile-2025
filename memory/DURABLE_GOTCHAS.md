@@ -18,7 +18,7 @@ first time — `MEMORY.md` is machine-local and unversioned, so these were one b
 Related: [LESSONS_LEARNED.md](LESSONS_LEARNED.md) is the full bug log (problem → root cause → fix →
 prevention); this file is the compressed, always-relevant residue. Architecture *rules* live in
 `CLAUDE.md`. Files named `feedback_*.md` and `user_*.md` live in the machine-local auto-memory tree
-at `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/`.
+at `~/.claude/projects/C--dev-pricing-index/memory/`.
 
 ---
 

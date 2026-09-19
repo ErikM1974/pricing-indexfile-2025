@@ -217,3 +217,17 @@ Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHI
 - Problem/root cause: SCP floored its LTM share before multiplication; EMB/SCP PDFs read rounded DOM text. Saved customer views preferred base prices, and screen-print handoffs had no returned row ID.
 - Solution: retain exact per-unit values for output, allocate saved row cents cumulatively, display billed totals/quantity and return the created product row. Keep API fees authoritative and display customer LTM inside unit prices.
 - Prevention: real Quick Quote-to-builder numeric handoffs for every method plus cap puff/patch/back-only, small quantities 3/7/23/24/37, screen/PDF consistency, seven-row fractional cents and saved/customer-cart checks. Check a real supplier-photo PDF too: external images need the same-origin relay for canvas access even when HTML displays them. See QUICK_QUOTE_2026-09.md.
+
+## Repository moves must update consumers, not just Git (2026-09-18)
+
+- Problem: after moving the three repositories to `C:\dev`, saved projects and helper instructions still selected retired OneDrive copies; the backend DTG parity check silently skipped its frontend comparison.
+- Root cause: saved desktop roots, Claude memory slugs and sibling folder names are independent of the Git remote and worktree metadata.
+- Solution: repointed app-server projects, active helper/config paths and the export destination; the parity test now resolves `../pricing-index` and passes with the real sibling present. The desktop caches its project roots and overwrites on-disk edits while running. An initial child helper exited with the app before applying the paths; the replacement runs independently under Windows Management Instrumentation and applies the desktop roots after app exit. Verified after the second restart: the completion log reports success, all 7 live/saved local projects resolve under `C:\dev`, and the current worktree uses `C:\dev\pricing-index\.git`.
+- Prevention: audit active filesystem references after a move, verify worktrees resolve to the new `.git`, and run cross-repository checks with both siblings present. Preserve historical folders and business-document links.
+
+## Windows scheduled code backups must preserve recoverability (2026-09-18)
+
+- Problem: an interactive backup script can fail under Task Scheduler or omit the history needed to recover a linked Git worktree.
+- Root cause: packaged-app LocalAppData redirection, Windows PowerShell 5.1 long-path limits, and worktree .git pointer files that reference history outside the checkout. OneDrive cloud placeholders are reparse points but are not directory junctions.
+- Solution: install under C:\Users\erik\.nwca-code-backup, run PowerShell 7, include uncovered Git common directories, skip actual links, encrypt with a separate recovery key, and decrypt/extract/hash-check every file before publishing to OneDrive.
+- Prevention: test the actual scheduled action with default arguments and long paths. Treat placement in the OneDrive folder separately from confirmed cloud upload. Save the recovery key off this computer; local-only keys cannot recover a lost device.

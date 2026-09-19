@@ -6,7 +6,7 @@ You are working with an existing Git repository that is already set up and confi
 
 ### Current Project Location
 ```
-c:/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025
+C:/dev/pricing-index
 ```
 
 ### Repository Information

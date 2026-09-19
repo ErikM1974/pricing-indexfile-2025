@@ -550,8 +550,8 @@ Erik asked to stop so he can shut down his laptop and resume later today. Work i
 
 ### Durable pointers and separate backlog
 
-- Frontend repo: C:/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025
-- Backend repo: C:/Users/erik/OneDrive - Northwest Custom Apparel/2025/caspio-pricing-proxy
+- Frontend repo: C:/dev/pricing-index
+- Backend repo: C:/dev/caspio-pricing-proxy
 - Artifacts and copied logs: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Start with pause-checkpoint-2026-09-08.json; art-live-verification.json records the live CSS release.
 - Prepared but NOT run: commit-transfer-frontend-source.cjs and verify-transfer-frontend-live.cjs. The source helper can still prepare a cache-bump commit after this checkpoint, but inspect it and current ownership first. Frontend/backend release preparation helpers have not yet been created. Do not rerun older integration or art-release mutation helpers.
 - Node 22 runtime and full-gate/Git helpers were under the Windows TEMP directory. The artifacts preserve copies for resume; temporary files may need restoring after restart. Use corporate certificate handling, never disable TLS verification, and never change global safe.directory to work around the sandbox identity.
