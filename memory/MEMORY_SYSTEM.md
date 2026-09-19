@@ -68,13 +68,13 @@
 
 We have **two** memory directories. Know the difference:
 
-- **`~/.claude/projects/<proj>/memory/`** — Claude's **auto-memory**. Machine-local, **NOT in git**, and on this OneDrive checkout it can be **silently reverted** mid-session. Holds the `MEMORY.md` index + modern per-fact files (`user_`/`feedback_`/`project_`/`reference_`) + a few topic files. **Treat as volatile.**
+- **`~/.claude/projects/<proj>/memory/`** — Claude's **auto-memory**. Machine-local, **NOT in git**, and can drift between sessions or machines. Holds the `MEMORY.md` index + modern per-fact files (`user_`/`feedback_`/`project_`/`reference_`) + a few topic files. **Treat as volatile.**
 - **repo `/memory/`** — git-tracked, shared across machines, survives. The durable references, guides, `LESSONS_LEARNED`, and session docs. **This is the canonical store.**
 
 **Rules:**
 1. Anything that must survive a machine change or be shared → put it in the **repo tree** (or commit it there).
 2. When a topic exists in **both** trees, the **repo copy is canonical**; the auto-memory keeps only a **one-line pointer**, never a second full copy. (Two divergent copies of a pricing/tax fact is a wrong-price risk — Erik's #1 rule.)
-3. After editing any repo memory file, **`git commit` immediately** — committed objects survive the OneDrive revert; working-tree edits may not.
+3. Review and commit repo memory changes with the related work. Repositories now live under `C:\dev` (2026-09-18); the former OneDrive immediate-commit workaround is retired.
 
 ---
 
@@ -102,7 +102,7 @@ Durable **rules/gotchas** graduate the other way: when a shipped item proves a l
 
 - **Every substantive session** updates memory per the decision tree above — it's part of finishing the task, not a separate ask (CLAUDE.md "Auto-Update Memory").
 - **Run `/memory-maintain`** when MEMORY.md > ~22 KB, LESSONS_LEARNED > 250 lines, or roughly monthly. It compacts the index, archives resolved lessons, de-dupes across the two trees, and regenerates `INDEX.md`.
-- **OneDrive:** commit memory edits immediately; re-Read/grep on disk after editing — never trust the edit-success message alone (this checkout reverts silently).
+- **Local workspaces:** use `C:\dev\{pricing-index,caspio-pricing-proxy,inksoft-transform}`. Verify saved edits on disk; keep repository work outside OneDrive.
 - **Naming a new repo topic file:** `SCREAMING_SNAKE_YYYY-MM.md` for dated session/audit docs, `kebab-case.md` for durable references. **Always add a line to `INDEX.md`** when you create one.
 
 ---

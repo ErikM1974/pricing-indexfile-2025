@@ -9,7 +9,7 @@
 **6 conflicts (hub says one thing, decks taught another) — Erik still has to decide; NOT changed in the hub**
 1. Per-box handling fee: Shipping Procedures + 6-16 cheat sheet say **$4.50/box**; 9-8 and 9-15 shipping trainings/scripts say **$4.00/box**. The new Shipping Charges SOP uses $4.00 "as trained" and both pages carry an "Open item for Erik" note.
 2. LTM presentation: hub = separate $50 line for embroidery (≤7 pcs, per-piece price unchanged); 2-6 huddle "included in unit price"; 2-5 training used 1–23 pcs for contract/AL; live builders fold it into unit prices (v2026.09.13.6).
-3. Contract Embroidery Guide still says **$40/hour** art cleanup (everything else GRT-75 $75/hr) and has no price list; Caspio contract card changed 2026-09-02.
+3. ~~Contract Embroidery Guide $40/hour art cleanup~~ — RESOLVED 2026-09-18: corrected to **$75/hour (GRT-75, 15-min increments)**, and a shop-labour line added (bench **$100.00/hr** = SHOP-BENCH-QH $25/qh; machine time **$150.00/hr** = SHOP-MACHINE-QH $37.50/qh). Both verified live.
 4. Three stitch-allowance versions: formulas page (8,000 incl., 2024 multiplier model) vs ShopWorks cheat sheet (ES >12,000 @ $0.75/1K) vs 2-17 training (10,000 incl.; +$4 for 10,001–15,000; +$10 for 15,001–25,000; 4 thread colours free, +$1/colour) vs 8-12 Fountainhead ($17 base incl. 10K, +$4 high-stitch). The draft "Embroidery Pricing Structure 2026" lists all of them as open items.
 5. Christmas dates: 8-4 "opens Oct 1, final Nov 2" vs every later deck "Oct 1 deadline". The draft "Holiday & Seasonal Order Calendar 2026" shows both readings as "to be settled".
 6. Showroom banner "Group Orders 12-piece minimum" vs LTM minimums 8/24/48; golf page digitizing offer read as $100/$109/$189 on different slides — verify live page (flagged in the golf draft).
@@ -44,6 +44,113 @@
 
 - Handbook two-way check: only `incentive-programs-2026` carries employment content; it defers to Bonus & Incentives and Handbook Ch 7/19/20, no contradiction. Proposed handbook additions (NOT applied, handbook is the higher authority): Ch 12 line that a Go Home Early release is an approved early departure still logged in TimeClick; Bonus & Incentives line that time-boxed sales incentives exist alongside the profit-margin bonus.
 - Prices re-checked against Caspio and the live cards won over both documents: LTM $50 at ≤7 pieces for standard/AL/DECG (5 Feb "1–23" slide stale); DECG-FB $100 LTM at ≤7, min 25,000 stitches; AS-Garm/AS-CAP bands (≤10K incl., +$4 to 15K, +$10 to 25K) are live for the first logo, AL/DECG use $1.25 per 1K above 8,000 (caps $1.00 above 5,000 AL / 8,000 DECG); contract card 2 Sep 2026 = no fee, $250 min, 72+ 8K example $6.80; sticker 3x3@50 = $98 (slide $128 was a typo), 4x4/5x5 500 and 1,000 columns filled from the live grid, >6" = custom decal $12/sq ft $90 min; banners $10/sq ft $40 min; golf digitizing = standard $100 DD, free on $2,000+ (slides' $189/$109 superseded); GRT-75 $75/h confirmed; plate engraving $25 has NO Service_Codes row (kept as taught).
-- "Newer wins" where Caspio has no value: box fee $4.00 (Shipping Procedures corrected from $4.50 in the same edit; its Summary field still needs the same fix); Christmas window = opens Oct 1, best orders in before October, final order date Nov 2; Holiday Gift Box close Oct 15 added to the calendar.
+- "Newer wins" where Caspio has no value: box fee $4.00 (Shipping Procedures corrected from $4.50 in the same edit; its Summary field was corrected to $4.00 on 2026-09-18 (verified live)); Christmas window = opens Oct 1, best orders in before October, final order date Nov 2; Holiday Gift Box close Oct 15 added to the calendar.
 - Every "confirm with Erik / to be settled / verify before publishing" line was rewritten into published wording; the dry-run diff of all 17 patches was reviewed before applying.
-- Still conflicting in already-published pages (not drafts): Contract Embroidery Guide $40/hr, ShopWorks Cheat Sheet ES stitch rule ($0.75/1K over 12K, not in Caspio), Promotional Products & Drinkware (pre-JDS mug-press text), showroom banner 12-piece minimum.
+- Still conflicting in already-published pages (not drafts): showroom banner 12-piece minimum.
+
+## Box fee — CLOSED 2026-09-18
+
+A full scan of all 158 live policies for `$4.50` / `$4.00` (2026-09-18) found the retired
+box fee in ONE more published document: **`onboarding-department-tour`** ("New-Hire Department
+Tour & Factory Training Guide") — body text, one occurrence, in both `Body_Plain` and
+`Body_HTML`: "Calculate freight (add the $4.50/box handling fee if it is not added
+automatically)". It is the guide new hires are trained from, so it actively taught the wrong
+number. CORRECTED to $4.00 on 2026-09-18 (Body_HTML, verified; the server re-derived Body_Plain).
+
+The other `$4.50` hits are unrelated: `pricing-negotiation-policy` uses it as a 15%-discount
+example. `$4.00` in `embroidery-pricing-structure-2026` is a stitch upcharge, not the box fee.
+
+No Employee Handbook policy mentions the per-box fee, so there is no handbook conflict.
+
+**Re-scanned all 158 live policies after both edits: every box-fee reference now reads $4.00.**
+The only surviving `$4.50` strings are correct — `pricing-negotiation-policy` uses it as a
+15%-discount example, and `shipping-charges-and-conversations` records the history of this very
+correction. Both Shipping Procedures fields (Summary + body) and the new-hire guide agree.
+
+## Contract Embroidery Guide rates — CLOSED 2026-09-18
+
+🔑 **The $40/hour was an ARTWORK rate, not shop labour.** It sat in the guide's Artwork section
+("we subcontract graphic artwork and charge $40/hour if we have to clean up your logo"), so
+swapping in the bench/machine rates would have mispriced artwork and newly contradicted the five
+policies that already say $75/hour (`artwork-pricing-and-services`, `artwork-intake-and-submission`,
+`art-department-expectations`, `artwork-rights-and-licensing`, `express-ordering-and-ai-artwork`).
+
+Erik chose to do both: correct the artwork rate AND document the shop rates. Caspio Service_Codes
+is the source for all three figures — GRT-75 $75; SHOP-BENCH-QH $25/quarter-hour = $100/hour;
+SHOP-MACHINE-QH $37.50/quarter-hour = $150/hour.
+
+⏭️ `SHOP-JOB-MIN` ($100) exists in Caspio but was deliberately NOT added to the guide — Erik did
+not ask for a job minimum in the contract terms.
+
+## ShopWorks Cheat Sheet ES stitch rule — CLOSED 2026-09-18
+
+The ES row read "Over 12,000 stitches — $0.75 per 1,000 extra stitches". Verified against
+Caspio: **no service code implements that rule**. The only per-1K code is `VOL-THREAD-PER-1K`
+($0.02), an internal thread/material cost input for Volume Quote — not a customer charge.
+
+🔑 **Two stitch models are in force, and they are both legitimate** — the cheat sheet had a third,
+retired one:
+
+1. **First logo on goods NWCA supplies** → the Caspio "Stitch Surcharges" rail, `AS-Garm` /
+   `AS-CAP`, three active+visible rows each: ≤10,000 included ($0), 10,001–15,000 **+$4.00**,
+   15,001–25,000 **+$10.00**.
+2. **Add Logo and customer-supplied** → per 1,000 above a base: **$1.25/1,000 above 8,000** on
+   garments; **$1.00/1,000 above 5,000** on Add Logo caps and **above 8,000** on customer-supplied
+   caps.
+
+Both were already resolved on 15 Sep 2026 and written into the live
+`embroidery-pricing-structure-2026`, which states outright that the cheat sheet rule "is not in
+Caspio and should not be quoted" — the cheat sheet simply never got the edit. Now carries both
+models with the AS codes cited. `ES` appears in no other live policy.
+
+## Promotional Products & Drinkware pre-JDS text — CLOSED 2026-09-18
+
+The page framed drinkware as a category still to be brought in-house "with a **mug press +
+sublimation**". That is not how it happened. Per the live `laser-engraving-plates-and-jds`
+policy, **JDS Industries supplies the blanks** (starting with the **Polar Camel** tumbler line)
+and NWCA decorates them in-house **on the Trotec laser** — engraving, not sublimation.
+
+Rewrote that section and the Summary to match, and pointed readers at the JDS policy for the
+item list, the JDS Product art-form tab and the Polar Camel Mockup Creator. The Mark Venit
+"sell promo defensively, ~3–5% of revenue" framing is unchanged — only the drinkware mechanism
+was wrong.
+
+🔑 No figures were invented: JDS work is priced from Caspio (`JDS-SETUP` $75, `JDS-LABOR` $2.99,
+`JDS-LOGO2` $3.16, `JDS-LTM` $50, `JDS-MARGIN` 0.53), and the page now says to quote from there
+rather than from itself.
+
+⏭️ Still open from this review: the showroom banner 12-piece minimum — see the check below.
+
+## Showroom banner 12-piece minimum — CHECKED 2026-09-18 (needs an Erik decision, not an edit)
+
+**The banner itself is physical signage.** "Group Orders … 12-piece minimum" appears nowhere in the
+repo (no `GROUP ORDERS` string in any html/js/json/md) and in no live policy. Nothing to edit here —
+if the sign is wrong it needs reprinting.
+
+🔑 **"12 pieces" is NOT globally wrong** — it is correct in at least three other places, so never
+blanket-replace it: JDS drinkware LTM (`laser-tumbler-mockup.js` `LTM_THRESHOLD = 12`, matching
+Caspio `JDS-LTM` "per order under 12 pieces"), 3-Day Tees LTM (`3DT-LTM` $75 under 12), and the
+customer-supplied embroidery minimum (sales-coordinator manual + training schedule).
+
+### What the check actually turned up: `csr-faqs` vs the LTM thresholds
+
+`csr-faqs` is live and customer-facing. Its minimum table disagrees with
+`ltm-order-decision-algorithm` on two rows that cost money:
+
+| Method | csr-faqs "minimum" | LTM fee clears at | Verdict |
+|---|---|---|---|
+| Embroidery garments | 12 pieces | 8 | Defensible — FAQ calls these "recommended minimums for the best pricing" |
+| **Embroidery caps** | **24 caps** | **8** | 🔴 3× the real threshold. The LTM doc says "our minimum for caps is just 8 pieces, and at that point the per-hat price drops a lot" — the FAQ turns away profitable 8–23 cap orders |
+| DTG | 24 shirts | 24 | ✅ agrees |
+| **DTF** | **10 pieces** | **24** | 🔴 FAQ is LOWER than the fee threshold. A customer told "10 is fine" gets a surprise $50 prorated LTM fee — Erik's #1 rule territory |
+| Screen printing | 72 shirts | 48 | Defensible — the LTM doc prefers 72+ for best per-piece price |
+
+**DECIDED by Erik 2026-09-18: caps -> 8, DTF -> 24.** Both corrected in `csr-faqs` and verified live.
+Garments (12) and screen print (72) deliberately left as-is — the page frames its table as
+"recommended minimums for the best pricing", which legitimately sits above a fee threshold, and DTG
+(24) already agreed. A re-scan of all 158 live policies found no other page stating "24 caps" or a
+10-piece DTF minimum; the only remaining "10 pieces" is a correct worked example in `ltm-fee-policy`
+that reinforces DTF = 24.
+
+The FAQ minimum table now reads: embroidery garments 12 · **embroidery caps 8** · DTG 24 ·
+**DTF 24** · screen printing 72 · customer-supplied at discretion · promo varies.

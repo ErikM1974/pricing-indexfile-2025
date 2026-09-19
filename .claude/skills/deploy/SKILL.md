@@ -145,7 +145,7 @@ burns a version number and writes a CHANGELOG entry with nothing under it.
 ### Step 0.5 — MEMORY.md size gate
 
 ```bash
-MEMFILE="$HOME/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md"
+MEMFILE="$HOME/.claude/projects/C--dev-pricing-index/memory/MEMORY.md"
 LINES=$(wc -l < "$MEMFILE")
 
 if [ "$LINES" -gt 180 ]; then
@@ -1268,8 +1268,8 @@ than re-derived each time.
 | The release contents were never printed before the merge | Code and docs are split and the code half is printed with per-file commit attribution |
 | A `WIP` / "do not deploy" commit on develop shipped silently | Hard abort before the merge, with `DEPLOY_ALLOW_WIP=1` as the deliberate override |
 
-`/deploy` releases everything on `develop`, not just the current session's work, and a shared
-OneDrive checkout means several sessions commit there concurrently. Step 3.6a already guarded the
+`/deploy` releases everything on `develop`, not just the current session's work. Parallel
+sessions may commit in the shared local checkout concurrently. Step 3.6a already guarded the
 working tree; nothing guarded the commit log, so a half-finished change committed by another
 session would ride out to production under someone else's release tag.
 

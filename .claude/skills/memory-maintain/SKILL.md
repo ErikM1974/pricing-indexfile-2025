@@ -11,14 +11,14 @@ Runs the upkeep that keeps NWCA's Claude memory loading fully, routing correctly
 Memory rots in three ways: the auto-loaded `MEMORY.md` index bloats past its 24 KB budget and **silently truncates** (bottom entries stop loading); `LESSONS_LEARNED.md` hits its 300-line cap; and the same fact gets restated in two files (or both memory trees) and the copies **diverge** — a wrong-price risk under Erik's #1 rule. This skill fixes all three.
 
 ## Two memory trees (know which you're touching)
-- **Auto-memory** `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/` — machine-local, NOT git, can be silently reverted. Holds `MEMORY.md` + per-fact files.
+- **Auto-memory** `~/.claude/projects/C--dev-pricing-index/memory/` — machine-local, NOT git, can be silently reverted. Holds `MEMORY.md` + per-fact files.
 - **Repo memory** `<repo>/memory/` — git-tracked, canonical. Holds durable refs, `LESSONS_LEARNED*`, `INDEX.md`, topic files, `MEMORY_SYSTEM.md`.
 
 ## Procedure
 
 ### 0. Measure (always)
 ```bash
-CL="$HOME/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory"
+CL="$HOME/.claude/projects/C--dev-pricing-index/memory"
 wc -lc "$CL/MEMORY.md"                       # budget: < 24576 bytes
 wc -l  memory/LESSONS_LEARNED.md             # cap 300, target < 250
 git status --short                            # note any PARALLEL-session dirt — never stage it
@@ -35,7 +35,7 @@ The reference sections (Sync Rules, Gotchas, Caspio schema, Backend, etc.) are d
 ### 2. Archive LESSONS_LEARNED.md (if > 250 lines)
 - Identify the **oldest RESOLVED one-time fixes** (specific bug shipped + locked by a test) — NOT recurring rules / active architecture invariants.
 - Move each full entry to `LESSONS_LEARNED_ARCHIVE.md` (unbounded) under a dated `## Archived YYYY-MM-DD` section; leave a **1-line keep-alive stub** in the active file (`### <title> (<date>, ARCHIVED <today>): <one rule>. Full entry in archive.`).
-- Do this as a **single Python write per file** (this repo's OneDrive checkout silently reverts piecemeal edits — see `feedback_onedrive_edit_silent_fail`), then verify on disk with grep.
+- Do this as a **single Python write per file** (one atomic write beats piecemeal edits; the repo left OneDrive on 2026-09-18, but the discipline stands), then verify on disk with grep.
 - To get under the 250 *target* (not just the 300 cap): graduate foundational always-true rules (falsy-zero, Caspio pagination, pricing-from-API, parity disciplines) OUT of the bug log into CLAUDE.md Critical Patterns, leaving a pointer.
 
 ### 3. De-dupe across trees (the drift killer)
@@ -45,7 +45,7 @@ The reference sections (Sync Rules, Gotchas, Caspio schema, Backend, etc.) are d
 ### 4. Regenerate INDEX.md
 - `git ls-files memory` → diff against `INDEX.md`. Remove orphan links (files that no longer exist), add missing files (or deliberately exclude one-time session logs), bump "Last Updated".
 
-### 5. Commit (OneDrive-revert guard) — repo files only
+### 5. Commit — repo files only
 Stage **only the memory files you changed** (never the parallel-session dirt from step 0):
 ```bash
 git add -- memory/LESSONS_LEARNED.md memory/LESSONS_LEARNED_ARCHIVE.md memory/INDEX.md memory/MEMORY_SYSTEM.md
@@ -59,6 +59,6 @@ One or two sentences: sizes before→after, what was archived/de-duped, and any 
 
 ## Guardrails
 - **Verify before you delete** — a fact only leaves the index/log if its detail is confirmed elsewhere.
-- **Never stage another session's files** — a shared OneDrive checkout means `git status` can show dirt you didn't create. Stage explicit paths only.
+- **Never stage another session's files** — parallel sessions and worktrees mean `git status` can show dirt you didn't create. Stage explicit paths only.
 - **Keep the reference sections of MEMORY.md verbatim** — they're the durable core; compaction only touches the shipped-log.
 - **One fact, one home** — the point of this pass is to *remove* duplication, not relocate it.

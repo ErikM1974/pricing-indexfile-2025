@@ -201,71 +201,33 @@ Exact-source CI must pass its actual browser/parity jobs, including credentials 
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
 
-## 2026-09-12: Background calculator rendering must not move keyboard focus
-
-Problem: screen-print price initialization could steal focus from thumbnails or another control. Root cause: rendering the small-order quantity field scheduled a delayed focus callback, just like explicit tier selection. Solution: render the field without focusing during refresh, and focus synchronously for explicit tier selection. Prevention: preserve keyboard focus through initialization and check the correct quantity field after choosing a small-order tier.
-
-Browser baselines must work from a fresh checkout. The tumbler export test previously depended on an ignored local original PNG. It now renders the preserved original controller in an isolated browser context and compares the actual download in the same browser, without changing immutable fixtures.
-
-## Quick Quote must distinguish unavailable stock and fresh print state (2026-09-12)
-
-- Problem/root cause: inventory errors disappeared; old async replies and cached rate-card markup could outlive the current selection. Layout rules exposed native hidden controls, and touch-height defaults orphaned paper footers.
-- Solution: clear old stock before each lookup, check the request generation, show a persistent unknown-stock warning with retry, and print a rate card only after its content is rebuilt for the current request. Restore screen print state afterward; scope hidden, keyboard and paper rules to both Quick Quote pages.
-- Prevention: preserve financial controller hashes and browser amounts; test failed-stock retry, keyboard price/quantity selection, failed rate-card preparation and narrow table scrolling. Visually inspect complete PDFs and long phone layouts; text assertions alone miss split currency and orphaned footers.
-
-
-## Scoped reference pages need explicit print and failure modes (2026-09-12)
-
-- Problem/root cause: shared navigation print rules hid the reference title; an old blanket contract-print rule hid ordinary pricing; a missing stitch response silently retained default fees.
-- Solution: give the reference header an explicit paper display, distinguish active-tab/account/contract print modes, open and restore disclosures, keep reference cards together, and fail visibly when required pricing is missing.
-- Prevention: preserve exact financial functions, exercise API rejection and recovery, and review complete PDFs alongside keyboard/dialog checks. Replace private customer initializers with synthetic records before test execution; never copy private controller data into a reversal ledger.
-
-
-## Quote requests must acknowledge a confirmed save (2026-09-12)
-
-- Problem/root cause: the fast request service ignored its database failure result and continued into email and the success screen; a submission handler relied on the implicit event target, so clicking its icon could bypass the button lock.
-- Solution: require a successful database result before confirming or emailing, select and lock the actual submit button, retain fields on failure and provide persistent accessible validation/retry.
-- Prevention: mock database rejection and retry, click both the button and its icon, assert one pending request and unchanged successful payloads; inspect narrow actions and every printed page.
-
-## Shared quote documents must await their external styles (2026-09-12)
-
-- Problem/root cause: document.write can report a complete document before linked print styles load; fixed print timers can open an unformatted quote. Chromium protocol interception also suppresses resource loading in these popup documents during tests.
-- Solution: all four builders await the shared invoice generator's stylesheet/image/font readiness with a bounded visible failure. Invoice tests serve real local assets and route business fetches through the same synthetic handler before releasing protocol interception.
-- Prevention: assert exactly one print after a delayed stylesheet, zero prints after a failed required stylesheet, original financial totals/payloads and full phone/paper layouts. Never weaken a missing-styles check to accommodate a test harness.
-
-## Quote tables need ink and page-break checks (2026-09-12)
-
-- Problem/root cause: DOM totals can be correct while narrow auto-sized columns split quantities or clip cents; grid cards can fragment into blank print frames.
-- Solution/prevention: use explicit numeric column widths and scrollable screen regions, assert actual printed currency ink fits cells, and inspect every PDF page with customer/order groups kept together.
-
-## Quote controls need complete column and field ownership (2026-09-12)
-
-- Problem/root cause: screen-print empty rows spanned only 13 of 14 columns, so horizontal scrolling clipped instructions; generic input padding overrode shipping currency spacing. Hidden native ink radios and mouse-only expanders blocked keyboard operation.
-- Solution: match both initial/reset column spans, use named shipping field styles with sufficient specificity, retain native focusable radios and reuse keyboard delegation for fees/order sections. Share artwork and customer controls with method-scoped layout rules.
-- Prevention: assert far-right scroll geometry, numeric text/currency clearance, arrow/Enter/Space operation, exact original prices and saved fields, every paper page, and all embroidery scenes after shared-style changes. Assert timed notices immediately at their trigger before comparing four-width layouts.
-
-## Notifications and runtime style ownership (2026-09-12)
-
-- Problem/root cause: sample notifications repeatedly loaded icons and rendered behind the native cart dialog; narrow messages lacked a width bound. The runtime census missed stylesheet links embedded in template strings and mistook data-invoice-style for inline CSS.
-- Solution: reuse the bundled icon link, render an accessible manual popover in the active dialog, bound/wrap the notification and retain focus; parse generated stylesheet links and distinguish style attributes from data attributes. Include every reviewed stylesheet in the actual expanded lint result.
-- Prevention: exercise each notification type at four widths, real failed-stock add, focus, text escaping, timed removal and print hiding. Reconcile shared-source evidence against the same immutable baseline instead of changing its hashes.
-
-## Server response templates need explicit style and escaping contracts (2026-09-13)
-
-- Problem/root cause: blog styles referenced tokens their response never loaded; access notices interpolated raw staff names, and JSON-LD could close its script when a title contained HTML.
-- Solution: serve canonical tokens/components and scoped blog/status styles; escape names as text and encode less-than signs in serialized JSON-LD. Authorization and HTTP/SEO behavior stay with the original callers.
-- Prevention: preserve original response content, links and metadata; test malicious names/titles, anonymous and authorized gates, keyboard exits with unavailable CSS, four widths and every printed page. Keep reviewed server owners in the runtime census after closing their backlog entries.
-
-## Faded action notices must leave keyboard navigation (2026-09-13)
-
-- Problem/root cause: the garment designer hid notices only with opacity, leaving their action controls in keyboard navigation; a full browser run also sampled the fading text during a contrast scan.
-- Solution: give dismissed notices an explicit hidden visibility state and honor reduced-motion preferences. Update old shared-safety checks to expect the now-migrated builder bodies.
-- Prevention: test the fully visible notice with contrast checks at four widths, activate its action by keyboard, and verify both the message and action are hidden afterward. Retain immutable originals and run the entire application gate before deployment.
-
-- Related capture rule: check expiring product-cart notices separately from multi-viewport page snapshots. Preserve their exact original text/link, visible contrast and keyboard dismissal before comparing permanent content. Original fixtures remain immutable; changing machine speed must not change the expected page contract.
+### 2026-09-12: Background calculator rendering must not move keyboard focus (ARCHIVED 2026-09-18): Render the small-order quantity field without focusing during refresh; focus only on explicit tier selection. Full entry in archive.
+### Quick Quote must distinguish unavailable stock and fresh print state (2026-09-12) (ARCHIVED 2026-09-18): Clear stale stock before each lookup, check the request generation, and rebuild a rate card before printing it. Full entry in archive.
+### Scoped reference pages need explicit print and failure modes (2026-09-12) (ARCHIVED 2026-09-18): Give the reference header an explicit paper display; fail visibly when required pricing is missing. Full entry in archive.
+### Quote requests must acknowledge a confirmed save (2026-09-12) (ARCHIVED 2026-09-18): Require a successful database result before confirming or emailing; lock the actual submit button, not the event target. Full entry in archive.
+### Shared quote documents must await their external styles (2026-09-12) (ARCHIVED 2026-09-18): All four builders await the shared invoice generator's stylesheet/font readiness with a bounded visible failure. Full entry in archive.
+### Quote tables need ink and page-break checks (2026-09-12) (ARCHIVED 2026-09-18): Use explicit numeric column widths and assert printed currency ink fits the cell — correct DOM totals can still clip cents. Full entry in archive.
+### Quote controls need complete column and field ownership (2026-09-12) (ARCHIVED 2026-09-18): Match initial and reset column spans; keep native focusable radios and reuse keyboard delegation. Full entry in archive.
+### Notifications and runtime style ownership (2026-09-12) (ARCHIVED 2026-09-18): The runtime census must parse stylesheet links inside template strings and not mistake data-invoice-style for inline CSS. Full entry in archive.
+### Server response templates need explicit style and escaping contracts (2026-09-13) (ARCHIVED 2026-09-18): Serve canonical tokens with every response; escape staff names as text and encode "<" in serialized JSON-LD. Full entry in archive.
+### Faded action notices must leave keyboard navigation (2026-09-13) (ARCHIVED 2026-09-18): Opacity alone does not remove a notice from keyboard navigation — dismissed notices need an explicit hidden visibility state. Full entry in archive.
 
 ## Inclusive customer pricing must preserve exact totals (2026-09-13)
 
 - Problem/root cause: SCP floored its LTM share before multiplication; EMB/SCP PDFs read rounded DOM text. Saved customer views preferred base prices, and screen-print handoffs had no returned row ID.
 - Solution: retain exact per-unit values for output, allocate saved row cents cumulatively, display billed totals/quantity and return the created product row. Keep API fees authoritative and display customer LTM inside unit prices.
 - Prevention: real Quick Quote-to-builder numeric handoffs for every method plus cap puff/patch/back-only, small quantities 3/7/23/24/37, screen/PDF consistency, seven-row fractional cents and saved/customer-cart checks. Check a real supplier-photo PDF too: external images need the same-origin relay for canvas access even when HTML displays them. See QUICK_QUOTE_2026-09.md.
+
+## Repository moves must update consumers, not just Git (2026-09-18)
+
+- Problem: after moving the three repositories to `C:\dev`, saved projects and helper instructions still selected retired OneDrive copies; the backend DTG parity check silently skipped its frontend comparison.
+- Root cause: saved desktop roots, Claude memory slugs and sibling folder names are independent of the Git remote and worktree metadata.
+- Solution: repointed app-server projects, active helper/config paths and the export destination; the parity test now resolves `../pricing-index` and passes with the real sibling present. The desktop caches its project roots and overwrites on-disk edits while running. An initial child helper exited with the app before applying the paths; the replacement runs independently under Windows Management Instrumentation and applies the desktop roots after app exit. Verified after the second restart: the completion log reports success, all 7 live/saved local projects resolve under `C:\dev`, and the current worktree uses `C:\dev\pricing-index\.git`.
+- Prevention: audit active filesystem references after a move, verify worktrees resolve to the new `.git`, and run cross-repository checks with both siblings present. Preserve historical folders and business-document links.
+
+## Windows scheduled code backups must preserve recoverability (2026-09-18)
+
+- Problem: an interactive backup script can fail under Task Scheduler or omit the history needed to recover a linked Git worktree.
+- Root cause: packaged-app LocalAppData redirection, Windows PowerShell 5.1 long-path limits, and worktree .git pointer files that reference history outside the checkout. OneDrive cloud placeholders are reparse points but are not directory junctions.
+- Solution: install under C:\Users\erik\.nwca-code-backup, run PowerShell 7, include uncovered Git common directories, skip actual links, encrypt with a separate recovery key, and decrypt/extract/hash-check every file before publishing to OneDrive.
+- Prevention: test the actual scheduled action with default arguments and long paths. Treat placement in the OneDrive folder separately from confirmed cloud upload. Save the recovery key off this computer; local-only keys cannot recover a lost device.
